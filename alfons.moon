@@ -21,9 +21,13 @@ files = {
   "Alfons"
   "alfons"
   "Alfons.moon"
-  "alfons.moon"
+  --"alfons.moon"
   "Alfons.lua"
   "alfons.lua"
+  "Alfons-moon"
+  "alfons-moon"
+  "Alfons-lua"
+  "alfons-lua"
 }
 
 load_alfons = (f) ->
@@ -39,11 +43,9 @@ load_alfons = (f) ->
       when "lua"               then lf = loadfile
       when "moon","moonscript" then lf = ms.loadfile if ms
   env     = gen_env!
-  fn, err = lf f, "t", env
+  fn, err = lf f, "t", env, {}
   error "Could not load file #{f}, #{err}" if err
   fn!
-  i = require "inspect"
-  print i env
   return env
 
 print ltext.arrow "Finding files..."
@@ -59,4 +61,4 @@ error "Must be called from command line!" if not arg
 print ltext.arrow "Reading tasks..."
 for i=1,#arg
   print ltext.bullet arg[i], false
-  if alfons[arg[i]] then alfons[arg[i]]!
+  if alfons[arg[i]] then alfons[arg[i]] arg[i]
