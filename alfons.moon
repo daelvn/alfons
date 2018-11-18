@@ -17,7 +17,6 @@ gen_env = -> {
   -- Provided standard modules
   :coroutine
   :table
-  :utf8
   :io
   :os
   :string
@@ -76,13 +75,35 @@ load_alfons = (f) ->
   fn!
   return env
 
+load_alfons_51 = (f) ->
+  local lf
+  if f\match "lua"           then lf = loadfile
+  if (f\match "moon") and ms then lf = ms.loadfile
+  else
+    fh   = io.open f, "r"
+    dump = fh\read "*all"
+    fh\close1
+    land = dump\match "%-%- alfons: ([a-z]+)"
+    switch lang
+      when "lua"               then lf = loadfile
+      when "moon","moonscript" then lf = ms.loadfile if ms
+  env     = gen_env!
+  fn, err = lf f
+  error "Could not load file #{f}, #{err}" if err
+  setfenv fn, env
+  fn!
+  return env
+
 print ltext.arrow "Finding files..."
 local alfons
 for f in *files
   print ltext.dart "Trying with #{f}"
   if file.exists f
     print ltext.bullet "Found!"
-    alfons = load_alfons f
+    switch tonumber _VERSION\match "Lua 5.(%d)"
+      when 3 then alfons = load_alfons f
+      when 1 then alfons = load_alfons_51 f
+      else alfons = load_alfons f
     break
 
 error "Must be called from command line!" if not arg
