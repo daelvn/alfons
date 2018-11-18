@@ -15,14 +15,34 @@ gen_env = -> {
   :ltext
   :file
   -- Provided standard modules
+  :coroutine
+  :table
+  :utf8
   :io
   :os
   :string
   :math
   -- Provided functions
-  :print
-  :require
+  :assert
+  :error
   :pcall
+
+  :dofile
+  :load
+  :loadfile
+  :require
+
+  :next
+  :ipairs
+  :pairs
+  :ipairs
+  :select
+
+  :tonumber
+  :tostring
+  :type
+
+  :print
 }
 
 files = {
