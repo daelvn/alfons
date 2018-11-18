@@ -11,10 +11,18 @@ if not pcall ->
 print ltext.title "alfons 14.11.2018"
 
 gen_env = -> {
+  -- Provided libraries
   :ltext
   :file
-  :print
+  -- Provided standard modules
   :io
+  :os
+  :string
+  :math
+  -- Provided functions
+  :print
+  :require
+  :pcall
 }
 
 files = {
