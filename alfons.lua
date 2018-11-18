@@ -12,13 +12,29 @@ gen_env = function()
   return {
     ltext = ltext,
     file = file,
+    coroutine = coroutine,
+    table = table,
+    utf8 = utf8,
     io = io,
     os = os,
     string = string,
     math = math,
-    print = print,
+    assert = assert,
+    error = error,
+    pcall = pcall,
+    dofile = dofile,
+    load = load,
+    loadfile = loadfile,
     require = require,
-    pcall = pcall
+    next = next,
+    ipairs = ipairs,
+    pairs = pairs,
+    ipairs = ipairs,
+    select = select,
+    tonumber = tonumber,
+    tostring = tostring,
+    type = type,
+    print = print
   }
 end
 local files = {
