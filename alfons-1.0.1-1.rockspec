@@ -1,8 +1,8 @@
 package = "alfons"
-version = "1.0-1"
+version = '1.0.1-1'
 source = {
   url = "git://github.com/daelvn/alfons",
-  tag = "v1.0"
+  tag = "v1.0.1"
 }
 description = {
   summary = "Small program to run tasks for your project",

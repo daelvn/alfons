@@ -12,8 +12,13 @@ gen_env = function()
   return {
     ltext = ltext,
     file = file,
+    io = io,
+    os = os,
+    string = string,
+    math = math,
     print = print,
-    io = io
+    require = require,
+    pcall = pcall
   }
 end
 local files = {
