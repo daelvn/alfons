@@ -6,77 +6,140 @@ if not pcall(function()
 end) then
   ms = false
 end
-print(ltext.title("alfons 14.11.2018"))
-local gen_env
-gen_env = function()
-  return {
-    ltext = ltext,
-    file = file,
-    coroutine = coroutine,
-    table = table,
-    utf8 = utf8,
-    io = io,
-    os = os,
-    string = string,
-    math = math,
-    assert = assert,
-    error = error,
-    pcall = pcall,
-    dofile = dofile,
-    load = load,
-    loadfile = loadfile,
-    require = require,
-    next = next,
-    ipairs = ipairs,
-    pairs = pairs,
-    ipairs = ipairs,
-    select = select,
-    tonumber = tonumber,
-    tostring = tostring,
-    type = type,
-    print = print
-  }
-end
+print(ltext.title("alfons 02.12.2018"))
 local files = {
   "Alfons",
   "alfons",
   "Alfons.moon",
   "Alfons.lua",
-  "alfons.lua",
-  "Alfons-moon",
-  "alfons-moon",
-  "Alfons-lua",
-  "alfons-lua"
+  "alfons.lua"
 }
-local load_alfons
-load_alfons = function(f)
+local get_load_fn
+get_load_fn = function(f)
   local lf
   if f:match("lua") then
     lf = loadfile
-  end
-  if (f:match("moon")) and ms then
+  elseif f:match("moon") then
     lf = ms.loadfile
   else
-    local fh = io.open(f, "r")
-    local dump = fh:read("*all")
-    fh:close()
-    local lang = dump:match("%-%- alfons: ([a-z]+)")
+    local content
+    do
+      local _with_0 = io.open(f, "r")
+      content = _with_0:read("*a")
+      _with_0:close()
+    end
+    local lang = content:match("%-%- alfons: ?([a-z]+)")
     local _exp_0 = lang
     if "lua" == _exp_0 then
       lf = loadfile
-    elseif "moon" == _exp_0 or "moonscript" == _exp_0 then
+    elseif "moon" == _exp_0 then
       if ms then
         lf = ms.loadfile
       end
     end
   end
-  local env = gen_env()
-  local fn, err = lf(f, "t", env, { })
-  if err then
-    error("Could not load file " .. tostring(f) .. ", " .. tostring(err))
+  return lf
+end
+local gen_env
+gen_env = function(version)
+  local base = {
+    _G = _G,
+    _VERSION = _VERSION,
+    assert = assert,
+    collectgarbage = collectgarbage,
+    dofile = dofile,
+    error = error,
+    getmetatable = getmetatable,
+    ipairs = ipairs,
+    load = load,
+    loadfile = loadfile,
+    next = next,
+    pairs = pairs,
+    pcall = pcall,
+    print = print,
+    rawequal = rawequal,
+    rawget = rawget,
+    rawset = rawset,
+    require = require,
+    select = select,
+    setmetatable = setmetatable,
+    tonumber = tonumber,
+    tostring = tostring,
+    type = type,
+    xpcall = xpcall,
+    coroutine = coroutine,
+    debug = debug,
+    io = io,
+    math = math,
+    os = os,
+    package = package,
+    string = string,
+    table = table
+  }
+  local _exp_0 = version
+  if "lua-51" == _exp_0 then
+    print(ltext.dart("Generating environment for Lua 5.1 or lesser"))
+    base.getfenv = getfenv
+    base.setfenv = setfenv
+    base.module = module
+    base.unpack = unpack
+  elseif "lua-52" == _exp_0 then
+    print(ltext.dart("Generating environment for Lua 5.2"))
+    base.rawlen = rawlen
+    base.rawequal = rawequal
+    base.bit32 = bit32
+  elseif "lua-53" == _exp_0 then
+    print(ltext.dart("Generating environment for Lua 5.3 or greater"))
+    base.rawlen = rawlen
+    base.rawequal = rawequal
+    base.utf8 = utf8
   end
-  fn()
+  return base
+end
+local load_alfons
+load_alfons = function(f)
+  local loadfn = get_load_fn(f)
+  local env, ending
+  do
+    ending = tonumber(_VERSION:match("Lua 5.(%d)"))
+    if ending <= 1 then
+      env = gen_env("lua-51")
+    end
+    if ending == 2 then
+      env = gen_env("lua-52")
+    end
+    if ending >= 3 then
+      env = gen_env("lua-53")
+    end
+  end
+  local alfons_fn
+  do
+    if ending < 2 then
+      local err
+      alfons_fn, err = loadfn(f)
+      if err then
+        error("Could not load file " .. tostring(f) .. ", " .. tostring(err))
+      end
+      setfenv(alfons_fn, env)
+    else
+      local err
+      alfons_fn, err = loadfn(f, "t", env, { })
+      if err then
+        error("Could not load file " .. tostring(f) .. ", " .. tostring(err))
+      end
+    end
+  end
+  print(ltext.dart("Fetching environment..."))
+  alfons_fn()
   return env
+end
+local task_kit
+task_kit = function(name)
+  return {
+    name = name,
+    ltext = ltext,
+    file = file
+  }
 end
 print(ltext.arrow("Finding files..."))
 local alfons
@@ -89,13 +152,14 @@ for _index_0 = 1, #files do
     break
   end
 end
-if not arg then
+if not arg[0] then
   error("Must be called from command line!")
 end
 print(ltext.arrow("Reading tasks..."))
 for i = 1, #arg do
   print(ltext.bullet(arg[i], false))
   if alfons[arg[i]] then
-    alfons[arg[i]](arg[i])
+    print(ltext.bullet("Running!"))
+    alfons[arg[i]](task_kit(arg[i]))
   end
 end
