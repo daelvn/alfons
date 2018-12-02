@@ -1,5 +1,10 @@
 local ltext = require("ltext")
-local file = require("file")
+local file
+if fs then
+  file = fs
+else
+  file = require("file")
+end
 local ms
 if not pcall(function()
   ms = require("moonscript.base")
