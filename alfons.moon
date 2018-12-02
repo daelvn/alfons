@@ -1,6 +1,6 @@
 -- alfons | 02.12.2018
 -- By daelvn
---> # alfons
+--> # [alfons](https://github.com/daelvn/alfons)
 --> Project management helper
 ltext = require "ltext"
 file  = require "file"
@@ -122,3 +122,5 @@ for i=1, #arg
   if alfons[arg[i]]
     print ltext.bullet "Running!"
     alfons[arg[i]] task_kit arg[i]
+
+--> [daelvn](https://github.com/daelvn) · [alfons](https://alfons.daelvn.ga)
