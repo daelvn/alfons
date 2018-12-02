@@ -3,11 +3,10 @@
 --> # [alfons](https://github.com/daelvn/alfons)
 --> Project management helper
 ltext = require "ltext"
-file  = require "file"
-local ms
-if not pcall ->
+file  = if fs then fs else require "file"
+ms = if not pcall ->
     ms = require "moonscript.base"
-  ms = false
+  false
 
 --> **Alfons** is a little script to aid with project management. Inspired by makefiles
 --> (and most importantly the non-C compiling cases), it relies on exported tasks in an
