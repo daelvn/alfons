@@ -79,7 +79,8 @@ gen_env = function(version)
     os = os,
     package = package,
     string = string,
-    table = table
+    table = table,
+    _VERSION = _VERSION
   }
   local _exp_0 = version
   if "lua-51" == _exp_0 then
@@ -139,12 +140,22 @@ load_alfons = function(f)
   return env
 end
 local task_kit
-task_kit = function(name)
-  return {
-    name = name,
-    ltext = ltext,
-    file = file
-  }
+task_kit = function(name, extra)
+  if extra == nil then
+    extra = { }
+  end
+  local extra_ = { }
+  do
+    local _tbl_0 = { }
+    for k, v in pairs(extra) do
+      _tbl_0[k] = v
+    end
+    extra_.argl = _tbl_0
+  end
+  extra_.name = name
+  extra_.ltext = ltext
+  extra_.file = file
+  return extra_
 end
 print(ltext.arrow("Finding files..."))
 local alfons
@@ -161,10 +172,18 @@ if not arg[0] then
   error("Must be called from command line!")
 end
 print(ltext.arrow("Reading tasks..."))
+local extra = { }
 for i = 1, #arg do
   print(ltext.bullet(arg[i], false))
-  if alfons[arg[i]] then
+  local argx = arg[i]:gsub("%-", "_")
+  if argx ~= arg[i] then
+    print(ltext.quote("Translating " .. tostring(arg[i]) .. " to " .. tostring(argx)))
+  end
+  if alfons[argx] then
     print(ltext.bullet("Running!"))
-    alfons[arg[i]](task_kit(arg[i]))
+    alfons[argx](task_kit(argx, extra))
+    extra = { }
+  else
+    table.insert(extra, argx)
   end
 end

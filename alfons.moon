@@ -53,6 +53,8 @@ gen_env = (version) ->
     :type, :xpcall
       
     :coroutine, :debug, :io, :math, :os, :package, :string, :table
+
+    :_VERSION
   }
   switch version
     when "lua-51"
@@ -100,7 +102,15 @@ load_alfons = (f) ->
 --> <a name="task_kit"></a>
 --> This small function will just let us pass the name of the task and two libraries
 --> to the callee.
-task_kit = (name) -> { :name, :ltext, :file }
+task_kit = (name, extra={}) ->
+  extra_       = {}
+  --> Make a shallow copy of extra, which are the unrecognized arguments, this will be our base.
+  --> We store it in argl so not to clutter the extra table
+  extra_.argl  = {k, v for k, v in pairs extra}
+  extra_.name  = name
+  extra_.ltext = ltext
+  extra_.file  = file
+  return extra_
 
 --> Here, the file will be loaded and all the functions will be fetched.
 print ltext.arrow "Finding files..."
@@ -115,11 +125,22 @@ for f in *files
 --> We're going to run the tasks now
 error "Must be called from command line!" if not arg[0]
 print ltext.arrow "Reading tasks..."
+--> This variable `extra` will hold our unrecognized tasks, to pass them as arguments to the next recognized task
+extra = {}
 for i=1, #arg
   print ltext.bullet arg[i], false
+  --> Replace - with _
+  argx = arg[i]\gsub "%-", "_"
+  if argx != arg[i]
+    print ltext.quote "Translating #{arg[i]} to #{argx}"
   --> Here we can see how we use [task_kit](#task_kit) to generate the self/@ argument 
-  if alfons[arg[i]]
+  if alfons[argx]
     print ltext.bullet "Running!"
-    alfons[arg[i]] task_kit arg[i]
+    alfons[argx] task_kit argx, extra
+    --> Clear extra for the next task
+    extra = {}
+  else
+    --> If it's not recognized, then we add it to extra
+    table.insert extra, argx
 
 --> [daelvn](https://github.com/daelvn) · [alfons](https://alfons.daelvn.ga)
