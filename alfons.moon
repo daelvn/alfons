@@ -134,11 +134,18 @@ for f in *files
     alfons = load_alfons f
     break
 
+--> Check if the `always` task exists. If so, run it
+if alfons.always
+  print ltext.arrow "Running \"always\" task"
+  alfons.always task_kit "always", extra
+
 --> We're going to run the tasks now
 error "Must be called from command line!" if not arg[0]
 print ltext.arrow "Reading tasks..."
 --> This variable `extra` will hold our unrecognized tasks, to pass them as arguments to the next recognized task
 extra = {}
+--> `has_run` is used to determine whether we have to run `all` or not
+has_run = false
 for i=1, #arg
   print ltext.bullet arg[i], false
   --> Replace - with _
@@ -155,5 +162,15 @@ for i=1, #arg
     --> If it's not recognized, then we add it to extra
     --> Remember! We have to pass the uncorrected argument! (-)
     table.insert extra, arg[i]
+
+--> Check if any task has been run. If it isn't the case, try to run `default`
+if (not has_run) and alfons.default
+  print ltext.arrow "Running \"default\" task"
+  alfons.default task_kit "default", extra
+
+--> Let's run `teardown` here.
+if alfons.teardown
+  print ltext.arrow "Running \"teardown\" task"
+  alfons.teardown task_kit "teardown", extra
 
 --> [daelvn](https://github.com/daelvn) · [alfons](https://alfons.daelvn.ga)
