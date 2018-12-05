@@ -126,6 +126,40 @@ Alfonsfile. You can write a very simple Alfonsfile just by writing:</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
+              <h2 id="contains">contains</h2>
+<p>This small functions will be useful for checking arguments.
+It gets passed to gen_env</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">contains</span> = <span class="hljs-params">(t, value)</span> -&gt;</span> #[v <span class="hljs-keyword">for</span> v <span class="hljs-keyword">in</span> *t <span class="hljs-keyword">when</span> v == value] != <span class="hljs-number">0</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <h2 id="has">has</h2>
+<p>Similar to contains, but check whenever the argument <em>starts</em> with value.
+This is useful for arguments that take values</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">has</span> = <span class="hljs-params">(t, argname)</span> -&gt;</span> #[v <span class="hljs-keyword">for</span> v <span class="hljs-keyword">in</span> *t <span class="hljs-keyword">when</span> v\match <span class="hljs-string">"^<span class="hljs-subst">#{argname}</span>"</span>] != <span class="hljs-number">0</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
               <p><strong>gen_env</strong> will generate an environment based on the version we’re running on</p>
 
             </div>
@@ -140,6 +174,8 @@ Alfonsfile. You can write a very simple Alfonsfile just by writing:</p>
     :<span class="hljs-built_in">coroutine</span>, :<span class="hljs-built_in">debug</span>, :<span class="hljs-built_in">io</span>, :<span class="hljs-built_in">math</span>, :<span class="hljs-built_in">os</span>, :<span class="hljs-built_in">package</span>, :<span class="hljs-built_in">string</span>, :<span class="hljs-built_in">table</span>
 
     :<span class="hljs-built_in">_VERSION</span>
+
+    :contains, :has
   }
   <span class="hljs-keyword">switch</span> version
     <span class="hljs-keyword">when</span> <span class="hljs-string">"lua-51"</span>
@@ -163,11 +199,11 @@ Alfonsfile. You can write a very simple Alfonsfile just by writing:</p>
         </li>
         
         
-        <li id="section-7">
+        <li id="section-9">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-7">&#182;</a>
+                <a class="pilcrow" href="#section-9">&#182;</a>
               </div>
               <p><strong>load_alfons</strong> gets a filename and returns the tasks of the Alfonsfile.</p>
 
@@ -199,11 +235,11 @@ Alfonsfile. You can write a very simple Alfonsfile just by writing:</p>
         </li>
         
         
-        <li id="section-8">
+        <li id="section-10">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-8">&#182;</a>
+                <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
               <p><a name="task_kit"></a>
 This small function will just let us pass the name of the task and two libraries
@@ -217,11 +253,11 @@ to the callee.</p>
         </li>
         
         
-        <li id="section-9">
+        <li id="section-11">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-9">&#182;</a>
+                <a class="pilcrow" href="#section-11">&#182;</a>
               </div>
               <p>Make a shallow copy of extra, which are the unrecognized arguments, this will be our base.
 We store it in argl so not to clutter the extra table</p>
@@ -237,11 +273,11 @@ We store it in argl so not to clutter the extra table</p>
         </li>
         
         
-        <li id="section-10">
+        <li id="section-12">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-10">&#182;</a>
+                <a class="pilcrow" href="#section-12">&#182;</a>
               </div>
               <p>Here, the file will be loaded and all the functions will be fetched.</p>
 
@@ -259,11 +295,11 @@ We store it in argl so not to clutter the extra table</p>
         </li>
         
         
-        <li id="section-11">
+        <li id="section-13">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-11">&#182;</a>
+                <a class="pilcrow" href="#section-13">&#182;</a>
               </div>
               <p>We’re going to run the tasks now</p>
 
@@ -275,11 +311,11 @@ We store it in argl so not to clutter the extra table</p>
         </li>
         
         
-        <li id="section-12">
+        <li id="section-14">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-12">&#182;</a>
+                <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
               <p>This variable <code>extra</code> will hold our unrecognized tasks, to pass them as arguments to the next recognized task</p>
 
@@ -292,11 +328,11 @@ We store it in argl so not to clutter the extra table</p>
         </li>
         
         
-        <li id="section-13">
+        <li id="section-15">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-13">&#182;</a>
+                <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
               <p>Replace - with _</p>
 
@@ -309,11 +345,11 @@ We store it in argl so not to clutter the extra table</p>
         </li>
         
         
-        <li id="section-14">
+        <li id="section-16">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-14">&#182;</a>
+                <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
               <p>Here we can see how we use <a href="#task_kit">task_kit</a> to generate the self/@ argument </p>
 
@@ -326,11 +362,11 @@ We store it in argl so not to clutter the extra table</p>
         </li>
         
         
-        <li id="section-15">
+        <li id="section-17">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-15">&#182;</a>
+                <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
               <p>Clear extra for the next task</p>
 
@@ -342,26 +378,27 @@ We store it in argl so not to clutter the extra table</p>
         </li>
         
         
-        <li id="section-16">
+        <li id="section-18">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-16">&#182;</a>
+                <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
-              <p>If it’s not recognized, then we add it to extra</p>
+              <p>If it’s not recognized, then we add it to extra
+Remember! We have to pass the uncorrected argument! (-)</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-built_in">table</span>.insert extra, argx</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-built_in">table</span>.insert extra, arg[i]</pre></div></div>
             
         </li>
         
         
-        <li id="section-17">
+        <li id="section-19">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-17">&#182;</a>
+                <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
               <p><a href="https://github.com/daelvn">daelvn</a> · <a href="https://alfons.daelvn.ga">alfons</a></p>
 

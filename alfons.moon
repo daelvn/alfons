@@ -44,6 +44,16 @@ get_load_fn = (f) ->
       when "moon" then lf = ms.loadfile if ms
   lf
 
+--> ## contains
+--> This small functions will be useful for checking arguments.
+--> It gets passed to gen_env
+contains = (t, value) -> #[v for v in *t when v == value] != 0
+
+--> ## has
+--> Similar to contains, but check whenever the argument *starts* with value.
+--> This is useful for arguments that take values
+has = (t, argname) -> #[v for v in *t when v\match "^#{argname}"] != 0
+
 --> **gen_env** will generate an environment based on the version we're running on
 gen_env = (version) ->
   base = {
@@ -55,6 +65,8 @@ gen_env = (version) ->
     :coroutine, :debug, :io, :math, :os, :package, :string, :table
 
     :_VERSION
+
+    :contains, :has
   }
   switch version
     when "lua-51"
@@ -141,6 +153,7 @@ for i=1, #arg
     extra = {}
   else
     --> If it's not recognized, then we add it to extra
-    table.insert extra, argx
+    --> Remember! We have to pass the uncorrected argument! (-)
+    table.insert extra, arg[i]
 
 --> [daelvn](https://github.com/daelvn) · [alfons](https://alfons.daelvn.ga)
