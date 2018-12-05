@@ -156,6 +156,7 @@ for i=1, #arg
   if alfons[argx]
     print ltext.bullet "Running!"
     alfons[argx] task_kit argx, extra
+    has_run = true
     --> Clear extra for the next task
     extra = {}
   else
