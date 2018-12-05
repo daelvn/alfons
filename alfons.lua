@@ -45,6 +45,36 @@ get_load_fn = function(f)
   end
   return lf
 end
+local contains
+contains = function(t, value)
+  return #(function()
+    local _accum_0 = { }
+    local _len_0 = 1
+    for _index_0 = 1, #t do
+      local v = t[_index_0]
+      if v == value then
+        _accum_0[_len_0] = v
+        _len_0 = _len_0 + 1
+      end
+    end
+    return _accum_0
+  end)() ~= 0
+end
+local has
+has = function(t, argname)
+  return #(function()
+    local _accum_0 = { }
+    local _len_0 = 1
+    for _index_0 = 1, #t do
+      local v = t[_index_0]
+      if v:match("^" .. tostring(argname)) then
+        _accum_0[_len_0] = v
+        _len_0 = _len_0 + 1
+      end
+    end
+    return _accum_0
+  end)() ~= 0
+end
 local gen_env
 gen_env = function(version)
   local base = {
@@ -80,7 +110,9 @@ gen_env = function(version)
     package = package,
     string = string,
     table = table,
-    _VERSION = _VERSION
+    _VERSION = _VERSION,
+    contains = contains,
+    has = has
   }
   local _exp_0 = version
   if "lua-51" == _exp_0 then
@@ -184,6 +216,6 @@ for i = 1, #arg do
     alfons[argx](task_kit(argx, extra))
     extra = { }
   else
-    table.insert(extra, argx)
+    table.insert(extra, arg[i])
   end
 end
