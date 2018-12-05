@@ -301,12 +301,13 @@ We store it in argl so not to clutter the extra table</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-13">&#182;</a>
               </div>
-              <p>We’re going to run the tasks now</p>
+              <p>Check if the <code>always</code> task exists. If so, run it</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="hljs-built_in">error</span> <span class="hljs-string">"Must be called from command line!"</span> <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> arg[<span class="hljs-number">0</span>]
-<span class="hljs-built_in">print</span> ltext.arrow <span class="hljs-string">"Reading tasks..."</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">if</span> alfons.always
+  <span class="hljs-built_in">print</span> ltext.arrow <span class="hljs-string">"Running \"always\" task"</span>
+  alfons.always task_kit <span class="hljs-string">"always"</span>, extra</pre></div></div>
             
         </li>
         
@@ -317,13 +318,12 @@ We store it in argl so not to clutter the extra table</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
-              <p>This variable <code>extra</code> will hold our unrecognized tasks, to pass them as arguments to the next recognized task</p>
+              <p>We’re going to run the tasks now</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>extra = {}
-<span class="hljs-keyword">for</span> i=<span class="hljs-number">1</span>, #arg
-  <span class="hljs-built_in">print</span> ltext.bullet arg[i], <span class="hljs-literal">false</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre><span class="hljs-built_in">error</span> <span class="hljs-string">"Must be called from command line!"</span> <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> arg[<span class="hljs-number">0</span>]
+<span class="hljs-built_in">print</span> ltext.arrow <span class="hljs-string">"Reading tasks..."</span></pre></div></div>
             
         </li>
         
@@ -333,6 +333,38 @@ We store it in argl so not to clutter the extra table</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-15">&#182;</a>
+              </div>
+              <p>This variable <code>extra</code> will hold our unrecognized tasks, to pass them as arguments to the next recognized task</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>extra = {}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-16">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-16">&#182;</a>
+              </div>
+              <p><code>has_run</code> is used to determine whether we have to run <code>all</code> or not</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>has_run = <span class="hljs-literal">false</span>
+<span class="hljs-keyword">for</span> i=<span class="hljs-number">1</span>, #arg
+  <span class="hljs-built_in">print</span> ltext.bullet arg[i], <span class="hljs-literal">false</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-17">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
               <p>Replace - with _</p>
 
@@ -345,11 +377,11 @@ We store it in argl so not to clutter the extra table</p>
         </li>
         
         
-        <li id="section-16">
+        <li id="section-18">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-16">&#182;</a>
+                <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
               <p>Here we can see how we use <a href="#task_kit">task_kit</a> to generate the self/@ argument </p>
 
@@ -362,11 +394,11 @@ We store it in argl so not to clutter the extra table</p>
         </li>
         
         
-        <li id="section-17">
+        <li id="section-19">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-17">&#182;</a>
+                <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
               <p>Clear extra for the next task</p>
 
@@ -378,11 +410,11 @@ We store it in argl so not to clutter the extra table</p>
         </li>
         
         
-        <li id="section-18">
+        <li id="section-20">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-18">&#182;</a>
+                <a class="pilcrow" href="#section-20">&#182;</a>
               </div>
               <p>If it’s not recognized, then we add it to extra
 Remember! We have to pass the uncorrected argument! (-)</p>
@@ -394,11 +426,45 @@ Remember! We have to pass the uncorrected argument! (-)</p>
         </li>
         
         
-        <li id="section-19">
+        <li id="section-21">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-19">&#182;</a>
+                <a class="pilcrow" href="#section-21">&#182;</a>
+              </div>
+              <p>Check if any task has been run. If it isn’t the case, try to run <code>default</code></p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">if</span> (<span class="hljs-keyword">not</span> has_run) <span class="hljs-keyword">and</span> alfons.default
+  <span class="hljs-built_in">print</span> ltext.arrow <span class="hljs-string">"Running \"default\" task"</span>
+  alfons.default task_kit <span class="hljs-string">"default"</span>, extra</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-22">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-22">&#182;</a>
+              </div>
+              <p>Let’s run <code>teardown</code> here.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">if</span> alfons.teardown
+  <span class="hljs-built_in">print</span> ltext.arrow <span class="hljs-string">"Running \"teardown\" task"</span>
+  alfons.teardown task_kit <span class="hljs-string">"teardown"</span>, extra</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-23">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
               <p><a href="https://github.com/daelvn">daelvn</a> · <a href="https://alfons.daelvn.ga">alfons</a></p>
 

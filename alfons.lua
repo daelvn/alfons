@@ -200,11 +200,16 @@ for _index_0 = 1, #files do
     break
   end
 end
+if alfons.always then
+  print(ltext.arrow("Running \"always\" task"))
+  alfons.always(task_kit("always", extra))
+end
 if not arg[0] then
   error("Must be called from command line!")
 end
 print(ltext.arrow("Reading tasks..."))
 local extra = { }
+local has_run = false
 for i = 1, #arg do
   print(ltext.bullet(arg[i], false))
   local argx = arg[i]:gsub("%-", "_")
@@ -218,4 +223,12 @@ for i = 1, #arg do
   else
     table.insert(extra, arg[i])
   end
+end
+if (not has_run) and alfons.default then
+  print(ltext.arrow("Running \"default\" task"))
+  alfons.default(task_kit("default", extra))
+end
+if alfons.teardown then
+  print(ltext.arrow("Running \"teardown\" task"))
+  return alfons.teardown(task_kit("teardown", extra))
 end
