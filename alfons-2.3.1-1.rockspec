@@ -2,7 +2,7 @@ package = "alfons"
 version = '2.3.1-1'
 source = {
   url = "git://github.com/daelvn/alfons",
-  tag = '2.3.1'
+  tag = 'v2.3.1'
 }
 description = {
   summary = "Small program to run tasks for your project",
