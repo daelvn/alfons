@@ -79,6 +79,15 @@ has = function(t, argname)
     return _accum_0
   end)() ~= 0
 end
+local act
+act = function(self, t)
+  local prefix = t._prefix or ""
+  for argname, fn in pairs(t) do
+    if contains(self.argl, prefix .. argname) then
+      fn(self)
+    end
+  end
+end
 local gen_env
 gen_env = function(version)
   local base = {
@@ -116,7 +125,8 @@ gen_env = function(version)
     table = table,
     _VERSION = _VERSION,
     contains = contains,
-    has = has
+    has = has,
+    act = act
   }
   local _exp_0 = version
   if "lua-51" == _exp_0 then
