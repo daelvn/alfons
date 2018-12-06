@@ -83,6 +83,10 @@ Alfonsfile. You can write a very simple Alfonsfile just by writing:</p>
             <div class="content"><div class='highlight'><pre>files = {
   <span class="hljs-string">"Alfons"</span>
   <span class="hljs-string">"alfons"</span>
+  <span class="hljs-string">"Alfonsfile"</span>
+  <span class="hljs-string">"alfonsfile"</span>
+  <span class="hljs-string">"Taskfile"</span>
+  <span class="hljs-string">"taskfile"</span>
   <span class="hljs-string">"Alfons.moon"</span>
   <span class="hljs-string">"Alfons.lua"</span>
   <span class="hljs-string">"alfons.lua"</span>
@@ -290,7 +294,10 @@ We store it in argl so not to clutter the extra table</p>
   <span class="hljs-keyword">if</span> file.exists f
     <span class="hljs-built_in">print</span> ltext.bullet <span class="hljs-string">"Found!"</span>
     alfons = load_alfons f
-    <span class="hljs-keyword">break</span></pre></div></div>
+    <span class="hljs-keyword">break</span>
+<span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> alfons <span class="hljs-keyword">then</span>
+  <span class="hljs-built_in">print</span> ltext.<span class="hljs-built_in">error</span> <span class="hljs-string">"Could not find file"</span>
+  <span class="hljs-built_in">os</span>.exit!</pre></div></div>
             
         </li>
         
@@ -389,7 +396,8 @@ We store it in argl so not to clutter the extra table</p>
             
             <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">if</span> alfons[argx]
     <span class="hljs-built_in">print</span> ltext.bullet <span class="hljs-string">"Running!"</span>
-    alfons[argx] task_kit argx, extra</pre></div></div>
+    alfons[argx] task_kit argx, extra
+    has_run = <span class="hljs-literal">true</span></pre></div></div>
             
         </li>
         

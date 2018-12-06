@@ -22,6 +22,10 @@ print ltext.title "alfons 02.12.2018"
 files = {
   "Alfons"
   "alfons"
+  "Alfonsfile"
+  "alfonsfile"
+  "Taskfile"
+  "taskfile"
   "Alfons.moon"
   "Alfons.lua"
   "alfons.lua"
@@ -133,6 +137,9 @@ for f in *files
     print ltext.bullet "Found!"
     alfons = load_alfons f
     break
+if not alfons then
+  print ltext.error "Could not find file"
+  os.exit!
 
 --> Check if the `always` task exists. If so, run it
 if alfons.always
