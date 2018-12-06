@@ -58,6 +58,20 @@ contains = (t, value) -> #[v for v in *t when v == value] != 0
 --> This is useful for arguments that take values
 has = (t, argname) -> #[v for v in *t when v\match "^#{argname}"] != 0
 
+--> ## act
+--> Executes a function depending on `contains` results
+--> ```moon
+--> act
+-->   _prefix: "."
+-->   lua:   clean_lua
+-->   nginx: clean_nginx
+--> ```
+act = (t) =>
+  prefix = t._prefix or ""
+  for argname, fn in pairs t
+    if contains @argl, prefix..argname
+      fn @
+
 --> **gen_env** will generate an environment based on the version we're running on
 gen_env = (version) ->
   base = {
@@ -70,7 +84,7 @@ gen_env = (version) ->
 
     :_VERSION
 
-    :contains, :has
+    :contains, :has, :act
   }
   switch version
     when "lua-51"
