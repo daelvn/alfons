@@ -15,6 +15,10 @@ print(ltext.title("alfons 02.12.2018"))
 local files = {
   "Alfons",
   "alfons",
+  "Alfonsfile",
+  "alfonsfile",
+  "Taskfile",
+  "taskfile",
   "Alfons.moon",
   "Alfons.lua",
   "alfons.lua"
@@ -200,6 +204,10 @@ for _index_0 = 1, #files do
     break
   end
 end
+if not alfons then
+  print(ltext.error("Could not find file"))
+  os.exit()
+end
 if alfons.always then
   print(ltext.arrow("Running \"always\" task"))
   alfons.always(task_kit("always", extra))
@@ -219,6 +227,7 @@ for i = 1, #arg do
   if alfons[argx] then
     print(ltext.bullet("Running!"))
     alfons[argx](task_kit(argx, extra))
+    has_run = true
     extra = { }
   else
     table.insert(extra, arg[i])
