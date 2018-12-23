@@ -47,6 +47,12 @@ get_load_fn = function(f)
       end
     end
   end
+  local _exp_0 = lf
+  if loadfile == _exp_0 then
+    print(ltext.dart("Using Lua 'loadfile'"))
+  elseif ms.loadfile == _exp_0 then
+    print(ltext.dart("Using MoonScript's load function"))
+  end
   return lf
 end
 local contains
