@@ -46,6 +46,9 @@ get_load_fn = (f) ->
     switch lang
       when "lua"  then lf = loadfile
       when "moon" then lf = ms.loadfile if ms
+  switch lf
+    when loadfile    then print ltext.dart "Using Lua 'loadfile'"
+    when ms.loadfile then print ltext.dart "Using MoonScript's load function"
   lf
 
 --> ## contains
