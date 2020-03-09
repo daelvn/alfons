@@ -1,5 +1,5 @@
 package = "alfons"
-version = '3.0'
+version = '3.0-1'
 source = {
   url = "git://github.com/daelvn/alfons",
   tag = 'v3.0'
@@ -20,7 +20,7 @@ dependencies = {
   "lua >= 5.1"
 }
 build = {
-  type = "builtin",
+  type = "none",
   install = {
     bin = {
       alfons = "alfons.lua"

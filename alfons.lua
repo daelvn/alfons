@@ -231,6 +231,7 @@ run = function(name, task, argl)
   return task(unpack(copy))
 end
 if tasks.always then
+  prints("%{green}->%{white} always")
   run("always", tasks.always, arg)
 end
 for i = 1, #arg do
@@ -251,5 +252,6 @@ for i = 1, #arg do
   end
 end
 if tasks.default and tasks_run == 0 then
+  prints("%{green}->%{white} default")
   return run("default", tasks.default, arg)
 end

@@ -1,5 +1,7 @@
 tasks:
   always:        => sh "moonc alfons.moon"
+  make:          =>
+    sh "luarocks make"
   publish: (ver) =>
     sh "git tag -a #{ver} -m 'Release #{ver}'"
     sh "git push origin master --tags"
