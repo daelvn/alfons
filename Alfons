@@ -1,3 +1,0 @@
--- alfons: moon
-export task = =>
-  print @.name
