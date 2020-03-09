@@ -144,6 +144,7 @@ run = (name, task, argl) ->
 
 -- If #always exists, run it
 if tasks.always
+  prints "%{green}->%{white} always"
   run "always", tasks.always, arg
 
 -- Run all specified tasks +teardown
@@ -156,4 +157,5 @@ for i=1, #arg
 
 -- Execute #default if no other task has been run
 if tasks.default and tasks_run == 0
+  prints "%{green}->%{white} default"
   run "default", tasks.default, arg
