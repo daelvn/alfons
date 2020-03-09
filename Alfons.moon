@@ -1,2 +1,2 @@
 tasks:
-  always: -> sh [[moonc alfons.moon]]
+  always:  -> sh [[moonc alfons.moon]]
