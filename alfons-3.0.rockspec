@@ -1,8 +1,8 @@
 package = "alfons"
-version = '2.3.2-2'
+version = '3.0'
 source = {
   url = "git://github.com/daelvn/alfons",
-  tag = 'v2.3.2-2'
+  tag = 'v3.0'
 }
 description = {
   summary = "Small program to run tasks for your project",
@@ -15,14 +15,12 @@ description = {
   homepage = "https://github.com/daelvn/alfons",
 }
 dependencies = {
-  "ltext",
-  "lua >= 5.0"
+  "filekit",
+  "ansikit",
+  "lua >= 5.1"
 }
 build = {
   type = "builtin",
-  modules = {
-    file = "file.lua"
-  },
   install = {
     bin = {
       alfons = "alfons.lua"
