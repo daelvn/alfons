@@ -3,7 +3,13 @@ tasks:
   make:          =>
     sh "luarocks make"
   publish: (ver) =>
-    sh "git tag -a #{ver} -m 'Release #{ver}'"
-    sh "git push origin master --tags"
-    sh "luarocks upload alfons-#{ver}-1.rockspec"
-    sh "rm *.rock"
+    commands = {
+      "git tag -a v#{ver} -m 'Release #{ver}'"
+      "git push origin master --tags"
+      "luarocks upload alfons-#{ver}-1.rockspec"
+      "rm *.rock"
+    }
+    --
+    for cmd in *commands
+      print cmd
+      sh    cmd
