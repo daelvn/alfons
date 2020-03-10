@@ -56,7 +56,7 @@ local env = setmetatable({ }, {
 local git = setmetatable({ }, {
   __index = function(self, i)
     return function(...)
-      return sh("git " .. tostring(i) .. " " .. tostring(table.concat({
+      return cmd("git " .. tostring(i) .. " " .. tostring(table.concat({
         ...
       }, ' ')))
     end
