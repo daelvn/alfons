@@ -174,7 +174,8 @@ local ENVIRONMENT = {
   wildcard = wildcard,
   basename = basename,
   extension = extension,
-  moonc = moonc
+  moonc = moonc,
+  git = git
 }
 local KEYS
 do
