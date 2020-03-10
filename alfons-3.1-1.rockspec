@@ -1,8 +1,8 @@
 package = "alfons"
-version = '3.0-1'
+version = '3.1-1'
 source = {
   url = "git://github.com/daelvn/alfons",
-  tag = 'v3.0'
+  tag = 'v3.1'
 }
 description = {
   summary = "Small program to run tasks for your project",
@@ -15,7 +15,7 @@ description = {
   homepage = "https://github.com/daelvn/alfons",
 }
 dependencies = {
-  "filekit",
+  "filekit >= 1.2.2",
   "ansikit",
   "lua >= 5.1"
 }

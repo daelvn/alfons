@@ -50,7 +50,11 @@ Taskfiles are `Alfons.lua` or `Alfons.moon` files that contain the tasks that ar
 
 ### Helper functions
 
-Two helper functions are provided: `cmd`/`sh` as an alias to `os.execute`, and `env` as a table to retrieve environment variables.
+Several helper functions are provided: 
+
+#### cmd
+
+`cmd`/`sh` as an alias to `os.execute`.
 
 #### env
 
@@ -61,6 +65,32 @@ $ TEST=5 alfons
 ```
 
 You can access `TEST` by using `env.TEST`.
+
+#### moonc
+
+Takes an input (`moonc #{input}`) and optionally an output (`moonc -o #{output} #{input}`)
+
+#### wildcard
+
+Iterable globbing that lets you do things such as:
+
+```moon
+compileall: =>
+  for file in wildcard "*.moon"
+    moonc file
+```
+
+#### basename
+
+Returns everything but the extension of a file
+
+#### extension
+
+Returns only the extension of a file without the dot.
+
+#### git
+
+`git.command "a", "o"` translates to running `git command a o`.
 
 ### Environment
 
