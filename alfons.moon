@@ -7,7 +7,7 @@ unpack or= table.unpack
 import style from ak
 
 -- Constants
-VERSION = "3"
+VERSION = "3.1"
 FILES   = {
   "Alfons.moon"
   "Alfons.lua"
@@ -25,8 +25,13 @@ prints "%{blue}Alfons #{VERSION}"
 arg or= {...}
 
 -- Utils for the environment
-cmd = (txt) -> os.execute txt
-env = setmetatable {}, __index: (i) => os.getenv i
+cmd       = (txt) -> os.execute txt
+env       = setmetatable {}, __index: (i) => os.getenv i
+git       = setmetatable {}, __index: (i) => (...) -> sh "git #{i} #{table.concat {...}, ' '}"
+wildcard  = fs.iglob
+basename  = (file) -> file\match "(.+)%..+"
+extension = (file) -> file\match ".+%.(.+)"
+moonc     = (i, o) -> cmd (o) and "moonc -o #{o} #{i}" or "moonc #{i}"
 
 -- Get files to run
 cdir        = shell and shell.dir! or fs.currentDir!
@@ -90,10 +95,12 @@ ENVIRONMENT = {
   :select, :type, :pairs, :ipairs, :next, :unpack
   :require
   :print
-  :io, :math, :string, :table, :os
+  :io, :math, :string, :table, :os, :fs -- fs is either CC/fs or filekit
   -- own
   :cmd, sh: cmd
   :env
+  :wildcard, :basename, :extension
+  :moonc
 }
 KEYS = [k for k, v in pairs ENVIRONMENT]
 

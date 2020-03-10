@@ -12,7 +12,7 @@ end
 local unpack = unpack or table.unpack
 local style
 style = ak.style
-local VERSION = "3"
+local VERSION = "3.1"
 local FILES = {
   "Alfons.moon",
   "Alfons.lua"
@@ -53,6 +53,19 @@ local env = setmetatable({ }, {
     return os.getenv(i)
   end
 })
+local wildcard = fs.iglob
+local basename
+basename = function(file)
+  return file:match("(.+)%..+")
+end
+local extension
+extension = function(file)
+  return file:match(".+%.(.+)")
+end
+local moonc
+moonc = function(i, o)
+  return cmd((o) and "moonc -o " .. tostring(o) .. " " .. tostring(i) or "moonc " .. tostring(i))
+end
 local cdir = shell and shell.dir() or fs.currentDir()
 local files, file = { }, ""
 local _list_0 = fs.list(cdir)
@@ -145,9 +158,14 @@ local ENVIRONMENT = {
   string = string,
   table = table,
   os = os,
+  fs = fs,
   cmd = cmd,
   sh = cmd,
-  env = env
+  env = env,
+  wildcard = wildcard,
+  basename = basename,
+  extension = extension,
+  moonc = moonc
 }
 local KEYS
 do
