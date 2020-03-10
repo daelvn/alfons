@@ -27,7 +27,7 @@ arg or= {...}
 -- Utils for the environment
 cmd       = (txt) -> os.execute txt
 env       = setmetatable {}, __index: (i) => os.getenv i
-git       = setmetatable {}, __index: (i) => (...) -> sh "git #{i} #{table.concat {...}, ' '}"
+git       = setmetatable {}, __index: (i) => (...) -> cmd "git #{i} #{table.concat {...}, ' '}"
 wildcard  = fs.iglob
 basename  = (file) -> file\match "(.+)%..+"
 extension = (file) -> file\match ".+%.(.+)"
