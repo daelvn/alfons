@@ -53,6 +53,15 @@ local env = setmetatable({ }, {
     return os.getenv(i)
   end
 })
+local git = setmetatable({ }, {
+  __index = function(self, i)
+    return function(...)
+      return sh("git " .. tostring(i) .. " " .. tostring(table.concat({
+        ...
+      }, ' ')))
+    end
+  end
+})
 local wildcard = fs.iglob
 local basename
 basename = function(file)

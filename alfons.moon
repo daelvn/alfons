@@ -100,7 +100,7 @@ ENVIRONMENT = {
   :cmd, sh: cmd
   :env
   :wildcard, :basename, :extension
-  :moonc
+  :moonc, :git
 }
 KEYS = [k for k, v in pairs ENVIRONMENT]
 
