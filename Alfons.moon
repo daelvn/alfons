@@ -1,3 +1,4 @@
+import tasks from github "daelvn/alfons-moonscript"
 tasks:
   always:        => moonc "alfons.moon"
   compileall:    =>

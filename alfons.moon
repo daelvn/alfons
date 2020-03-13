@@ -12,6 +12,22 @@ FILES   = {
   "Alfons.moon"
   "Alfons.lua"
 }
+-- Environment for Alfons files
+ENVIRONMENT = {
+  :_VERSION, :_HOST
+  :assert, :error, :pcall, :xpcall
+  :tonumber, :tostring
+  :select, :type, :pairs, :ipairs, :next, :unpack
+  :require
+  :print
+  :io, :math, :string, :table, :os, :fs -- fs is either CC/fs or filekit
+  -- own
+  :cmd, sh: cmd
+  :env
+  :wildcard, :basename, :extension
+  :moonc, :git
+}
+KEYS = [k for k, v in pairs ENVIRONMENT]
 
 -- Util functions
 contains = (t, v) -> #[vv for vv in *t when vv == v] != 0
@@ -23,6 +39,7 @@ prints "%{blue}Alfons #{VERSION}"
 
 -- Collect arguments
 arg or= {...}
+cdir  = shell and shell.dir! or fs.currentDir!
 
 -- Utils for the environment
 cmd       = (txt) -> os.execute txt
@@ -31,10 +48,9 @@ git       = setmetatable {}, __index: (i) => (...) -> cmd "git #{i} #{table.conc
 wildcard  = fs.iglob
 basename  = (file) -> file\match "(.+)%..+"
 extension = (file) -> file\match ".+%.(.+)"
-moonc     = (i, o) -> cmd (o) and "moonc -o #{o} #{i}" or "moonc #{i}"
+moonc     = (i, o) -> cmd (o) and "moonc -o #{o} #{i}" or "moonc #{i}"]
 
 -- Get files to run
-cdir        = shell and shell.dir! or fs.currentDir!
 files, file = {}, ""
 for node in *fs.list cdir
   continue if (node == ".") or (node == "..")
@@ -86,23 +102,6 @@ if file == "Alfons.lua"
       printerr "Could not read or parse Alfons.lua"
       os.exit!
     \close!
-
--- Environment for Alfons files
-ENVIRONMENT = {
-  :_VERSION, :_HOST
-  :assert, :error, :pcall, :xpcall
-  :tonumber, :tostring
-  :select, :type, :pairs, :ipairs, :next, :unpack
-  :require
-  :print
-  :io, :math, :string, :table, :os, :fs -- fs is either CC/fs or filekit
-  -- own
-  :cmd, sh: cmd
-  :env
-  :wildcard, :basename, :extension
-  :moonc, :git
-}
-KEYS = [k for k, v in pairs ENVIRONMENT]
 
 -- Load in environment
 local fn
