@@ -1,13 +1,4 @@
-import tasks from github "daelvn/alfons-moonscript"
 tasks:
-  always:        => moonc "alfons.moon"
-  compileall:    =>
-    for file in wildcard "*.moon"
-      moonc file
-  make:          =>
-    sh "luarocks make"
-  publish: (ver) =>
-    git.tag  "-a v#{ver} -m 'Release #{ver}'"
-    git.push "origin master --tags"
-    sh "luarocks upload alfons-#{ver}-1.rockspec"
-    sh "rm *.rock"
+  always:        get "ms-compile"
+  make:          => sh "luarocks make"
+  publish:       (get "publish-rockspec") "alfons"

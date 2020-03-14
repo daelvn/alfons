@@ -6,28 +6,26 @@ ak       = unless _HOST then require "ansikit.style" else {style: (x)->x\gsub "%
 unpack or= table.unpack
 import style from ak
 
+-- Compatibility
+setfenv or= (fn, env) ->
+  i = 1
+  while true
+    name = debug.getupvalue fn, i
+    if name == "_ENV"
+      debug.upvaluejoin fn, i, (-> env), 1
+    elseif not name then break
+    i += 1
+  return fn
+
 -- Constants
 VERSION = "3.1"
 FILES   = {
   "Alfons.moon"
   "Alfons.lua"
 }
--- Environment for Alfons files
-ENVIRONMENT = {
-  :_VERSION, :_HOST
-  :assert, :error, :pcall, :xpcall
-  :tonumber, :tostring
-  :select, :type, :pairs, :ipairs, :next, :unpack
-  :require
-  :print
-  :io, :math, :string, :table, :os, :fs -- fs is either CC/fs or filekit
-  -- own
-  :cmd, sh: cmd
-  :env
-  :wildcard, :basename, :extension
-  :moonc, :git
-}
-KEYS = [k for k, v in pairs ENVIRONMENT]
+
+-- Flags
+--IMPORTED = false
 
 -- Util functions
 contains = (t, v) -> #[vv for vv in *t when vv == v] != 0
@@ -42,13 +40,33 @@ arg or= {...}
 cdir  = shell and shell.dir! or fs.currentDir!
 
 -- Utils for the environment
+local ENVIRONMENT
 cmd       = (txt) -> os.execute txt
 env       = setmetatable {}, __index: (i) => os.getenv i
 git       = setmetatable {}, __index: (i) => (...) -> cmd "git #{i} #{table.concat {...}, ' '}"
 wildcard  = fs.iglob
 basename  = (file) -> file\match "(.+)%..+"
 extension = (file) -> file\match ".+%.(.+)"
-moonc     = (i, o) -> cmd (o) and "moonc -o #{o} #{i}" or "moonc #{i}"]
+moonc     = (i, o) -> cmd (o) and "moonc -o #{o} #{i}" or "moonc #{i}"
+get       = (task) -> return setfenv (require "alfons.tasks.#{task}"), ENVIRONMENT
+
+-- Environment for Alfons files
+ENVIRONMENT = {
+  :_VERSION, :_HOST
+  :assert, :error, :pcall, :xpcall
+  :tonumber, :tostring
+  :select, :type, :pairs, :ipairs, :next, :unpack
+  :require
+  :print
+  :io, :math, :string, :table, :os, :fs -- fs is either CC/fs or filekit
+  -- own
+  :cmd, sh: cmd
+  :env
+  :wildcard, :basename, :extension
+  :moonc, :git
+  :get
+}
+KEYS = [k for k, v in pairs ENVIRONMENT]
 
 -- Get files to run
 files, file = {}, ""
