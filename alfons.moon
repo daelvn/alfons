@@ -18,7 +18,7 @@ setfenv or= (fn, env) ->
   return fn
 
 -- Constants
-VERSION = "3.1"
+VERSION = "3.3.1"
 FILES   = {
   "Alfons.moon"
   "Alfons.lua"
@@ -44,7 +44,7 @@ local ENVIRONMENT
 cmd       = (txt) -> os.execute txt
 env       = setmetatable {}, __index: (i) => os.getenv i
 git       = setmetatable {}, __index: (i) => (...) -> cmd "git #{i} #{table.concat {...}, ' '}"
-clone     = (repo) -> cmd "git clone https://github.com/#{repo}.git"
+clone     = (repo, to="") -> cmd "git clone https://github.com/#{repo}.git #{to}"
 wildcard  = fs.iglob
 basename  = (file) -> file\match "(.+)%..+"
 extension = (file) -> file\match ".+%.(.+)"
