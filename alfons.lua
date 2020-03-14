@@ -27,7 +27,7 @@ local setfenv = setfenv or function(fn, env)
   end
   return fn
 end
-local VERSION = "3.1"
+local VERSION = "3.3.1"
 local FILES = {
   "Alfons.moon",
   "Alfons.lua"
@@ -79,6 +79,13 @@ local git = setmetatable({ }, {
     end
   end
 })
+local clone
+clone = function(repo, to)
+  if to == nil then
+    to = ""
+  end
+  return cmd("git clone https://github.com/" .. tostring(repo) .. ".git " .. tostring(to))
+end
 local wildcard = fs.iglob
 local basename
 basename = function(file)
@@ -127,7 +134,8 @@ ENVIRONMENT = {
   extension = extension,
   moonc = moonc,
   git = git,
-  get = get
+  get = get,
+  clone = clone
 }
 local KEYS
 do

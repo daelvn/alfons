@@ -96,7 +96,9 @@ Returns only the extension of a file without the dot.
 
 Clones a repository from GitHub over HTTPS.
 
-`clone "daelvn/alfons"` translates to running `git clone https://github.com/daelvn/alfons.git`
+`clone "daelvn/alfons"` translates to running `git clone https://github.com/daelvn/alfons.git`.
+
+Optionally takes a destination folder.
 
 #### get
 
