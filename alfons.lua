@@ -12,6 +12,21 @@ end
 local unpack = unpack or table.unpack
 local style
 style = ak.style
+local setfenv = setfenv or function(fn, env)
+  local i = 1
+  while true do
+    local name = debug.getupvalue(fn, i)
+    if name == "_ENV" then
+      debug.upvaluejoin(fn, i, (function()
+        return env
+      end), 1)
+    elseif not name then
+      break
+    end
+    i = i + 1
+  end
+  return fn
+end
 local VERSION = "3.1"
 local FILES = {
   "Alfons.moon",
@@ -44,6 +59,8 @@ prints("%{blue}Alfons " .. tostring(VERSION))
 local arg = arg or {
   ...
 }
+local cdir = shell and shell.dir() or fs.currentDir()
+local ENVIRONMENT
 local cmd
 cmd = function(txt)
   return os.execute(txt)
@@ -75,7 +92,53 @@ local moonc
 moonc = function(i, o)
   return cmd((o) and "moonc -o " .. tostring(o) .. " " .. tostring(i) or "moonc " .. tostring(i))
 end
-local cdir = shell and shell.dir() or fs.currentDir()
+local get
+get = function(task)
+  return setfenv((require("alfons.tasks." .. tostring(task))), ENVIRONMENT)
+end
+ENVIRONMENT = {
+  _VERSION = _VERSION,
+  _HOST = _HOST,
+  assert = assert,
+  error = error,
+  pcall = pcall,
+  xpcall = xpcall,
+  tonumber = tonumber,
+  tostring = tostring,
+  select = select,
+  type = type,
+  pairs = pairs,
+  ipairs = ipairs,
+  next = next,
+  unpack = unpack,
+  require = require,
+  print = print,
+  io = io,
+  math = math,
+  string = string,
+  table = table,
+  os = os,
+  fs = fs,
+  cmd = cmd,
+  sh = cmd,
+  env = env,
+  wildcard = wildcard,
+  basename = basename,
+  extension = extension,
+  moonc = moonc,
+  git = git,
+  get = get
+}
+local KEYS
+do
+  local _accum_0 = { }
+  local _len_0 = 1
+  for k, v in pairs(ENVIRONMENT) do
+    _accum_0[_len_0] = k
+    _len_0 = _len_0 + 1
+  end
+  KEYS = _accum_0
+end
 local files, file = { }, ""
 local _list_0 = fs.list(cdir)
 for _index_0 = 1, #_list_0 do
@@ -144,48 +207,6 @@ if file == "Alfons.lua" then
     end
     _with_0:close()
   end
-end
-local ENVIRONMENT = {
-  _VERSION = _VERSION,
-  _HOST = _HOST,
-  assert = assert,
-  error = error,
-  pcall = pcall,
-  xpcall = xpcall,
-  tonumber = tonumber,
-  tostring = tostring,
-  select = select,
-  type = type,
-  pairs = pairs,
-  ipairs = ipairs,
-  next = next,
-  unpack = unpack,
-  require = require,
-  print = print,
-  io = io,
-  math = math,
-  string = string,
-  table = table,
-  os = os,
-  fs = fs,
-  cmd = cmd,
-  sh = cmd,
-  env = env,
-  wildcard = wildcard,
-  basename = basename,
-  extension = extension,
-  moonc = moonc,
-  git = git
-}
-local KEYS
-do
-  local _accum_0 = { }
-  local _len_0 = 1
-  for k, v in pairs(ENVIRONMENT) do
-    _accum_0[_len_0] = k
-    _len_0 = _len_0 + 1
-  end
-  KEYS = _accum_0
 end
 local fn
 local environment

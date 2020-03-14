@@ -92,6 +92,40 @@ Returns only the extension of a file without the dot.
 
 `git.command "a", "o"` translates to running `git command a o`.
 
+#### get
+
+`get (name)` imports `alfons.tasks.name` with the proper Alfons environment. To create your own, simple make a LuaRocks package that exports to `alfons.tasks.<task>`. Use it as:
+
+```lua
+always = get "task"
+```
+
+```moon
+tasks:
+  always: get "task"
+```
+
+These modules simply return a function, nothing more to it, really.
+
+##### publish-rockspec
+
+```moon
+(pkg, message="Release", prefix="v", source="origin", branch="master") -> (ver) =>
+  git.tag  "-a #{prefix}#{ver} -m '#{message} #{ver}'"
+  git.push "#{source} #{branch} --tags"
+  sh "luarocks upload #{pkg}-#{ver}-1.rockspec"
+  for file in wildcard "*.rock" do fs.delete file
+```
+
+##### ms-compile
+
+```moon
+=>
+  for file in wildcard "**.moon"
+    continue if file\match "Alfons%.moon"
+    moonc file
+```
+
 ### Environment
 
 These Taskfiles have a limited environment, defined as such:
@@ -105,10 +139,13 @@ ENVIRONMENT = {
   :select, :type, :pairs, :ipairs, :next, :unpack
   :require
   :print
-  :io, :math, :string, :table, :os
+  :io, :math, :string, :table, :os, :fs -- fs is either CC/fs or filekit
   -- own
   :cmd, sh: cmd
   :env
+  :wildcard, :basename, :extension
+  :moonc, :git
+  :get
 }
 ```
 
