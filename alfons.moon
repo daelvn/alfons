@@ -44,6 +44,7 @@ local ENVIRONMENT
 cmd       = (txt) -> os.execute txt
 env       = setmetatable {}, __index: (i) => os.getenv i
 git       = setmetatable {}, __index: (i) => (...) -> cmd "git #{i} #{table.concat {...}, ' '}"
+clone     = (repo) -> cmd "git clone https://github.com/#{repo}.git"
 wildcard  = fs.iglob
 basename  = (file) -> file\match "(.+)%..+"
 extension = (file) -> file\match ".+%.(.+)"
@@ -64,7 +65,7 @@ ENVIRONMENT = {
   :env
   :wildcard, :basename, :extension
   :moonc, :git
-  :get
+  :get, :clone
 }
 KEYS = [k for k, v in pairs ENVIRONMENT]
 

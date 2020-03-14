@@ -92,6 +92,12 @@ Returns only the extension of a file without the dot.
 
 `git.command "a", "o"` translates to running `git command a o`.
 
+#### clone
+
+Clones a repository from GitHub over HTTPS.
+
+`clone "daelvn/alfons"` translates to running `git clone https://github.com/daelvn/alfons.git`
+
 #### get
 
 `get (name)` imports `alfons.tasks.name` with the proper Alfons environment. To create your own, simple make a LuaRocks package that exports to `alfons.tasks.<task>`. Use it as:
@@ -145,7 +151,7 @@ ENVIRONMENT = {
   :env
   :wildcard, :basename, :extension
   :moonc, :git
-  :get
+  :get, :clone
 }
 ```
 
