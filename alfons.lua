@@ -27,7 +27,8 @@ local setfenv = setfenv or function(fn, env)
   end
   return fn
 end
-local VERSION = "3.3.1"
+os.execute = os.execute or shell.run
+local VERSION = "3.4"
 local FILES = {
   "Alfons.moon",
   "Alfons.lua"
@@ -54,6 +55,34 @@ end
 local printerr
 printerr = function(text)
   return printError and (printError(text)) or (print(style("%{red}" .. tostring(text))))
+end
+local readfile
+readfile = function(file)
+  local contents
+  do
+    local _with_0 = io.open(tostring(file), "r")
+    contents = _with_0:read("*a")
+    _with_0:close()
+  end
+  return contents
+end
+local writefile
+writefile = function(file, txt)
+  do
+    local _with_0 = io.open(tostring(file), "w")
+    _with_0:write(txt)
+    _with_0:close()
+    return _with_0
+  end
+end
+local serialize
+serialize = function(t)
+  local full = "return {\n"
+  for k, v in pairs(t) do
+    full = full .. " [\"" .. tostring(k) .. "\"] = " .. tostring(v) .. ",\n"
+  end
+  full = full .. "}"
+  return full
 end
 prints("%{blue}Alfons " .. tostring(VERSION))
 local arg = arg or {
@@ -103,6 +132,39 @@ local get
 get = function(task)
   return setfenv((require("alfons.tasks." .. tostring(task))), ENVIRONMENT)
 end
+local toflags
+toflags = function(...)
+  local _tbl_0 = { }
+  local _list_0 = {
+    ...
+  }
+  for _index_0 = 1, #_list_0 do
+    local v = _list_0[_index_0]
+    _tbl_0[v] = true
+  end
+  return _tbl_0
+end
+local build
+build = function(iter, fn)
+  local times = { }
+  if fs.exists(".alfons") then
+    prints("%{cyan}:%{white} using .alfons")
+    times = dofile(".alfons")
+  end
+  for file in iter do
+    local mtime = fs.getLastModification(file)
+    if times[file] then
+      if mtime > times[file] then
+        fn(file)
+      end
+      times[file] = mtime
+    else
+      fn(file)
+      times[file] = mtime
+    end
+  end
+  return writefile(".alfons", serialize(times))
+end
 ENVIRONMENT = {
   _VERSION = _VERSION,
   _HOST = _HOST,
@@ -126,6 +188,9 @@ ENVIRONMENT = {
   table = table,
   os = os,
   fs = fs,
+  toflags = toflags,
+  readfile = readfile,
+  writefile = writefile,
   cmd = cmd,
   sh = cmd,
   env = env,
@@ -135,7 +200,8 @@ ENVIRONMENT = {
   moonc = moonc,
   git = git,
   get = get,
-  clone = clone
+  clone = clone,
+  build = build
 }
 local KEYS
 do

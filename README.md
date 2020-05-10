@@ -1,6 +1,38 @@
 # Alfons
 Alfons is a small script that will help you with your project management! Inspired by the worst use cases of Make (so basically, using targets instead of shell scripts), it will read an `Alfons` file, extract the exported functions and run the tasks just like `alfons <task>`.
 
+## Table of contents
+
+- [Alfons](#alfons)
+  - [Table of contents](#table-of-contents)
+  - [Usage](#usage)
+    - [Arguments](#arguments)
+    - [Flags](#flags)
+  - [Installing](#installing)
+  - [Taskfiles](#taskfiles)
+    - [Helper functions](#helper-functions)
+      - [cmd](#cmd)
+      - [env](#env)
+      - [moonc](#moonc)
+      - [wildcard](#wildcard)
+      - [basename](#basename)
+      - [extension](#extension)
+      - [git](#git)
+      - [clone](#clone)
+      - [get](#get)
+      - [toflags](#toflags)
+      - [readfile](#readfile)
+      - [writefile](#writefile)
+        - [publish-rockspec](#publish-rockspec)
+        - [ms-compile](#ms-compile)
+    - [Environment](#environment)
+    - [As a build system](#as-a-build-system)
+    - [Defining tasks](#defining-tasks)
+      - [Lua](#lua)
+      - [MoonScript](#moonscript)
+    - [Arguments](#arguments-1)
+  - [License](#license)
+
 ## Usage
 
 Simply call `alfons` in a directory with an `Alfons.lua` or `Alfons.moon` file (Note: `.moon` loading requires to install MoonScript).
@@ -37,6 +69,27 @@ d
 ```
 
 Hope this clarifies things!
+
+### Flags
+
+Alfons 3.4 introduces a new `toflags` function that turns the varargs in your tasks into flags, such as:
+
+```moon
+tasks:
+  example: (...) =>
+    flags = toflags ...
+    print "hello!" if flags.sayhello
+```
+
+And then:
+
+```sh
+$ alfons example sayhello
+Alfons 3.4
+Using alfons.moon
+-> example
+hello!
+```
 
 ## Installing
 
@@ -115,6 +168,18 @@ tasks:
 
 These modules simply return a function, nothing more to it, really.
 
+#### toflags
+
+Turns varargs into flags. See above.
+
+#### readfile
+
+Takes a filename and returns its contents.
+
+#### writefile
+
+Takes a filename and a string, and writes the string to it.
+
 ##### publish-rockspec
 
 ```moon
@@ -149,12 +214,27 @@ ENVIRONMENT = {
   :print
   :io, :math, :string, :table, :os, :fs -- fs is either CC/fs or filekit
   -- own
+  :toflags
+  :readfile, :writefile
   :cmd, sh: cmd
   :env
   :wildcard, :basename, :extension
   :moonc, :git
   :get, :clone
+  :build
 }
+```
+
+### As a build system
+
+Well, not really, but you can use Alfons as a really simple build system that will only compile the files you've modified. You do this via the 3.4 addition: `build`. You give it an iterator (`wildcard`), and a function. This function must take a filename and do whatever with it. It will iterate through all files and get their last modification time (and, if not created yet, will store them in `.alfons`). Then, it will compare the modification time with the old ones found on `.alfons`, produced by a previous run, and only use the function on the files which have been modified.
+
+```moon
+tasks:
+  compile:
+    build (wildcard "**.moon"), =>
+      return if @match "Alfons.moon"
+      moonc @
 ```
 
 ### Defining tasks
