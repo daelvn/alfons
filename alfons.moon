@@ -16,9 +16,10 @@ setfenv or= (fn, env) ->
     elseif not name then break
     i += 1
   return fn
+os.execute or= shell.run
 
 -- Constants
-VERSION = "3.3.1"
+VERSION = "3.4"
 FILES   = {
   "Alfons.moon"
   "Alfons.lua"
@@ -31,6 +32,22 @@ FILES   = {
 contains = (t, v) -> #[vv for vv in *t when vv == v] != 0
 prints   = (text) -> print style text
 printerr = (text) -> printError and (printError text) or (print style "%{red}#{text}")
+readfile = (file) ->
+  local contents
+  with io.open "#{file}", "r"
+    contents = \read "*a"
+    \close!
+  return contents
+writefile = (file, txt) ->
+  with io.open "#{file}", "w"
+    \write txt
+    \close!
+serialize = (t) ->
+  full = "return {\n"
+  for k, v in pairs t
+    full ..= " [\"#{k}\"] = #{v},\n"
+  full ..= "}"
+  return full
 
 -- Header
 prints "%{blue}Alfons #{VERSION}"
@@ -50,6 +67,26 @@ basename  = (file) -> file\match "(.+)%..+"
 extension = (file) -> file\match ".+%.(.+)"
 moonc     = (i, o) -> cmd (o) and "moonc -o #{o} #{i}" or "moonc #{i}"
 get       = (task) -> return setfenv (require "alfons.tasks.#{task}"), ENVIRONMENT
+toflags   = (...)  -> {v, true for v in *{...}}
+build     = (iter, fn) ->
+  -- get modif times
+  times = {}
+  if fs.exists ".alfons"
+    prints "%{cyan}:%{white} using .alfons"
+    times = dofile ".alfons"
+  --
+  for file in iter
+    mtime = fs.getLastModification file
+    if times[file]
+      -- previously built
+      fn file if mtime > times[file]
+      times[file] = mtime
+    else
+      -- never built before
+      fn file
+      times[file] = mtime
+  -- write back to file
+  writefile ".alfons", serialize times
 
 -- Environment for Alfons files
 ENVIRONMENT = {
@@ -61,11 +98,14 @@ ENVIRONMENT = {
   :print
   :io, :math, :string, :table, :os, :fs -- fs is either CC/fs or filekit
   -- own
+  :toflags
+  :readfile, :writefile
   :cmd, sh: cmd
   :env
   :wildcard, :basename, :extension
   :moonc, :git
   :get, :clone
+  :build
 }
 KEYS = [k for k, v in pairs ENVIRONMENT]
 
