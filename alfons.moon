@@ -118,11 +118,11 @@ for node in *fs.list cdir
 -- Exit if no files were found
 if #files == 0
   printerr "No Alfons file found"
-  os.exit!
+  os.exit 1
 -- Exit if Alfons.moon was the only file found on CC
 if (#files == 1) and _HOST and files[1]\match "moon$"
   printerr "ComputerCraft cannot load Alfons.moon files"
-  os.exit!
+  os.exit 1
 -- If both .lua and .moon files were found, give priority to .lua
 if (#files == 2)
   file = "Alfons.lua"
@@ -142,12 +142,12 @@ if file == "Alfons.moon"
   with fs.open file, "r"
     unless .read
       printerr "Could not open Alfons.moon"
-      os.exit!
+      os.exit 1
     import to_lua from require "moonscript.base"
     contents = to_lua \read "*a"
     unless contents
       printerr "Could not read or parse Alfons.moon"
-      os.exit!
+      os.exit 1
     \close!
 
 -- Read contents of Lua file
@@ -155,11 +155,11 @@ if file == "Alfons.lua"
   with fs.open file, "r"
     unless .read
       printerr "Could not open Alfons.moon"
-      os.exit!
+      os.exit 1
     contents = \read "*a"
     unless contents
       printerr "Could not read or parse Alfons.lua"
-      os.exit!
+      os.exit 1
     \close!
 
 -- Load in environment
@@ -176,13 +176,13 @@ else
       fn, err = loadstring contents
       unless fn
         printerr "Could not load Alfons as function: #{err}"
-        os.exit!
+        os.exit 1
       setfenv fn, environment
     when "Lua 5.2", "Lua 5.3", "Lua 5.4"
       fn, err = load contents, "Alfons", "t", environment
       unless fn
         printerr "Could not load Alfons as function: #{err}"
-        os.exit!
+        os.exit 1
 
 -- Execute with arguments and get list of tasks
 list = fn unpack arg
@@ -191,6 +191,12 @@ if list
   tasks = list.tasks
 else
   tasks = {k, v for k, v in pairs environment when not contains KEYS, k}
+
+-- Check that all tasks are functions
+for _name, _task in pairs tasks
+  if "function" != type _task
+    printerr "Task '#{_name}' is not a function"
+    os.exit 1
 
 -- Function to execute a task
 tasks_run = 0
