@@ -235,11 +235,11 @@ for _index_0 = 1, #_list_0 do
 end
 if #files == 0 then
   printerr("No Alfons file found")
-  os.exit()
+  os.exit(1)
 end
 if (#files == 1) and _HOST and files[1]:match("moon$") then
   printerr("ComputerCraft cannot load Alfons.moon files")
-  os.exit()
+  os.exit(1)
 end
 if (#files == 2) then
   file = "Alfons.lua"
@@ -256,14 +256,14 @@ if file == "Alfons.moon" then
     local _with_0 = fs.open(file, "r")
     if not (_with_0.read) then
       printerr("Could not open Alfons.moon")
-      os.exit()
+      os.exit(1)
     end
     local to_lua
     to_lua = require("moonscript.base").to_lua
     contents = to_lua(_with_0:read("*a"))
     if not (contents) then
       printerr("Could not read or parse Alfons.moon")
-      os.exit()
+      os.exit(1)
     end
     _with_0:close()
   end
@@ -273,12 +273,12 @@ if file == "Alfons.lua" then
     local _with_0 = fs.open(file, "r")
     if not (_with_0.read) then
       printerr("Could not open Alfons.moon")
-      os.exit()
+      os.exit(1)
     end
     contents = _with_0:read("*a")
     if not (contents) then
       printerr("Could not read or parse Alfons.lua")
-      os.exit()
+      os.exit(1)
     end
     _with_0:close()
   end
@@ -306,7 +306,7 @@ else
     fn, err = loadstring(contents)
     if not (fn) then
       printerr("Could not load Alfons as function: " .. tostring(err))
-      os.exit()
+      os.exit(1)
     end
     setfenv(fn, environment)
   elseif "Lua 5.2" == _exp_0 or "Lua 5.3" == _exp_0 or "Lua 5.4" == _exp_0 then
@@ -314,7 +314,7 @@ else
     fn, err = load(contents, "Alfons", "t", environment)
     if not (fn) then
       printerr("Could not load Alfons as function: " .. tostring(err))
-      os.exit()
+      os.exit(1)
     end
   end
 end
@@ -331,6 +331,12 @@ else
       end
     end
     tasks = _tbl_0
+  end
+end
+for _name, _task in pairs(tasks) do
+  if "function" ~= type(_task) then
+    printerr("Task '" .. tostring(_name) .. "' is not a function")
+    os.exit(1)
   end
 end
 local tasks_run = 0
