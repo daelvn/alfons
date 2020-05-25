@@ -5,8 +5,8 @@ Alfons is a small script that will help you with your project management! Inspir
 
 - [Alfons](#alfons)
   - [Table of contents](#table-of-contents)
+  - [Changelog](#changelog)
   - [Usage](#usage)
-      - [Changelog](#changelog)
     - [Arguments](#arguments)
     - [Flags](#flags)
   - [Installing](#installing)
@@ -39,11 +39,7 @@ Alfons is a small script that will help you with your project management! Inspir
     - [Arguments](#arguments-1)
   - [License](#license)
 
-## Usage
-
-Simply call `alfons` in a directory with an `Alfons.lua` or `Alfons.moon` file (Note: `.moon` loading requires to install MoonScript).
-
-#### Changelog
+## Changelog
 
 - **3.5.2** - Tasks are now checked to be functions.
 - **3.5.1** - `style` from [ansikit](https://github.com/daelvn/ansikit) is now available in the environment.
@@ -53,6 +49,10 @@ Simply call `alfons` in a directory with an `Alfons.lua` or `Alfons.moon` file (
 - **3.3.1** - `clone` now allows for a destination folder.
 - **3.3** - Added `clone`.
 - **3.2** - Added importable tasks.
+
+## Usage
+
+Simply call `alfons` in a directory with an `Alfons.lua` or `Alfons.moon` file (Note: `.moon` loading requires to install MoonScript).
 
 ### Arguments
 
