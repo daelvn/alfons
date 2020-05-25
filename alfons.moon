@@ -19,7 +19,7 @@ setfenv or= (fn, env) ->
 os.execute or= shell.run
 
 -- Constants
-VERSION = "3.5.1"
+VERSION = "3.5.2"
 FILES   = {
   "Alfons.moon"
   "Alfons.lua"
