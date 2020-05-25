@@ -6,6 +6,7 @@ Alfons is a small script that will help you with your project management! Inspir
 - [Alfons](#alfons)
   - [Table of contents](#table-of-contents)
   - [Usage](#usage)
+      - [Changelog](#changelog)
     - [Arguments](#arguments)
     - [Flags](#flags)
   - [Installing](#installing)
@@ -41,6 +42,17 @@ Alfons is a small script that will help you with your project management! Inspir
 ## Usage
 
 Simply call `alfons` in a directory with an `Alfons.lua` or `Alfons.moon` file (Note: `.moon` loading requires to install MoonScript).
+
+#### Changelog
+
+- **3.5.2** - Tasks are now checked to be functions.
+- **3.5.1** - `style` from [ansikit](https://github.com/daelvn/ansikit) is now available in the environment.
+- **3.5** - You can now reference other tasks with `tasks.TASKNAME`.
+- **3.4.1** - Added `build`, `readfile`, `writefile` and `toflags`
+- **3.4** - Switched to [Rockbuild](https://github.com/daelvn/rockbuild) for rockspec publishing.
+- **3.3.1** - `clone` now allows for a destination folder.
+- **3.3** - Added `clone`.
+- **3.2** - Added importable tasks.
 
 ### Arguments
 
