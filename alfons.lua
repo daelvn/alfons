@@ -28,7 +28,7 @@ local setfenv = setfenv or function(fn, env)
   return fn
 end
 os.execute = os.execute or shell.run
-local VERSION = "3.4"
+local VERSION = "3.5"
 local FILES = {
   "Alfons.moon",
   "Alfons.lua"
@@ -352,6 +352,17 @@ run = function(name, task, argl)
   }
   table.insert(copy, 1, self)
   return task(unpack(copy))
+end
+do
+  local _tbl_0 = { }
+  for k, v in pairs(tasks) do
+    _tbl_0[k] = (function(...)
+      return run(k, v, {
+        ...
+      })
+    end)
+  end
+  environment.tasks = _tbl_0
 end
 if tasks.always then
   prints("%{green}->%{white} always")

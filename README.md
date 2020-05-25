@@ -30,6 +30,9 @@ Alfons is a small script that will help you with your project management! Inspir
     - [Defining tasks](#defining-tasks)
       - [Lua](#lua)
       - [MoonScript](#moonscript)
+    - [Calling tasks](#calling-tasks)
+      - [Lua](#lua-1)
+      - [MoonScript](#moonscript-1)
     - [Arguments](#arguments-1)
   - [License](#license)
 
@@ -260,6 +263,30 @@ export always ==> print @name
 -- Returning table
 tasks:
   always: => @name
+```
+
+### Calling tasks
+
+Starting from version 3.5, you can now use `tasks.TASK()` to call a task named `TASK`. I don't know why I didn't do this earlier, considering it was literally a one line change.
+
+#### Lua
+
+```lua
+function test (self, caller)
+  print("I am " .. self.name .. " and " .. caller .. " called me.")
+end
+
+function call (self)
+  tasks.test(self.name)
+end
+```
+
+#### MoonScript
+
+```moon
+tasks:
+  test: (caller) => print "I am #{@name} and #{caller} called me."
+  call:          => tasks.test @name
 ```
 
 ### Arguments

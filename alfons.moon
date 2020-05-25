@@ -19,7 +19,7 @@ setfenv or= (fn, env) ->
 os.execute or= shell.run
 
 -- Constants
-VERSION = "3.4"
+VERSION = "3.5"
 FILES   = {
   "Alfons.moon"
   "Alfons.lua"
@@ -200,6 +200,9 @@ run = (name, task, argl) ->
   self = {:name}
   table.insert copy, 1, self
   task unpack copy
+
+-- Make list of tasks available
+environment.tasks = {k, ((...) -> run k, v, {...}) for k, v in pairs tasks}
 
 -- How running tasks works:
 --   All arguments passed to Alfons will be tried as rules
