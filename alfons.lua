@@ -28,7 +28,7 @@ local setfenv = setfenv or function(fn, env)
   return fn
 end
 os.execute = os.execute or shell.run
-local VERSION = "3.5"
+local VERSION = "3.5.1"
 local FILES = {
   "Alfons.moon",
   "Alfons.lua"
@@ -182,6 +182,7 @@ ENVIRONMENT = {
   unpack = unpack,
   require = require,
   print = print,
+  style = style,
   io = io,
   math = math,
   string = string,

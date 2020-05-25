@@ -19,7 +19,7 @@ setfenv or= (fn, env) ->
 os.execute or= shell.run
 
 -- Constants
-VERSION = "3.5"
+VERSION = "3.5.1"
 FILES   = {
   "Alfons.moon"
   "Alfons.lua"
@@ -95,7 +95,7 @@ ENVIRONMENT = {
   :tonumber, :tostring
   :select, :type, :pairs, :ipairs, :next, :unpack
   :require
-  :print
+  :print, :style                        -- from ansikit
   :io, :math, :string, :table, :os, :fs -- fs is either CC/fs or filekit
   -- own
   :toflags

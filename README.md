@@ -23,7 +23,9 @@ Alfons is a small script that will help you with your project management! Inspir
       - [toflags](#toflags)
       - [readfile](#readfile)
       - [writefile](#writefile)
-        - [publish-rockspec](#publish-rockspec)
+      - [style](#style)
+    - [Importable tasks](#importable-tasks)
+      - [publish-rockspec](#publish-rockspec)
         - [ms-compile](#ms-compile)
     - [Environment](#environment)
     - [As a build system](#as-a-build-system)
@@ -183,7 +185,20 @@ Takes a filename and returns its contents.
 
 Takes a filename and a string, and writes the string to it.
 
-##### publish-rockspec
+#### style
+
+As it is imported/defined from Alfons, it is now available to the environment. You can now use the [`style` function from Ansikit](https://git.daelvn.com/ansikit/module/style/#style) in Alfons.
+
+```moon
+tasks
+  pretty: => print "%{blue}#{@name}"
+```
+
+### Importable tasks
+
+These are tasks that can be imported with `get "task"`.
+
+#### publish-rockspec
 
 ```moon
 (pkg, message="Release", prefix="v", source="origin", branch="master") -> (ver) =>
@@ -214,7 +229,7 @@ ENVIRONMENT = {
   :tonumber, :tostring
   :select, :type, :pairs, :ipairs, :next, :unpack
   :require
-  :print
+  :print, :style                        -- from ansikit
   :io, :math, :string, :table, :os, :fs -- fs is either CC/fs or filekit
   -- own
   :toflags
