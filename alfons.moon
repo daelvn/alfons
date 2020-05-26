@@ -64,6 +64,7 @@ git       = setmetatable {}, __index: (i) => (...) -> cmd "git #{i} #{table.conc
 clone     = (repo, to="") -> cmd "git clone https://github.com/#{repo}.git #{to}"
 wildcard  = fs.iglob
 basename  = (file) -> file\match "(.+)%..+"
+filename  = (file) -> file\match ".+/(.+)%..+"
 extension = (file) -> file\match ".+%.(.+)"
 moonc     = (i, o) -> cmd (o) and "moonc -o #{o} #{i}" or "moonc #{i}"
 get       = (task) -> return setfenv (require "alfons.tasks.#{task}"), ENVIRONMENT
@@ -102,7 +103,7 @@ ENVIRONMENT = {
   :readfile, :writefile
   :cmd, sh: cmd
   :env
-  :wildcard, :basename, :extension
+  :wildcard, :basename, :extension, :filename
   :moonc, :git
   :get, :clone
   :build
