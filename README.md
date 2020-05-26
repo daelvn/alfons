@@ -42,6 +42,7 @@ Alfons is a small script that will help you with your project management! Inspir
 
 ## Changelog
 
+- **3.6** - Added `filename` function.
 - **3.5.2** - Tasks are now checked to be functions.
 - **3.5.1** - `style` from [ansikit](https://github.com/daelvn/ansikit) is now available in the environment.
 - **3.5** - You can now reference other tasks with `tasks.TASKNAME`.
@@ -161,7 +162,7 @@ Returns only the extension of a file without the dot.
 
 #### filename
 
-Returns only the filename without extension and parent path. `/home/daelvn/test.txt` becomes `test`.
+Returns only the filename without extension and parent path. `/home/daelvn/test.txt` becomes `test`. Only available starting from version 3.6+
 
 #### git
 
