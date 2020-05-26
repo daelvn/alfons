@@ -120,6 +120,10 @@ local basename
 basename = function(file)
   return file:match("(.+)%..+")
 end
+local filename
+filename = function(file)
+  return file:match(".+/(.+)%..+")
+end
 local extension
 extension = function(file)
   return file:match(".+%.(.+)")
@@ -198,6 +202,7 @@ ENVIRONMENT = {
   wildcard = wildcard,
   basename = basename,
   extension = extension,
+  filename = filename,
   moonc = moonc,
   git = git,
   get = get,

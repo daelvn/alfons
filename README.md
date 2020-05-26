@@ -18,6 +18,7 @@ Alfons is a small script that will help you with your project management! Inspir
       - [wildcard](#wildcard)
       - [basename](#basename)
       - [extension](#extension)
+      - [filename](#filename)
       - [git](#git)
       - [clone](#clone)
       - [get](#get)
@@ -152,11 +153,15 @@ compileall: =>
 
 #### basename
 
-Returns everything but the extension of a file
+Returns everything but the extension of a file.
 
 #### extension
 
 Returns only the extension of a file without the dot.
+
+#### filename
+
+Returns only the filename without extension and parent path. `/home/daelvn/test.txt` becomes `test`.
 
 #### git
 
