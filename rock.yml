@@ -19,6 +19,7 @@ build:
   modules:
     alfons.tasks.publish-rockspec: tasks/publish-rockspec.lua
     alfons.tasks.ms-compile:       tasks/ms-compile.lua
+    alfons.tasks.fetch:            tasks/fetch.lua
   install:
     bin:
       alfons: alfons.lua

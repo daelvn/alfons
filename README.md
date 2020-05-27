@@ -27,7 +27,7 @@ Alfons is a small script that will help you with your project management! Inspir
       - [writefile](#writefile)
       - [style](#style)
     - [Importable tasks](#importable-tasks)
-      - [publish-rockspec](#publish-rockspec)
+        - [fetch](#fetch)
         - [ms-compile](#ms-compile)
     - [Environment](#environment)
     - [As a build system](#as-a-build-system)
@@ -42,6 +42,7 @@ Alfons is a small script that will help you with your project management! Inspir
 
 ## Changelog
 
+- **3.7** - Deprecating `publish-rockspec`. Added `fetch` task.
 - **3.6** - Added `filename` function.
 - **3.5.2** - Tasks are now checked to be functions.
 - **3.5.1** - `style` from [ansikit](https://github.com/daelvn/ansikit) is now available in the environment.
@@ -216,14 +217,51 @@ tasks
 
 These are tasks that can be imported with `get "task"`.
 
-#### publish-rockspec
+##### fetch
+
+`fetch` will return the contents of a URL over HTTP. It uses the HTTP API on ComputerCraft, and LuaSocket on every other platform. To install LuaSocket, you can simply do:
+
+```sh
+$ luarocks install luasocket
+```
+
+The task gets an URL, and simply returns the contents as a string:
+
+```lua
+fetch = get "fetch"
+
+function printurl (self)
+  print(tasks.fetch("https://example.com"))
+end
+```
 
 ```moon
-(pkg, message="Release", prefix="v", source="origin", branch="master") -> (ver) =>
-  git.tag  "-a #{prefix}#{ver} -m '#{message} #{ver}'"
-  git.push "#{source} #{branch} --tags"
-  sh "luarocks upload #{pkg}-#{ver}-1.rockspec"
-  for file in wildcard "*.rock" do fs.delete file
+tasks:
+  fetch:    get "fetch"
+  printurl: => print tasks.fetch "https://example.com"
+```
+
+If you need to write the contents to a file, you can use `writefile`:
+
+```lua
+fetch = get "fetch"
+
+function download (self, url, file)
+  writefile(file, tasks.fetch(url))
+end
+
+function main (self)
+  tasks.download("https://example.com", "index.html")
+end
+```
+
+```moon
+tasks:
+  fetch:    get "fetch"
+  download: (url, file) =>
+    writefile file, tasks.fetch url
+  main: =>
+    tasks.download "https://example.com", "index.html"
 ```
 
 ##### ms-compile

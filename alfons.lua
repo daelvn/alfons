@@ -28,7 +28,7 @@ local setfenv = setfenv or function(fn, env)
   return fn
 end
 os.execute = os.execute or shell.run
-local VERSION = "3.6"
+local VERSION = "3.7"
 local FILES = {
   "Alfons.moon",
   "Alfons.lua"
@@ -84,7 +84,7 @@ serialize = function(t)
   full = full .. "}"
   return full
 end
-prints("%{blue}Alfons " .. tostring(VERSION))
+prints("%{bold blue}Alfons " .. tostring(VERSION))
 local arg = arg or {
   ...
 }
