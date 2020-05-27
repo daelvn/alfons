@@ -28,7 +28,7 @@ local setfenv = setfenv or function(fn, env)
   return fn
 end
 os.execute = os.execute or shell.run
-local VERSION = "3.7"
+local VERSION = "3.8"
 local FILES = {
   "Alfons.moon",
   "Alfons.lua"
@@ -93,6 +93,14 @@ local ENVIRONMENT
 local cmd
 cmd = function(txt)
   return os.execute(txt)
+end
+local cmdfail
+cmdfail = function(txt)
+  local _, code
+  _, _, code = os.execute(txt)
+  if not (code == 0) then
+    return os.exit(code)
+  end
 end
 local env = setmetatable({ }, {
   __index = function(self, i)
@@ -197,7 +205,9 @@ ENVIRONMENT = {
   readfile = readfile,
   writefile = writefile,
   cmd = cmd,
+  cmdfail = cmdfail,
   sh = cmd,
+  shfail = cmdfail,
   env = env,
   wildcard = wildcard,
   basename = basename,

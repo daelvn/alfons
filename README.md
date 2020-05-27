@@ -13,6 +13,7 @@ Alfons is a small script that will help you with your project management! Inspir
   - [Taskfiles](#taskfiles)
     - [Helper functions](#helper-functions)
       - [cmd](#cmd)
+      - [cmdfail](#cmdfail)
       - [env](#env)
       - [moonc](#moonc)
       - [wildcard](#wildcard)
@@ -42,6 +43,7 @@ Alfons is a small script that will help you with your project management! Inspir
 
 ## Changelog
 
+- **3.8** - Added `cmdfail`.
 - **3.7** - Deprecating `publish-rockspec`. Added `fetch` task.
 - **3.6** - Added `filename` function.
 - **3.5.2** - Tasks are now checked to be functions.
@@ -128,6 +130,10 @@ Several helper functions are provided:
 #### cmd
 
 `cmd`/`sh` as an alias to `os.execute`.
+
+#### cmdfail
+
+`cmdfail`/`shfail` is a wrapper around `os.execute` that will exit the program with the code returned by `os.execute` if it is not 0. For example, trying to run a program that does not exist will exit alfons with code 127.
 
 #### env
 
