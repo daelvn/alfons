@@ -25,9 +25,6 @@ FILES   = {
   "Alfons.lua"
 }
 
--- Flags
---IMPORTED = false
-
 -- Util functions
 contains = (t, v) -> #[vv for vv in *t when vv == v] != 0
 prints   = (text) -> print style text
@@ -59,6 +56,9 @@ cdir  = shell and shell.dir! or fs.currentDir!
 -- Utils for the environment
 local ENVIRONMENT
 cmd       = (txt) -> os.execute txt
+cmdfail   = (txt) ->
+  _, _, code = os.execute txt
+  os.exit code unless code == 0
 env       = setmetatable {}, __index: (i) => os.getenv i
 git       = setmetatable {}, __index: (i) => (...) -> cmd "git #{i} #{table.concat {...}, ' '}"
 clone     = (repo, to="") -> cmd "git clone https://github.com/#{repo}.git #{to}"
@@ -101,7 +101,8 @@ ENVIRONMENT = {
   -- own
   :toflags
   :readfile, :writefile
-  :cmd, sh: cmd
+  :cmd, :cmdfail
+  sh: cmd, shfail: cmdfail
   :env
   :wildcard, :basename, :extension, :filename
   :moonc, :git
