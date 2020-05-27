@@ -19,7 +19,7 @@ setfenv or= (fn, env) ->
 os.execute or= shell.run
 
 -- Constants
-VERSION = "3.6"
+VERSION = "3.7"
 FILES   = {
   "Alfons.moon"
   "Alfons.lua"
@@ -50,7 +50,7 @@ serialize = (t) ->
   return full
 
 -- Header
-prints "%{blue}Alfons #{VERSION}"
+prints "%{bold blue}Alfons #{VERSION}"
 
 -- Collect arguments
 arg or= {...}
