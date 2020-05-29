@@ -28,7 +28,7 @@ Alfons is a small script that will help you with your project management! Inspir
       - [writefile](#writefile)
       - [style](#style)
     - [Importable tasks](#importable-tasks)
-        - [fetch](#fetch)
+        - [fetchs](#fetchs)
         - [ms-compile](#ms-compile)
     - [Environment](#environment)
     - [As a build system](#as-a-build-system)
@@ -43,6 +43,7 @@ Alfons is a small script that will help you with your project management! Inspir
 
 ## Changelog
 
+- **3.9** - Added `fetchs` (with `https` support, using [lua-http](https://github.com/daurnimator/lua-http)). Deprecating `fetch`.
 - **3.8** - Added `cmdfail`.
 - **3.7** - Deprecating `publish-rockspec`. Added `fetch` task.
 - **3.6** - Added `filename` function.
@@ -223,37 +224,37 @@ tasks
 
 These are tasks that can be imported with `get "task"`.
 
-##### fetch
+##### fetchs
 
-`fetch` will return the contents of a URL over HTTP. It uses the HTTP API on ComputerCraft, and LuaSocket on every other platform. To install LuaSocket, you can simply do:
+`fetchs` will return the contents of a URL over HTTP. It uses the HTTP API on ComputerCraft, and lua-http on every other platform. To install lua-http, you can simply do:
 
 ```sh
-$ luarocks install luasocket
+$ luarocks install http
 ```
 
 The task gets an URL, and simply returns the contents as a string:
 
 ```lua
-fetch = get "fetch"
+fetchs = get "fetchs"
 
 function printurl (self)
-  print(tasks.fetch("https://example.com"))
+  print(tasks.fetchs("https://example.com"))
 end
 ```
 
 ```moon
 tasks:
-  fetch:    get "fetch"
-  printurl: => print tasks.fetch "https://example.com"
+  fetchs:   get "fetchs"
+  printurl: => print tasks.fetchs "https://example.com"
 ```
 
 If you need to write the contents to a file, you can use `writefile`:
 
 ```lua
-fetch = get "fetch"
+fetchs = get "fetchs"
 
 function download (self, url, file)
-  writefile(file, tasks.fetch(url))
+  writefile(file, tasks.fetchs(url))
 end
 
 function main (self)
@@ -263,9 +264,9 @@ end
 
 ```moon
 tasks:
-  fetch:    get "fetch"
+  fetchs:   get "fetchs"
   download: (url, file) =>
-    writefile file, tasks.fetch url
+    writefile file, tasks.fetchs url
   main: =>
     tasks.download "https://example.com", "index.html"
 ```
