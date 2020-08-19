@@ -332,6 +332,10 @@ ask = function(str)
   io.write(style(str))
   return io.read()
 end
+local show
+show = function(str)
+  return prints("%{cyan}:%{white} " .. tostring(str))
+end
 local env = setmetatable({ }, {
   __index = function(self, i)
     return os.getenv(i)
@@ -609,7 +613,8 @@ return {
   build = build,
   watch = watch,
   env = env,
-  ask = ask
+  ask = ask,
+  show = show
 }
 
 end
@@ -741,10 +746,11 @@ end
 do
   local _tbl_0 = { }
   for k, v in pairs(tasks) do
-    _tbl_0[k] = (function(...)
-      return run(k, v, {
-        ...
-      })
+    _tbl_0[k] = (function(t)
+      if t == nil then
+        t = { }
+      end
+      return run(k, v, t)
     end)
   end
   environment.tasks = _tbl_0
@@ -755,10 +761,11 @@ environment.load = function(mod)
     if "function" == type(ttask) then
       setfenv(ttask, environment)
       tasks[tname] = ttask
-      environment.tasks[tname] = function(...)
-        return run(tname, ttask, {
-          ...
-        })
+      environment.tasks[tname] = function(t)
+        if t == nil then
+          t = { }
+        end
+        return run(tname, ttask, t)
       end
     end
   end

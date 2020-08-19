@@ -53,6 +53,10 @@ ask = (str) ->
   io.write style str
   return io.read!
 
+-- show (str:string) -> nil
+-- Displays a message, but fancy
+show = (str) -> prints "%{cyan}:%{white} #{str}"
+
 -- env {string:string}
 -- Proxy table to os.getenv
 env = setmetatable {}, __index: (i) => os.getenv i
@@ -282,5 +286,5 @@ watch = (dirs, exclude, evf, pred, fn) ->
   :wildcard, :iwildcard, :glob
   :basename, :filename, :extension, :pathname
   :build, :watch
-  :env, :ask
+  :env, :ask, :show
 }

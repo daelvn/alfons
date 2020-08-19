@@ -4,6 +4,20 @@
 
 Alfons is a task runner to help you manage your project. It's inspired by the worst use cases of Make (this means using `make` instead of shell scripts), it will read an Alfonsfile, extract the exported functions and run the tasks.
 
+## Installing
+
+Since this is not upstream yet, you can't install through the LuaRocks server. However, you can install Alfons using itself.
+
+```sh
+$ git clone --branch rewrite daelvn/alfons
+$ moon bin/alfons.moon compile pack           # you will need moonscript and amalg.lua for this
+$ moon bin/alfons.moon make -v 4.0            # you will need rockbuild for this
+# Alternatively, if you want to install unbundled
+$ git clone --branch rewrite daelvn/alfons
+$ moon bin/alfons.moon compile
+$ rockbuild -f rock-dev.yml -m --delete 4.0
+```
+
 ## Usage
 
 Run `alfons` in a directory with an `Alfons.lua` or `Alfons.moon` file. Using MoonScript (obviously) requires installing MoonScript via LuaRocks.
@@ -13,15 +27,15 @@ Run `alfons` in a directory with an `Alfons.lua` or `Alfons.moon` file. Using Mo
 Arguments can be a bit weird due to the nature of tasks. This is different from how it used to be in Alfons 3. It probably helps to see it visually in this example:
 
 ```py
-$ alfons -i command -abc -f=yes.txt next --file another.txt --flag
+$ alfons command -abc -f yes.txt -g=true next --file another.txt --flag
 # The resulting argument structure would be
 {
-  i = true,
   command = {
     a = true,
     b = true,
     c = true,
-    f = "yes.txt"
+    f = "yes.txt",
+    g = "true"
   },
   next = {
     file = "another.txt",

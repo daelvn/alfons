@@ -67,14 +67,14 @@ run       = (name, task, argl) ->
   task self
 
 -- create self-referencing tables and functions
-environment.tasks = {k, ((...) -> run k, v, {...}) for k, v in pairs tasks}
+environment.tasks = {k, ((t={}) -> run k, v, t) for k, v in pairs tasks}
 environment.load  = (mod) ->
   loadtasks = require "alfons.tasks.#{mod}"
   for tname, ttask in pairs loadtasks.tasks
     if "function" == type ttask
       setfenv ttask, environment
       tasks[tname]             = ttask
-      environment.tasks[tname] = (...) -> run tname, ttask, {...}
+      environment.tasks[tname] = (t={}) -> run tname, ttask, t
 
 -- If #always exists, run it before anything
 if tasks.always
