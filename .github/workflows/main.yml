@@ -25,8 +25,8 @@ jobs:
     # Install glibc and yaml
     - name: Install glibc and yaml
       run: |
-        apt install glibc
-        apt install yaml
+        sudo apt install glibc
+        sudo apt install yaml
     
     # Lua
     - name: Install Lua/LuaJIT
@@ -46,6 +46,7 @@ jobs:
         luarocks install moonscript
         luarocks install filekit
         luarocks install ansikit
+        luarocks install inotify
         luarocks install http
         luarocks install rockbuild
         luarocks install amalg
