@@ -99,9 +99,9 @@ iwildcard = (paths) ->
     i += 1
     return all[i] if i <= n
 
--- glob (glob:string) -> (file:string) -> boolean
+-- glob (glob:string) -> (path:string) -> boolean
 -- Curried fs.matchGlob
-glob = (glob) -> (file) -> fs.matchGlob (fs.fromGlob glob), file
+glob = (glob) -> (path) -> fs.matchGlob (fs.fromGlob glob), path
 
 -- build (iter:function, fn:function) -> nil
 -- Compares last modification times with a cache, and if the file was
