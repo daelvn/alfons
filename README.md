@@ -1,9 +1,12 @@
-# Alfons
+# Alfons 3
+
+> This version of Alfons is being phased out. Please move to Alfons 4.
+
 Alfons is a small script that will help you with your project management! Inspired by the worst use cases of Make (so basically, using targets instead of shell scripts), it will read an `Alfons` file, extract the exported functions and run the tasks just like `alfons <task>`.
 
 ## Table of contents
 
-- [Alfons](#alfons)
+- [Alfons 3](#alfons-3)
   - [Table of contents](#table-of-contents)
   - [Changelog](#changelog)
   - [Usage](#usage)
