@@ -23,9 +23,8 @@ jobs:
     - uses: actions/checkout@v2
     
     # Install glibc and yaml
-    - name: Install libc6 and libyaml
+    - name: Install libyaml
       run: |
-        sudo apt install libc6 libc6-dev
         sudo apt install libyaml-dev
     
     # Lua
@@ -46,7 +45,6 @@ jobs:
         luarocks install moonscript
         luarocks install filekit
         luarocks install ansikit
-        luarocks install inotify
         luarocks install http
         luarocks install rockbuild
         luarocks install amalg
