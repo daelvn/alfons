@@ -64,3 +64,9 @@ jobs:
     - name: rockbuild -m
       run: |
         rockbuild -m "$GITHUB_SHA"
+        
+    # Upload artifacts
+    - uses: actions/upload-artifact@v2
+      with:
+        name: alfons
+        path: alfons.lua
