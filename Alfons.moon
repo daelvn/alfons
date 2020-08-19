@@ -10,6 +10,7 @@ tasks:
     show "Cleaning files"
     for file in wildcard "**.lua"
       continue if (file\match "alfons.lua") and not (file\match "bin")
+      continue if (file\match "tasks")
       fs.delete file
   -- use amalg to pack Alfons
   pack: =>
@@ -18,8 +19,3 @@ tasks:
     @s    or= @entry or "bin/alfons.lua"
     modules = for file in wildcard "alfons/*.moon" do "alfons.#{filename file}" 
     sh "amalg.lua -o #{@o} -s #{@s} #{table.concat modules, ' '}"
-  -- test
-  test: =>
-    tasks.compile!
-    tasks.pack!
-    tasks.make v: "4.0"
