@@ -391,8 +391,8 @@ iwildcard = function(paths)
 end
 local glob
 glob = function(glob)
-  return function(file)
-    return fs.matchGlob((fs.fromGlob(glob)), file)
+  return function(path)
+    return fs.matchGlob((fs.fromGlob(glob)), path)
   end
 end
 local build
