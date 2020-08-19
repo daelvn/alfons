@@ -28,7 +28,7 @@ local setfenv = setfenv or function(fn, env)
   return fn
 end
 os.execute = os.execute or shell.run
-local VERSION = "3.8"
+local VERSION = "3.10"
 local FILES = {
   "Alfons.moon",
   "Alfons.lua"
@@ -85,6 +85,8 @@ serialize = function(t)
   return full
 end
 prints("%{bold blue}Alfons " .. tostring(VERSION))
+prints("%{red}Alfons 3 is being phased out in favor of v4.")
+prints("%{red}Learn how to migrate at https://github.com/daelvn/alfons")
 local arg = arg or {
   ...
 }

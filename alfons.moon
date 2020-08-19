@@ -19,7 +19,7 @@ setfenv or= (fn, env) ->
 os.execute or= shell.run
 
 -- Constants
-VERSION = "3.8"
+VERSION = "3.10"
 FILES   = {
   "Alfons.moon"
   "Alfons.lua"
@@ -48,6 +48,8 @@ serialize = (t) ->
 
 -- Header
 prints "%{bold blue}Alfons #{VERSION}"
+prints "%{red}Alfons 3 is being phased out in favor of v4."
+prints "%{red}Learn how to migrate at https://github.com/daelvn/alfons"
 
 -- Collect arguments
 arg or= {...}

@@ -1,6 +1,7 @@
 package: alfons
 source:
   url: git://github.com/daelvn/alfons
+  branch: three
 description:
   summary: Small program to run tasks for your project
   detailed: >
