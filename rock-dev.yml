@@ -12,6 +12,8 @@ dependencies:
   - filekit >= 1.3
   - ansikit
   - lua >= 5.1
+  - inotify
+  - http
 build:
   type: builtin
   modules:
