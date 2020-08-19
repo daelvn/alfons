@@ -1,8 +1,14 @@
 # Alfons 4
 
+<img align="left" width="128" height="128" src=".github/alfons-logo.svg">
+
 > Alfons 4 is a rewrite of the original Alfons, written to be much more modular and usable. For the old Alfons 3, see the [`three`](https://github.com/daelvn/alfons/tree/three) GitHub branch.
 
-Alfons is a task runner to help you manage your project. It's inspired by the worst use cases of Make (this means using `make` instead of shell scripts), it will read an Alfonsfile, extract the exported functions and run the tasks.
+Alfons is a task runner to help you manage your project. It's inspired by the worst use cases of Make (this means using `make` instead of shell scripts), it will read an Alfonsfile, extract the exported functions and run the tasks in order. I would tell you that there is no real reason to use this thing, but it's becoming surprisingly useful, so actually try it out.
+
+## Usage
+
+Run `alfons` in a directory with an `Alfons.lua` or `Alfons.moon` file. Using MoonScript (obviously) requires installing MoonScript via LuaRocks.
 
 ## Installing
 
@@ -10,36 +16,27 @@ Since this is not upstream yet, you can't install through the LuaRocks server. H
 
 ```sh
 $ git clone --branch rewrite daelvn/alfons
-$ moon bin/alfons.moon compile pack           # you will need moonscript and amalg.lua for this
-$ moon bin/alfons.moon make -v 4.0            # you will need rockbuild for this
+$ moon bin/alfons.moon compile pack  # you will need moonscript and amalg.lua for this
+$ moon bin/alfons.moon make -v 4.0   # you will need rockbuild for this
 # Alternatively, if you want to install unbundled
 $ git clone --branch rewrite daelvn/alfons
 $ moon bin/alfons.moon compile
 $ rockbuild -f rock-dev.yml -m --delete 4.0
 ```
 
-## Usage
+### Extra features
 
-Run `alfons` in a directory with an `Alfons.lua` or `Alfons.moon` file. Using MoonScript (obviously) requires installing MoonScript via LuaRocks.
+The preincluded task `fetch` depends on [lua-http](https://github.com/daurnimator/lua-http) to be used. The `watch` function depends on [linotify](https://github.com/hoelzro/linotify) and will not work on platforms other than Linux.
 
-### Arguments
-
-Arguments can be a bit weird due to the nature of tasks. This is different from how it used to be in Alfons 3. It probably helps to see it visually in this example:
-
-```py
-$ alfons command -abc -f yes.txt -g=true next --file another.txt --flag
-# The resulting argument structure would be
-{
-  command = {
-    a = true,
-    b = true,
-    c = true,
-    f = "yes.txt",
-    g = "true"
-  },
-  next = {
-    file = "another.txt",
-    flag = true
-  } 
-}
+```sh
+$ luarocks install http     # lua-http
+$ luarocks install inotify  # linotify
 ```
+
+## License
+
+Throwing it to the public domain. Check out the [license](https://github.com/daelvn/alfons/blob/rewrite/LICENSE.md).
+
+## Goodbye?
+
+goodbye.
