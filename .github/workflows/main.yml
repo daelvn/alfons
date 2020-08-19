@@ -22,9 +22,6 @@ jobs:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
     
-    - name: List installed packages
-      run: apt list
-    
     # Lua
     - name: Install Lua/LuaJIT
       uses: leafo/gh-actions-lua@v6
@@ -43,7 +40,6 @@ jobs:
         luarocks install moonscript
         luarocks install filekit
         luarocks install ansikit
-        luarocks install inotify
         luarocks install http
         luarocks install rockbuild
         luarocks install amalg
