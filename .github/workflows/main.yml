@@ -26,7 +26,7 @@ jobs:
     - name: Install libc6 and libyaml
       run: |
         sudo apt install libc6 libc6-dev
-        sudo apt install libyaml
+        sudo apt install libyaml-dev
     
     # Lua
     - name: Install Lua/LuaJIT
