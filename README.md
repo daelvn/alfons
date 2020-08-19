@@ -111,16 +111,12 @@ compile: => sh "moonc #{file}" for file in wildcard "**.moon"
 
 ## Installing
 
-Since this is not upstream yet, you can't install through the LuaRocks server. However, you can install Alfons using itself.
+~~Since this is not upstream yet, you can't install through the LuaRocks server. However, you can install Alfons using itself.~~
+
+Alfons 4 is now available on LuaRocks!
 
 ```sh
-$ git clone --branch rewrite daelvn/alfons
-$ moon bin/alfons.moon compile pack  # you will need moonscript and amalg.lua for this
-$ moon bin/alfons.moon make -v 4.0   # you will need rockbuild for this
-# Alternatively, if you want to install unbundled
-$ git clone --branch rewrite daelvn/alfons
-$ moon bin/alfons.moon compile
-$ rockbuild -f rock-dev.yml -m --delete 4.0
+$ luarocks install alfons
 ```
 
 ### Extra features
