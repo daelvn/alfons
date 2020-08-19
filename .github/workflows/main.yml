@@ -22,6 +22,12 @@ jobs:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
     
+    # Install glibc and yaml
+    - name: Install glibc and yaml
+      run: |
+        apt install glibc
+        apt install yaml
+    
     # Lua
     - name: Install Lua/LuaJIT
       uses: leafo/gh-actions-lua@v6
