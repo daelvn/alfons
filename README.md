@@ -2,6 +2,7 @@
 <a href="https://discord.gg/Y75ZXrD"><img src="https://img.shields.io/static/v1?label=discord&message=chat&color=brightgreen&style=flat-square"></a> 
 ![GitHub stars](https://img.shields.io/github/stars/daelvn/alfons?style=flat-square)
 ![GitHub tag (latest SemVer pre-release)](https://img.shields.io/github/v/tag/daelvn/alfons?include_prereleases&label=release&style=flat-square)
+![LuaRocks](https://img.shields.io/luarocks/v/daelvn/alfons?style=flat-square)
 
 <!--<img align="left" width="128" height="128" src=".github/alfons-logo.svg">-->
 <img src=".github/alfons-banner.png">
