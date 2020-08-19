@@ -3,7 +3,8 @@
 ![GitHub stars](https://img.shields.io/github/stars/daelvn/alfons?style=flat-square)
 ![GitHub tag (latest SemVer pre-release)](https://img.shields.io/github/v/tag/daelvn/alfons?include_prereleases&label=release&style=flat-square)
 
-<img align="left" width="128" height="128" src=".github/alfons-logo.svg">
+<!--<img align="left" width="128" height="128" src=".github/alfons-logo.svg">-->
+<img src=".github/alfons-banner.png">
 
 > Alfons 4 is a rewrite of the original Alfons, written to be much more modular and usable. For the old Alfons 3, see the [`three`](https://github.com/daelvn/alfons/tree/three) GitHub branch.
 
