@@ -4,8 +4,8 @@
 ![GitHub tag (latest SemVer pre-release)](https://img.shields.io/github/v/tag/daelvn/alfons?include_prereleases&label=release&style=flat-square)
 ![LuaRocks](https://img.shields.io/luarocks/v/daelvn/alfons?style=flat-square)
 
-<!--<img align="left" width="128" height="128" src=".github/alfons-logo.svg">-->
-<img src=".github/alfons-banner.png">
+<img align="left" width="128" height="128" src=".github/alfons-logo.svg">
+<!-- <img src=".github/alfons-banner.png"> -->
 
 > Alfons 4 is a rewrite of the original Alfons, written to be much more modular and usable. For the old Alfons 3, see the [`three`](https://github.com/daelvn/alfons/tree/three) GitHub branch.
 
@@ -14,6 +14,8 @@ Alfons is a task runner to help you manage your project. It's inspired by the wo
 ## Usage
 
 Run `alfons` in a directory with an `Alfons.lua` or `Alfons.moon` file. Using MoonScript (obviously) requires installing MoonScript via LuaRocks.
+
+To see the documentation,, check out the `docs/` folder of this repo.
 
 ## Installing
 
