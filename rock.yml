@@ -17,9 +17,7 @@ dependencies:
 build:
   type: builtin
   modules:
-    alfons.tasks.publish-rockspec: tasks/publish-rockspec.lua
-    alfons.tasks.ms-compile:       tasks/ms-compile.lua
-    alfons.tasks.fetch:            tasks/fetch.lua
+    alfons.tasks.fetch: alfons/tasks/fetch.lua
   install:
     bin:
       alfons: alfons.lua

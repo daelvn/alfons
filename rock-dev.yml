@@ -1,0 +1,29 @@
+package: alfons-dev
+source:
+  url: git://github.com/daelvn/alfons
+description:
+  summary: Unpacked Alfons modules for development
+  detailed: >
+    The normal 'alfons' package is bundled, making all
+    modules unavailable. 'alfons-dev' installs them
+    without bundling.
+  homepage: https://github.com/daelvn/alfons
+dependencies:
+  - filekit >= 1.3
+  - ansikit
+  - lua >= 5.1
+  - inotify
+  - http
+build:
+  type: builtin
+  modules:
+    alfons.tasks.fetch: alfons/tasks/fetch.lua
+    alfons.compat:      alfons/compat.lua
+    alfons.env:         alfons/env.lua
+    alfons.file:        alfons/file.lua
+    alfons.getopt:      alfons/getopt.lua
+    alfons.provide:     alfons/provide.lua
+    alfons.version:     alfons/version.lua
+  install:
+    bin:
+      alfons: bin/alfons.lua
