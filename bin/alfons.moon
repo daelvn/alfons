@@ -2,7 +2,7 @@
 -- Task execution with Lua and MoonScript
 -- By daelvn
 import VERSION          from require "alfons.version"
-import prints, printErr from require "alfons.provide"
+import prints, printError from require "alfons.provide"
 import setfenv          from require "alfons.compat"
 fs                         = require "filekit"
 
@@ -54,7 +54,7 @@ else
 -- check that all tasks are functions
 for tname, ttask in pairs tasks
   if "function" != type ttask
-    printErr "alfons :: Task '#{nname}' is not a function"
+    printError "alfons :: Task '#{nname}' is not a function"
     os.exit 1
 
 -- function to execute a task

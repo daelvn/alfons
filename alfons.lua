@@ -80,7 +80,7 @@ loadEnv = function(content, env)
     local err
     fn, err = loadstring(content)
     if not (fn) then
-      printerr("loadEnv-5.1 :: Could not load Alfonsfile content: " .. tostring(err))
+      provide.printError("loadEnv-5.1 :: Could not load Alfonsfile content: " .. tostring(err))
       os.exit(1)
     end
     setfenv(fn, env)
@@ -88,7 +88,7 @@ loadEnv = function(content, env)
     local err
     fn, err = load(content, "Alfons", "t", env)
     if not (fn) then
-      printerr("loadEnv :: Could not load Alfonsfile content: " .. tostring(err))
+      provide.printError("loadEnv :: Could not load Alfonsfile content: " .. tostring(err))
       os.exit(1)
     end
   end
@@ -106,8 +106,8 @@ end
 do
 local _ENV = _ENV
 package.preload[ "alfons.file" ] = function( ... ) local arg = _G.arg;
-local printerr
-printerr = require("alfons.provide").printerr
+local printError
+printError = require("alfons.provide").printError
 local fs = require("filekit")
 local readMoon
 readMoon = function(file)
@@ -115,14 +115,15 @@ readMoon = function(file)
   do
     local _with_0 = fs.safeOpen(file, "r")
     if _with_0.error then
-      printerr("loadMoon :: Could not open " .. tostring(file) .. ": " .. tostring(_with_0.error))
+      printError("loadMoon :: Could not open " .. tostring(file) .. ": " .. tostring(_with_0.error))
       os.exit(1)
     end
     local to_lua
     to_lua = require("moonscript.base").to_lua
-    content = to_lua(_with_0:read("*a"))
+    local err
+    content, err = to_lua(_with_0:read("*a"))
     if not (content) then
-      printerr("loadMoon :: Could not read or parse " .. tostring(file) .. ": " .. tostring(content))
+      printError("loadMoon :: Could not read or parse " .. tostring(file) .. ": " .. tostring(err))
       os.exit(1)
     end
     _with_0:close()
@@ -135,12 +136,12 @@ readLua = function(file)
   do
     local _with_0 = fs.safeOpen(file, "r")
     if _with_0.error then
-      printerr("readLua :: Could not open " .. tostring(file) .. ": " .. tostring(_with_0.error))
+      printError("readLua :: Could not open " .. tostring(file) .. ": " .. tostring(_with_0.error))
       os.exit(1)
     end
     content = _with_0:read("*a")
     if not (content) then
-      printerr("readLua :: Could not read " .. tostring(file) .. ": " .. tostring(content))
+      printError("readLua :: Could not read " .. tostring(file) .. ": " .. tostring(content))
       os.exit(1)
     end
     _with_0:close()
@@ -624,7 +625,7 @@ do
 local _ENV = _ENV
 package.preload[ "alfons.version" ] = function( ... ) local arg = _G.arg;
 return {
-  VERSION = "4.0"
+  VERSION = "4.0.2"
 }
 
 end
@@ -634,8 +635,11 @@ end
 
 local VERSION
 VERSION = require("alfons.version").VERSION
-local prints
-prints = require("alfons.provide").prints
+local prints, printError
+do
+  local _obj_0 = require("alfons.provide")
+  prints, printError = _obj_0.prints, _obj_0.printError
+end
 local setfenv
 setfenv = require("alfons.compat").setfenv
 local fs = require("filekit")
@@ -721,7 +725,7 @@ else
 end
 for tname, ttask in pairs(tasks) do
   if "function" ~= type(ttask) then
-    printerr("alfons :: Task '" .. tostring(nname) .. "' is not a function")
+    printError("alfons :: Task '" .. tostring(nname) .. "' is not a function")
     os.exit(1)
   end
 end
