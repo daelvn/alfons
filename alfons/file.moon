@@ -1,6 +1,6 @@
 -- alfons.file
 -- Gets the contents of a taskfile
-import printErr from require "alfons.provide"
+import printError from require "alfons.provide"
 fs                 = require "filekit"
 
 readMoon = (file) ->
@@ -8,14 +8,14 @@ readMoon = (file) ->
   with fs.safeOpen file, "r"
     -- check that we could open correctly
     if .error
-      printErr "loadMoon :: Could not open #{file}: #{.error}"
+      printError "loadMoon :: Could not open #{file}: #{.error}"
       os.exit 1
     -- read and compile
     import to_lua from require "moonscript.base"
-    content = to_lua \read "*a"
+    content, err = to_lua \read "*a"
     -- check that we could compile correctly
     unless content
-      printErr "loadMoon :: Could not read or parse #{file}: #{content}"
+      printError "loadMoon :: Could not read or parse #{file}: #{err}"
       os.exit 1
     \close!
   -- return
@@ -26,13 +26,13 @@ readLua = (file) ->
   with fs.safeOpen file, "r"
     -- check that we could open correctly
     if .error
-      printErr "readLua :: Could not open #{file}: #{.error}"
+      printError "readLua :: Could not open #{file}: #{.error}"
       os.exit 1
     -- read and compile
     content = \read "*a"
     -- check that we could compile correctly
     unless content
-      printErr "readLua :: Could not read #{file}: #{content}"
+      printError "readLua :: Could not read #{file}: #{content}"
       os.exit 1
     \close!
   -- return

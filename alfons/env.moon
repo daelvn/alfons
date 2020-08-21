@@ -34,14 +34,14 @@ loadEnv = (content, env) ->
     when "Lua 5.1"
       fn, err = loadstring content
       unless fn
-        provide.printErr "loadEnv-5.1 :: Could not load Alfonsfile content: #{err}"
+        provide.printError "loadEnv-5.1 :: Could not load Alfonsfile content: #{err}"
         os.exit 1
       setfenv fn, env
     -- use load otherwise
     when "Lua 5.2", "Lua 5.3", "Lua 5.4"
       fn, err = load content, "Alfons", "t", env
       unless fn
-        provide.printErr "loadEnv :: Could not load Alfonsfile content: #{err}"
+        provide.printError "loadEnv :: Could not load Alfonsfile content: #{err}"
         os.exit 1
   -- return
   return fn
