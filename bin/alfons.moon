@@ -38,8 +38,10 @@ content = switch LANGUAGE
   else error "Cannot resolve format '#{LANGUAGE}' for Alfonsfile."
 
 -- create local copy of environment
+import contains from require "alfons.provide"
 environment      = {k, v for k, v in pairs ENVIRONMENT}
 environment.args = args
+environment.uses = (cmdmd) -> contains (args.commands or {}), cmdmd
 
 -- load tasks
 alfons = loadEnv content, environment
@@ -48,7 +50,6 @@ local tasks
 if list
   tasks = list.tasks
 else
-  import contains from require "alfons.provide"
   tasks = {k, v for k, v in pairs environment when not contains KEYS, k}
 
 -- check that all tasks are functions
