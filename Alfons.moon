@@ -1,6 +1,6 @@
 tasks:
-  make:    => sh "rockbuild -m --delete #{@v}"
-  release: => sh "rockbuild -m -t #{@v} u"
+  make:    => sh "rockbuild -m --delete #{@v}" if @v
+  release: => sh "rockbuild -m -t #{@v} u"     if @v
   -- compile everything
   compile: =>
     sh "moonc #{file}" for file in wildcard "alfons/**.moon"

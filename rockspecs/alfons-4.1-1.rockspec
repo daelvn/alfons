@@ -22,7 +22,7 @@ description = {
 package = "alfons"
 rockspec_format = "3.0"
 source = {
-  tag = "vnil",
+  tag = "v4.1",
   url = "git://github.com/daelvn/alfons"
 }
-version = "nil-1"
+version = "4.1-1"
