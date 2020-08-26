@@ -625,7 +625,7 @@ do
 local _ENV = _ENV
 package.preload[ "alfons.version" ] = function( ... ) local arg = _G.arg;
 return {
-  VERSION = "4.0.2"
+  VERSION = "4.1"
 }
 
 end
@@ -696,6 +696,8 @@ elseif "lua" == _exp_0 then
 else
   content = error("Cannot resolve format '" .. tostring(LANGUAGE) .. "' for Alfonsfile.")
 end
+local contains
+contains = require("alfons.provide").contains
 local environment
 do
   local _tbl_0 = { }
@@ -705,14 +707,15 @@ do
   environment = _tbl_0
 end
 environment.args = args
+environment.uses = function(cmdmd)
+  return contains((args.commands or { }), cmdmd)
+end
 local alfons = loadEnv(content, environment)
 local list = alfons(args)
 local tasks
 if list then
   tasks = list.tasks
 else
-  local contains
-  contains = require("alfons.provide").contains
   do
     local _tbl_0 = { }
     for k, v in pairs(environment) do

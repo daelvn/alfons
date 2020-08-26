@@ -45,3 +45,33 @@ tasks:
 function first(self) print(args.first.a) end
 function second(self) print(args.second.b) end
 ```
+
+## Uses
+
+When running from the command line, a new function is provided (`uses`) that is effectively a shortcut for `contains args.commands, "task"`. It will check if another task was called. The task does not have to exist. You can use this for "subtasks", like `alfons docs serve`, instead of having to do `alfons docs --serve`, which is considerably *uglier*.
+
+**MoonScript**
+
+```moon
+tasks:
+  task: =>
+    if uses "subtask"
+      print "subtask was called!"
+```
+
+**Lua**
+
+```lua
+function task()
+  if uses "subtask" then
+    print "subtask was called!"
+  end
+end
+```
+
+**Result**
+
+```
+$ alfons task subtask
+subtask was called!
+```
