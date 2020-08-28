@@ -1,7 +1,7 @@
 -- alfons.file
 -- Gets the contents of a taskfile
 import printError from require "alfons.provide"
-fs                 = require "filekit"
+fs                   = require "filekit"
 
 readMoon = (file) ->
   local content

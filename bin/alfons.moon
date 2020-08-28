@@ -1,16 +1,15 @@
 -- alfons 4
 -- Task execution with Lua and MoonScript
 -- By daelvn
-import VERSION          from require "alfons.version"
+import VERSION            from require "alfons.version"
 import prints, printError from require "alfons.provide"
-import setfenv          from require "alfons.compat"
-fs                         = require "filekit"
+import setfenv            from require "alfons.compat"
+fs                           = require "filekit"
 
 prints "%{bold blue}Alfons #{VERSION}"
 
 -- get arguments
 import getopt from require "alfons.getopt"
-inspect = require "inspect"
 args = getopt {...}
 
 -- optionally accept a custom file
