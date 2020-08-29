@@ -3,6 +3,7 @@
 import style from require "ansikit.style"
 inotify         = require "inotify"
 fs              = require "filekit"
+unpack        or= table.unpack
 
 -- contains (t:table, v:any) -> boolean
 -- Checks whether a table contains a value
