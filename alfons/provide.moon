@@ -258,7 +258,7 @@ watch = (dirs, exclude, evf, pred, fn) ->
       -- get full path
       full = fs.combine reversed[ev.wd], (ev.name or "")
       -- if dir, add watcher
-      if (fs.isDir full) and (bit_band ev.mask, inotify.IN_CREATE) and not watchers[dir]
+      if (fs.isDir full) and (bit_band ev.mask, inotify.IN_CREATE) and not watchers[full]
         prints "%{cyan}:%{white} Added to watchlist: %{green}#{full}"
         watchers[full]           = handle\addwatch full, unpack events
         reversed[watchers[full]] = full

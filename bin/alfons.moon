@@ -54,7 +54,7 @@ else
 -- check that all tasks are functions
 for tname, ttask in pairs tasks
   if "function" != type ttask
-    printError "alfons :: Task '#{nname}' is not a function"
+    printError "alfons :: Task '#{tname}' is not a function"
     os.exit 1
 
 -- function to execute a task
