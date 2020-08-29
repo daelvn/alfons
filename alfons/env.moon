@@ -4,6 +4,7 @@ import setfenv from require "alfons.compat"
 import style   from require "ansikit.style"
 fs                = require "filekit"
 provide           = require "alfons.provide"
+unpack          or= table.unpack
 
 -- forward-declare environment
 local ENVIRONMENT
