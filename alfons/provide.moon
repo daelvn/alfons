@@ -1,9 +1,13 @@
 -- alfons.provide
 -- Functions provided to the environment
 import style from require "ansikit.style"
-inotify         = require "inotify"
 fs              = require "filekit"
 unpack        or= table.unpack
+
+-- try loading inotify, which is an optional dependancy
+inotify = do
+  ok, inotify = pcall -> require "intoify"
+  ok and inotify or nil
 
 -- contains (t:table, v:any) -> boolean
 -- Checks whether a table contains a value
@@ -211,6 +215,7 @@ bit_band = (a, b) ->
 
 -- watch (dirs:{string}, exclude:{string}, evf:{string}, pred:(file -> boolean), fn:(file -> nil)) -> nil
 watch = (dirs, exclude, evf, pred, fn) ->
+  error "can't load inotify" unless inotify
   handle  = inotify.init!
   -- do equivalents
   if evf == "live"
