@@ -92,4 +92,4 @@ for command in *args.commands
 -- Execute #default if no other task has been run
 if tasks.default and tasks_run == 0
   prints "%{green}->%{white} default"
-  run "default", tasks.default, args.default
+  run "default", tasks.default, args.default or {}

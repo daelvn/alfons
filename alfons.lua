@@ -637,7 +637,7 @@ do
 local _ENV = _ENV
 package.preload[ "alfons.version" ] = function( ... ) local arg = _G.arg;
 return {
-  VERSION = "4.1.3"
+  VERSION = "4.1.4"
 }
 
 end
@@ -805,5 +805,5 @@ for _index_0 = 1, #_list_0 do
 end
 if tasks.default and tasks_run == 0 then
   prints("%{green}->%{white} default")
-  return run("default", tasks.default, args.default)
+  return run("default", tasks.default, args.default or { })
 end
