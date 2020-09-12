@@ -34,6 +34,7 @@ local style
 style = require("ansikit.style").style
 local fs = require("filekit")
 local provide = require("alfons.provide")
+local unpack = unpack or table.unpack
 local ENVIRONMENT
 ENVIRONMENT = {
   _VERSION = _VERSION,
@@ -255,8 +256,16 @@ local _ENV = _ENV
 package.preload[ "alfons.provide" ] = function( ... ) local arg = _G.arg;
 local style
 style = require("ansikit.style").style
-local inotify = require("inotify")
 local fs = require("filekit")
+local unpack = unpack or table.unpack
+local inotify
+do
+  local ok
+  ok, inotify = pcall(function()
+    return require("intoify")
+  end)
+  inotify = ok and inotify or nil
+end
 local contains
 contains = function(t, v)
   return #(function()
@@ -456,6 +465,9 @@ bit_band = function(a, b)
 end
 local watch
 watch = function(dirs, exclude, evf, pred, fn)
+  if not (inotify) then
+    error("can't load inotify")
+  end
   local handle = inotify.init()
   if evf == "live" then
     evf = {
@@ -550,7 +562,7 @@ watch = function(dirs, exclude, evf, pred, fn)
       repeat
         local ev = evts[_index_0]
         local full = fs.combine(reversed[ev.wd], (ev.name or ""))
-        if (fs.isDir(full)) and (bit_band(ev.mask, inotify.IN_CREATE)) and not watchers[dir] then
+        if (fs.isDir(full)) and (bit_band(ev.mask, inotify.IN_CREATE)) and not watchers[full] then
           prints("%{cyan}:%{white} Added to watchlist: %{green}" .. tostring(full))
           watchers[full] = handle:addwatch(full, unpack(events))
           reversed[watchers[full]] = full
@@ -625,7 +637,7 @@ do
 local _ENV = _ENV
 package.preload[ "alfons.version" ] = function( ... ) local arg = _G.arg;
 return {
-  VERSION = "4.1"
+  VERSION = "4.1.3"
 }
 
 end
@@ -646,7 +658,6 @@ local fs = require("filekit")
 prints("%{bold blue}Alfons " .. tostring(VERSION))
 local getopt
 getopt = require("alfons.getopt").getopt
-local inspect = require("inspect")
 local args = getopt({
   ...
 })
@@ -728,7 +739,7 @@ else
 end
 for tname, ttask in pairs(tasks) do
   if "function" ~= type(ttask) then
-    printError("alfons :: Task '" .. tostring(nname) .. "' is not a function")
+    printError("alfons :: Task '" .. tostring(tname) .. "' is not a function")
     os.exit(1)
   end
 end
