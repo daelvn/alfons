@@ -1,6 +1,6 @@
--- alfons.compat
--- Compatibility for all Lua versions
-setfenv or= (fn, env) ->
+-- alfons.setfenv
+-- Provides setfenv for 5.1
+return setfenv or (fn, env) ->
   i = 1
   while true
     name = debug.getupvalue fn, i
@@ -9,5 +9,3 @@ setfenv or= (fn, env) ->
     elseif not name then break
     i += 1
   return fn
-
-{ :setfenv }

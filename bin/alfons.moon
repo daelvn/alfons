@@ -3,7 +3,7 @@
 -- By daelvn
 import VERSION            from require "alfons.version"
 import prints, printError from require "alfons.provide"
-import setfenv            from require "alfons.compat"
+setfenv                    or= require "alfons.setfenv"
 fs                           = require "filekit"
 
 prints "%{bold blue}Alfons #{VERSION}"

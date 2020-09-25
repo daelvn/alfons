@@ -1,6 +1,5 @@
 -- alfons.getopt
 -- Alfons needs its own getopt because of how it calls tasks.
-
 getopt = (argl) ->
   args  = {
     commands: {}
