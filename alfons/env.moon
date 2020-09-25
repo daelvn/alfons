@@ -28,6 +28,7 @@ for k, v in pairs provide
 KEYS = [k for k, v in pairs ENVIRONMENT]
 
 -- load in environment
+-- loadEnv content:string, env:table -> fn:function | nil, err:string
 loadEnv = (content, env) ->
   local fn
   switch _VERSION
@@ -35,15 +36,13 @@ loadEnv = (content, env) ->
     when "Lua 5.1"
       fn, err = loadstring content
       unless fn
-        provide.printError "loadEnv-5.1 :: Could not load Alfonsfile content: #{err}"
-        os.exit 1
+        return nil, "Could not load Alfonsfile content (5.1): #{err}"
       setfenv fn, env
     -- use load otherwise
     when "Lua 5.2", "Lua 5.3", "Lua 5.4"
       fn, err = load content, "Alfons", "t", env
       unless fn
-        provide.printError "loadEnv :: Could not load Alfonsfile content: #{err}"
-        os.exit 1
+        return nil, "Could not load Alfonsfile content (5.2+): #{err}"
   -- return
   return fn
 

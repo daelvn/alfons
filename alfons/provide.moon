@@ -215,7 +215,7 @@ bit_band = (a, b) ->
 
 -- watch (dirs:{string}, exclude:{string}, evf:{string}, pred:(file -> boolean), fn:(file -> nil)) -> nil
 watch = (dirs, exclude, evf, pred, fn) ->
-  error "can't load inotify" unless inotify
+  error "Could not load inotify" unless inotify
   handle  = inotify.init!
   -- do equivalents
   if evf == "live"

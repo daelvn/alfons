@@ -18,23 +18,32 @@ FILE = do
   elseif args.file               then args.file
   elseif fs.exists "Alfons.lua"  then "Alfons.lua"
   elseif fs.exists "Alfons.moon" then "Alfons.moon"
-  else   error "No Alfonsfile found."
+  else
+    printError "No Alfonsfile found."
+    os.exit 1
 
 -- Also accept a custom language
 LANGUAGE = do
   if     FILE\match "moon$" then "moon"
   elseif FILE\match "lua$"  then "lua"
   elseif args.type          then args.type
-  else   error "Cannot resolve format for Alfonsfile."
+  else
+    printError "Cannot resolve format for Alfonsfile."
+    os.exit 1
 print "Using #{FILE} (#{LANGUAGE})"
 
 -- read alfonsfile
 import readMoon, readLua          from require "alfons.file"
 import ENVIRONMENT, KEYS, loadEnv from require "alfons.env"
-content = switch LANGUAGE
+content, contentErr = switch LANGUAGE
   when "moon" then readMoon FILE
   when "lua"  then readLua  FILE
-  else error "Cannot resolve format '#{LANGUAGE}' for Alfonsfile."
+  else
+    printError "Cannot resolve format '#{LANGUAGE}' for Alfonsfile."
+    os.exit 1
+unless content
+  printError contentErr
+  os.exit 1
 
 -- create local copy of environment
 import contains from require "alfons.provide"
@@ -43,8 +52,11 @@ environment.args = args
 environment.uses = (cmdmd) -> contains (args.commands or {}), cmdmd
 
 -- load tasks
-alfons = loadEnv content, environment
-list   = alfons args
+alfons, alfonsErr = loadEnv content, environment
+unless alfons
+  printError alfonsErr
+  os.exit 1
+list = alfons args
 local tasks
 if list
   tasks = list.tasks
