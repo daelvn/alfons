@@ -24,3 +24,8 @@ tasks:
     tasks.compile!
     tasks.pack!
     tasks.clean!
+  -- run tests
+  test: => sh "moon test/#{@n or @name or ''}.moon"
+  -- dummy tasks
+  hello:  => print "hello!"
+  shello: => sh "echo 'hello!'"

@@ -1,10 +1,11 @@
 -- alfons 4
 -- Task execution with Lua and MoonScript
 -- By daelvn
-import VERSION            from require "alfons.version"
-import prints, printError from require "alfons.provide"
-setfenv                    or= require "alfons.setfenv"
-fs                           = require "filekit"
+import VERSION from require "alfons.version"
+import style   from require "ansikit.style"
+setfenv         or= require "alfons.setfenv"
+fs                = require "filekit"
+unpack          or= table.unpack
 
 prints     = (...)       -> print unpack [style arg for arg in *{...}]
 printError = (text)      -> print style "%{red}#{text}"

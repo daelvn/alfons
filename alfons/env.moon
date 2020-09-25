@@ -1,7 +1,7 @@
 -- alfons.env
 -- Loading and custom environment
-import setfenv from require "alfons.compat"
 import style   from require "ansikit.style"
+setfenv         or= require "alfons.setfenv"
 fs                = require "filekit"
 provide           = require "alfons.provide"
 unpack          or= table.unpack
