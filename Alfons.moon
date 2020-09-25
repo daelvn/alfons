@@ -19,3 +19,8 @@ tasks:
     @s    or= @entry or "bin/alfons.lua"
     modules = for file in wildcard "alfons/*.moon" do "alfons.#{filename file}" 
     sh "amalg.lua -o #{@o} -s #{@s} #{table.concat modules, ' '}"
+  -- generate only alfons.lua
+  produce: =>
+    tasks.compile!
+    tasks.pack!
+    tasks.clean!
