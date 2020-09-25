@@ -6,6 +6,12 @@ import prints, printError from require "alfons.provide"
 setfenv                    or= require "alfons.setfenv"
 fs                           = require "filekit"
 
+prints     = (...)       -> print unpack [style arg for arg in *{...}]
+printError = (text)      -> print style "%{red}#{text}"
+errors     = (code, msg) ->
+  print style "%{red}#{msg}"
+  os.exit code
+
 prints "%{bold blue}Alfons #{VERSION}"
 
 -- get arguments
@@ -18,18 +24,14 @@ FILE = do
   elseif args.file               then args.file
   elseif fs.exists "Alfons.lua"  then "Alfons.lua"
   elseif fs.exists "Alfons.moon" then "Alfons.moon"
-  else
-    printError "No Alfonsfile found."
-    os.exit 1
+  else errors 1, "No Alfonsfile found."
 
 -- Also accept a custom language
 LANGUAGE = do
   if     FILE\match "moon$" then "moon"
   elseif FILE\match "lua$"  then "lua"
   elseif args.type          then args.type
-  else
-    printError "Cannot resolve format for Alfonsfile."
-    os.exit 1
+  else errors 1, "Cannot resolve format for Alfonsfile."
 print "Using #{FILE} (#{LANGUAGE})"
 
 -- read alfonsfile
@@ -38,12 +40,8 @@ import ENVIRONMENT, KEYS, loadEnv from require "alfons.env"
 content, contentErr = switch LANGUAGE
   when "moon" then readMoon FILE
   when "lua"  then readLua  FILE
-  else
-    printError "Cannot resolve format '#{LANGUAGE}' for Alfonsfile."
-    os.exit 1
-unless content
-  printError contentErr
-  os.exit 1
+  else errors 1, "Cannot resolve format '#{LANGUAGE}' for Alfonsfile."
+unless content then errors 1, contentErr
 
 -- create local copy of environment
 import contains from require "alfons.provide"
@@ -53,9 +51,7 @@ environment.uses = (cmdmd) -> contains (args.commands or {}), cmdmd
 
 -- load tasks
 alfons, alfonsErr = loadEnv content, environment
-unless alfons
-  printError alfonsErr
-  os.exit 1
+unless alfons then errors 1, alfonsErr
 list = alfons args
 local tasks
 if list
@@ -65,9 +61,7 @@ else
 
 -- check that all tasks are functions
 for tname, ttask in pairs tasks
-  if "function" != type ttask
-    printError "alfons :: Task '#{tname}' is not a function"
-    os.exit 1
+  if "function" != type ttask then errors 1, "Task '#{tname}' is not a function"
 
 -- function to execute a task
 tasks_run = 0
