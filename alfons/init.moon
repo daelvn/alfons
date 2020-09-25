@@ -33,14 +33,21 @@ runString = (content, environment=ENVIRONMENT) ->
     -- argument handling
     args     = getopt {...}
     rawset env, "args", args
+    -- add utils
+    rawset env, "uses", (cmdmd) -> provide.contains (args.commands or {}), cmdmd
     -- run
     list  = alf args
+    -- collect all tasks into a single table
     tasks = list.tasks or {}
     -- wrap tasks
     etasks = {}
-    for k, v in pairs tasks
-      etasks[k] = (t={}) -> run k, v, t
+    for k, v in pairs tasks do etasks[k] = (t={}) -> run k, v, t
+    -- 
     -- return
     return etasks, env
 
-{ :runString }
+-- runString, but for env.load
+runGlobal = (mod, environment=ENVIRONMENT) ->
+  
+
+{ :run, :runString }
