@@ -2,6 +2,7 @@
 -- API for running taskfiles
 import ENVIRONMENT, KEYS, loadEnv from require "alfons.env"
 import getopt                     from require "alfons.getopt"
+import look                       from require "alfons.look"
 provide                              = require "alfons.provide"
 
 -- run name:string, task:function, argl:table
@@ -48,6 +49,10 @@ runString = (content, environment=ENVIRONMENT) ->
 
 -- runString, but for env.load
 runGlobal = (mod, environment=ENVIRONMENT) ->
-  
+  file, fileErr = look mod
+  if file
+    return runString (look mod), environment
+  else
+    return nil, fileErr
 
 { :run, :runString }
