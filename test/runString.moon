@@ -6,5 +6,5 @@ alfons, err = runString readMoon "test/alfons/main.moon"
 error err if err
 env = alfons!
 
-env.tasks.always!
+--env.tasks.always!
 env.tasks.execute!

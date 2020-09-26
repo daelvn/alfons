@@ -21,7 +21,7 @@ run       = (name, task, argl) ->
 -- initialize a new environment
 initEnv = (base=ENVIRONMENT) ->
   -- create table to be the actual environment
-  env, envmt         = {}, {}
+  env, envmt         = {:depth}, {}
   env.tasks, tasksmt = {}, {}
   setmetatable env, envmt
   setmetatable env.tasks, tasksmt
@@ -36,10 +36,12 @@ initEnv = (base=ENVIRONMENT) ->
   --
   return env
 
--- TODO run always task
 -- TODO make teardown queue and add the teardown task to it
 -- subloading another taskfile
 subload = (env) -> (name, argl={}) ->
+  -- FIXME an environment is initialized here but also inside subalf
+  -- NOTE  subalf and alf are not the same kind of function.
+  --       alf is curried load, subalf is runString
   subenv            = initEnv env
   subalf, subalfErr = runGlobal "test.alfons.#{name}"
   if subalf
@@ -81,7 +83,8 @@ runString = (content, environment=ENVIRONMENT, runAlways=true) ->
     -- add function for subloading
     rawset env, "load", subload env
     -- run always task
-    env.tasks.always! if runAlways
+    -- FIXME says it does not exist
+    env.tasks.always! if env.tasks.always and runAlways
     -- return
     return env
 
