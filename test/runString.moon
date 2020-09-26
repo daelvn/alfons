@@ -2,8 +2,9 @@ import runString from require "alfons"
 import readMoon  from require "alfons.file"
 inspect             = require "inspect" 
 
-alfons     = runString readMoon "Alfons.moon"
-tasks, env = alfons!
+alfons, err = runString readMoon "test/alfons/main.moon"
+error err if err
+env = alfons!
 
-print inspect {:tasks,:env}
-tasks.shello!
+env.tasks.always!
+env.tasks.execute!

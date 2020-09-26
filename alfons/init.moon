@@ -4,48 +4,86 @@ import ENVIRONMENT, KEYS, loadEnv from require "alfons.env"
 import getopt                     from require "alfons.getopt"
 import look                       from require "alfons.look"
 provide                              = require "alfons.provide"
+unpack                             or= table.unpack
+inspect = require "inspect"
+
+local *
 
 -- run name:string, task:function, argl:table
 tasks_run = 0
 run       = (name, task, argl) ->
   tasks_run += 1
-  print tasks_run, name
   self       = {k, v for k, v in pairs argl}
   self.name  = name
   self.task  = -> run name, task, argl
   task self
 
--- runString content:string, environment:table -> ... -> tasks:table
-runString = (content, environment=ENVIRONMENT) ->
+-- initialize a new environment
+initEnv = (base=ENVIRONMENT) ->
   -- create table to be the actual environment
-  env, envmt = {tasks: {}}, {}
+  env, envmt         = {}, {}
+  env.tasks, tasksmt = {}, {}
   setmetatable env, envmt
-  -- set __index to access environment
-  envmt.__index = (k) => environment[k] or provide[k]
-  -- set __newindex to get new tasks
+  setmetatable env.tasks, tasksmt
+  -- set envmt.__index to access environment and provided functions
+  envmt.__index = (k) => base[k] or provide[k]
+  -- set envmt.__newindex to get new tasks
   envmt.__newindex = (k, v) =>
     error "Task '#{k}' is not a function."
     @tasks[k] = (t={}) -> run k, v, t
+  -- set tasksmt.__index to give friendly messages
+  tasksmt.__index = (k) => error "Task '#{k}' does not exist."
+  --
+  return env
+
+-- TODO run always task
+-- TODO make teardown queue and add the teardown task to it
+-- subloading another taskfile
+subload = (env) -> (name, argl={}) ->
+  subenv            = initEnv env
+  subalf, subalfErr = runGlobal "test.alfons.#{name}"
+  if subalf
+    --subargs = getopt argl
+    subargs = argl
+    rawset subenv, "args", subargs
+    rawset subenv, "uses", (cmdmd) -> provide.contains (subargs.commands or {}), cmdmd
+    -- run
+    sublist  = subalf unpack subargs
+    subtasks = sublist.tasks or {}
+    for k, v in pairs subtasks do subenv.tasks[k] = (t={}) -> run k, v, t
+    rawset subenv, "load", subload subenv
+    -- add to available tasks
+    tasksmt         = (getmetatable env.tasks)
+    fallback        = tasksmt.__index
+    tasksmt.__index = (k) => (rawget @, k) or subtasks[k] or fallback k
+  else
+    error "triggered"
+
+-- runString content:string, env:table, runAlways:boolean -> ... -> tasks:table
+runString = (content, environment=ENVIRONMENT, runAlways=true) ->
+  -- initialize environment
+  env = initEnv environment
   -- load file
   alf, alfErr = loadEnv content, env
-  return nil, "Could not run string: #{alfErr}" if err
+  if alfErr then return nil, "Could not run string: #{alfErr}"
   -- return with wrapper
-  (...) ->
+  return (...) ->
     -- argument handling
-    args     = getopt {...}
+    args = getopt {...}
     rawset env, "args", args
     -- add utils
     rawset env, "uses", (cmdmd) -> provide.contains (args.commands or {}), cmdmd
     -- run
     list  = alf args
-    -- collect all tasks into a single table
     tasks = list.tasks or {}
-    -- wrap tasks
-    etasks = {}
-    for k, v in pairs tasks do etasks[k] = (t={}) -> run k, v, t
-    -- 
+    -- wrap tasks and put into environment
+    for k, v in pairs tasks do env.tasks[k] = (t={}) -> run k, v, t
+    -- add function for subloading
+    rawset env, "load", subload env
+    -- run always task
+    env.tasks.always! if runAlways
     -- return
-    return etasks, env
+    return env
 
 -- runString, but for env.load
 runGlobal = (mod, environment=ENVIRONMENT) ->
