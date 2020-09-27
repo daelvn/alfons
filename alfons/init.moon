@@ -1,27 +1,29 @@
 -- alfons.init
 -- API for running taskfiles
-import ENVIRONMENT, KEYS, loadEnv from require "alfons.env"
-import getopt                     from require "alfons.getopt"
-import look                       from require "alfons.look"
-provide                              = require "alfons.provide"
-unpack                             or= table.unpack
-inspect = require "inspect"
+import ENVIRONMENT, loadEnv from require "alfons.env"
+import getopt               from require "alfons.getopt"
+import look                 from require "alfons.look"
+provide                        = require "alfons.provide"
+unpack                       or= table.unpack
+inspect                        = require "inspect"
 
+-- forward-declare all globals
 local *
 
--- run name:string, task:function, argl:table
-tasks_run = 0
-run       = (name, task, argl) ->
-  tasks_run += 1
-  self       = {k, v for k, v in pairs argl}
-  self.name  = name
-  self.task  = -> run name, task, argl
+-- prefix for modules
+PREFIX = "test.alfons."
+
+-- run a single task with the proper arguments
+run = (name, task, argl) ->
+  self      = setmetatable {}, __index: argl
+  self.name = name
+  self.task = -> run name, task, argl
   task self
 
 -- initialize a new environment
 initEnv = (base=ENVIRONMENT) ->
   -- create table to be the actual environment
-  env, envmt         = {:depth}, {}
+  env, envmt         = {}, {}
   env.tasks, tasksmt = {}, {}
   setmetatable env, envmt
   setmetatable env.tasks, tasksmt
@@ -36,64 +38,75 @@ initEnv = (base=ENVIRONMENT) ->
   --
   return env
 
--- TODO make teardown queue and add the teardown task to it
--- subloading another taskfile
-subload = (env) -> (name, argl={}) ->
-  -- FIXME an environment is initialized here but also inside subalf
-  -- NOTE  subalf and alf are not the same kind of function.
-  --       alf is curried load, subalf is runString
-  subenv            = initEnv env
-  subalf, subalfErr = runGlobal "test.alfons.#{name}"
-  if subalf
-    --subargs = getopt argl
-    subargs = argl
-    rawset subenv, "args", subargs
-    rawset subenv, "uses", (cmdmd) -> provide.contains (subargs.commands or {}), cmdmd
-    -- run
-    sublist  = subalf unpack subargs
-    subtasks = sublist.tasks or {}
-    for k, v in pairs subtasks do subenv.tasks[k] = (t={}) -> run k, v, t
-    rawset subenv, "load", subload subenv
-    -- add to available tasks
-    tasksmt         = (getmetatable env.tasks)
-    fallback        = tasksmt.__index
-    tasksmt.__index = (k) => (rawget @, k) or subtasks[k] or fallback k
+-- runs a taskfile
+runString = (content, environment=ENVIRONMENT, runAlways=true, child=0, genv={}) ->
+  -- if content has no newlines and starts with 'alfons.tasks', use look.
+  local modname
+  if (not content\match "\n") and (content\match "^#{PREFIX\gsub '%.', '%%.'}")
+    modname             = content
+    content, contentErr = look content
+    if contentErr then return nil, contentErr
   else
-    error "triggered"
-
--- runString content:string, env:table, runAlways:boolean -> ... -> tasks:table
-runString = (content, environment=ENVIRONMENT, runAlways=true) ->
+    modname = "main"
+  -- if modname already exists, return genv[modname]
+  return genv[modname] if genv[modname]
   -- initialize environment
-  env = initEnv environment
+  env           = initEnv environment
+  genv[modname] = env
   -- load file
   alf, alfErr = loadEnv content, env
-  if alfErr then return nil, "Could not run string: #{alfErr}"
+  if alfErr then return nil, "Could not run Taskfile #{child}: #{alfErr}"
   -- return with wrapper
   return (...) ->
     -- argument handling
-    args = getopt {...}
+    argl = {...}
+    args = getopt argl
     rawset env, "args", args
     -- add utils
-    rawset env, "uses", (cmdmd) -> provide.contains (args.commands or {}), cmdmd
+    rawset env, "uses",   (cmdmd) -> provide.contains (args.commands or {}), cmdmd
     -- run
     list  = alf args
-    tasks = list.tasks or {}
+    tasks = list and (list.tasks and list.tasks or {}) or {}
     -- wrap tasks and put into environment
     for k, v in pairs tasks do env.tasks[k] = (t={}) -> run k, v, t
     -- add function for subloading
-    rawset env, "load", subload env
+    rawset env, "load", (mod) ->
+      -- add prefix to mod
+      mod = PREFIX .. mod
+      -- avoid mutual loading
+      return genv[mod] if genv[mod]
+      -- wrap
+      subalf, subalfErr = runString mod, env, runAlways, child+1, genv
+      if subalfErr then error subalfErr
+      subenv = subalf unpack argl
+      -- add tasks to main task table
+      -- direction: down/below
+      --tasksmt            = getmetatable env.tasks
+      --fallback           = tasksmt.__index
+      --tasksmt.__index    = (k) => (rawget @, k) or subenv.tasks[k] or fallback k
+      tasksmt         = getmetatable env.tasks
+      tasksmt.__index = (k) => (rawget @, k) or do
+        --print inspect genv
+        for scope, t in pairs genv
+          for name, task in pairs t.tasks
+            return task if k == name
+        -- else
+        return error "Task '#{k}' does not exist."
+      -- make the main tasks table accessible to the subloaded task table
+      -- direction: up/above
+      --subtasksmt         = getmetatable subenv.tasks
+      --subfallback        = subtasksmt.__index
+      --subtasksmt.__index = (k) => (rawget @, k) or env.tasks[k] or subfallback k
+      subtasksmt         = getmetatable subenv.tasks
+      subtasksmt.__index = (k) => (rawget @, k) or do
+        for scope, t in pairs genv
+          for name, task in pairs t.tasks
+            return task if k == name
+        -- else
+        return error "Task '#{k}' does not exist."
     -- run always task
-    -- FIXME says it does not exist
-    env.tasks.always! if env.tasks.always and runAlways
+    (rawget env.tasks, "always")! if runAlways and (rawget env.tasks, "always")
     -- return
     return env
 
--- runString, but for env.load
-runGlobal = (mod, environment=ENVIRONMENT) ->
-  file, fileErr = look mod
-  if file
-    return runString (look mod), environment
-  else
-    return nil, fileErr
-
-{ :run, :runString }
+{ :run, :runString, :initEnv }

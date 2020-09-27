@@ -1,3 +1,7 @@
 tasks:
   always:  => load "subalf"
-  execute: => tasks.subloaded!
+  hello:   => print @name
+  shello:  => sh "echo 'Hello from sh!'"
+  execute: =>
+    print @name
+    tasks.subloaded!
