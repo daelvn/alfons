@@ -7,7 +7,7 @@ provide                        = require "alfons.provide"
 unpack                       or= table.unpack
 inspect                        = require "inspect"
 
--- forward-declare all globals
+-- forward-declare all locals
 local *
 
 -- prefix for modules
