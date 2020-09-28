@@ -36,7 +36,7 @@ Alfons is a task runner to help you manage your project. It's inspired by the wo
 
 Run `alfons` in a directory with an `Alfons.lua` or `Alfons.moon` file. Using MoonScript (obviously) requires installing MoonScript via LuaRocks.
 
-To see the documentation,, check out the [`docs/`](docs/) folder of this repo.
+To see the documentation, check out the [`docs/`](docs/) folder of this repo.
 
 ### Defining tasks
 
