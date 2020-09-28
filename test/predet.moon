@@ -1,6 +1,6 @@
 import runString from require "alfons"
 import readMoon  from require "alfons.file"
-inspect             = require "inspect" 
+inspect             = require "inspect"
 
 -- testing default and finalize tasks
 alfons, err = runString readMoon "test/alfons/predet.moon"
