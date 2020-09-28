@@ -11,7 +11,8 @@ inspect                        = require "inspect"
 local *
 
 -- prefix for modules
-PREFIX = "test.alfons."
+--PREFIX = "test.alfons."
+PREFIX = "alfons.tasks."
 
 -- initialize a new environment
 initEnv = (run, base=ENVIRONMENT, genv, modname="main") ->
