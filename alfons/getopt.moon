@@ -16,7 +16,6 @@ getopt = (argl) ->
       args[o] = v
   -- loop args
   for arg in *argl
-    print (require "inspect") arg
     -- stop parsing
     if arg == "--"
       flags.stop = true
