@@ -58,3 +58,4 @@ for command in *args.commands
   (rawget env.tasks, "teardown") if rawget env.tasks, "teardown"
 
 -- TODO add finalize mechanism for running `default` and `finalize`.
+env.finalize!

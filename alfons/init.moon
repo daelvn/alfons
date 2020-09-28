@@ -13,33 +13,31 @@ local *
 -- prefix for modules
 PREFIX = "test.alfons."
 
--- run a single task with the proper arguments
-run = (name, task, argl) ->
-  self      = setmetatable {}, __index: argl
-  self.name = name
-  self.task = -> run name, task, argl
-  task self
-
 -- initialize a new environment
-initEnv = (base=ENVIRONMENT) ->
+initEnv = (run, base=ENVIRONMENT, genv, modname="main") ->
   -- create table to be the actual environment
   env, envmt         = {}, {}
   env.tasks, tasksmt = {}, {}
   setmetatable env, envmt
   setmetatable env.tasks, tasksmt
   -- set envmt.__index to access environment and provided functions
-  envmt.__index = (k) => base[k] or provide[k]
+  envmt.__index = (k) =>
+    if genv and k == "__ran"
+      return (getmetatable genv[modname]).__ran
+    else
+      base[k] or provide[k]
   -- set envmt.__newindex to get new tasks
   envmt.__newindex = (k, v) =>
     error "Task '#{k}' is not a function."
     @tasks[k] = (t={}) -> run k, v, t
   -- set tasksmt.__index to give friendly messages
   tasksmt.__index = (k) => error "Task '#{k}' does not exist."
-  --
+  -- set __ran value to 0
+  envmt.__ran = 0
   return env
 
 -- runs a taskfile
-runString = (content, environment=ENVIRONMENT, runAlways=true, child=0, genv={}) ->
+runString = (content, environment=ENVIRONMENT, runAlways=true, child=0, genv={}, rqueue={}) ->
   -- if content has no newlines and starts with 'alfons.tasks', use look.
   local modname
   if (not content\match "\n") and (content\match "^#{PREFIX\gsub '%.', '%%.'}")
@@ -50,8 +48,17 @@ runString = (content, environment=ENVIRONMENT, runAlways=true, child=0, genv={})
     modname = "main"
   -- if modname already exists, return genv[modname]
   return genv[modname] if genv[modname]
+  -- add run function
+  -- run a single task with the proper arguments
+  run = (name, task, argl) ->
+    (getmetatable genv[modname]).__ran += 1
+    --print "ran tasks for #{modname}", (getmetatable genv[modname]).__ran
+    self      = setmetatable {}, __index: argl
+    self.name = name
+    self.task = -> run name, task, argl
+    task self
   -- initialize environment
-  env           = initEnv environment
+  env           = initEnv run, environment, genv, modname
   genv[modname] = env
   -- load file
   alf, alfErr = loadEnv content, env
@@ -69,6 +76,9 @@ runString = (content, environment=ENVIRONMENT, runAlways=true, child=0, genv={})
     tasks = list and (list.tasks and list.tasks or {}) or {}
     -- wrap tasks and put into environment
     for k, v in pairs tasks do env.tasks[k] = (t={}) -> run k, v, t
+    -- add finalize tasks to the queue
+    if fintask = (rawget env.tasks, "finalize")
+      rqueue[#rqueue+1] = fintask
     -- add function for subloading
     rawset env, "load", (mod) ->
       -- add prefix to mod
@@ -76,7 +86,7 @@ runString = (content, environment=ENVIRONMENT, runAlways=true, child=0, genv={})
       -- avoid mutual loading
       return genv[mod] if genv[mod]
       -- wrap
-      subalf, subalfErr = runString mod, env, runAlways, child+1, genv
+      subalf, subalfErr = runString mod, env, runAlways, child+1, genv, rqueue
       if subalfErr then error subalfErr
       subenv = subalf unpack argl
       -- add tasks to main task table
@@ -105,7 +115,17 @@ runString = (content, environment=ENVIRONMENT, runAlways=true, child=0, genv={})
         -- else
         return error "Task '#{k}' does not exist."
     -- run always task
-    (rawget env.tasks, "always")! if runAlways and (rawget env.tasks, "always")
+    if runAlways and (rawget env.tasks, "always")
+      (rawget env.tasks, "always")!
+      (getmetatable genv[modname]).__ran -= 1
+    -- add trigger for default and finalize tasks
+    rawset env, "finalize", ->
+      -- default
+      for scope, t in pairs genv
+        --print "ran for #{scope}", t.__ran
+        (rawget t.tasks, "default")! if (rawget t.tasks, "default") and t.__ran < 1
+      -- finalize
+      rqueue[i]! for i=#rqueue, 1, -1
     -- return
     return env
 
