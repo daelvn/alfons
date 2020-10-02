@@ -16,6 +16,8 @@ Alfons is a task runner to help you manage your project. It's inspired by the wo
 - [Alfons 4](#alfons-4)
   - [Table of contents](#table-of-contents)
   - [Changelog](#changelog)
+    - [4.2](#42)
+    - [4.1](#41)
   - [Usage](#usage)
     - [Defining tasks](#defining-tasks)
     - [Calling tasks](#calling-tasks)
@@ -30,6 +32,18 @@ Alfons is a task runner to help you manage your project. It's inspired by the wo
 
 ## Changelog
 
+### 4.2
+
+- **4.2** (02.10.2020) Internal overhaul.
+
+Alfons 4.2 changes the whole way that Alfons works on the inside.
+
+### 4.1
+
+- **4.1.4** (12.09.2020) - Bugfix on `default` task.
+- **4.1.3** (11.09.2020) - Funny Homestuck Number update. Fix `inotify` dependency.
+- **4.1.2** (29.08.2020) - More bugfixes
+- **4.1.1** (27.08.2020) - Bugfixes
 - **4.1** (27.08.2020) - Added [`uses`](docs/arguments.md)
 
 ## Usage
@@ -70,12 +84,12 @@ From the command line, simply pass the name of the task you wish to run. Alterna
 **Lua:**
 
 ```
-function test (self, caller)
-  print("I am " .. self.name .. " and " .. caller .. " called me.")
+function test (self)
+  print("I am " .. self.name .. " and " .. self.caller .. " called me.")
 end
 
 function call (self)
-  tasks.test(self.name)
+  tasks.test{caller = self.name}
 end
 ```
 
@@ -83,13 +97,13 @@ end
 
 ```moon
 tasks:
-  test: (caller) => print "I am #{@name} and #{caller} called me."
-  call:          => tasks.test @name
+  test: => print "I am #{@name} and #{@caller} called me."
+  call: => tasks.test caller: @name
 ```
 
 ### Arguments
 
-Arguments are passed in the `self` table of every function, along with an automatic one called `name` which is, well, uh, its own name. You can also use the `args` table to see the whole tree of arguments. Feel free to play with and abuse this!
+Arguments are passed in the `self` table of every function, which contains a field called `name` which is, well, uh, its own name. You can also use the `args` table to see the whole tree of arguments. Feel free to play with and abuse this!
 
 ### Migrating from Alfons 3
 
