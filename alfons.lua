@@ -391,7 +391,6 @@ runString = function(content, environment, runAlways, child, genv, rqueue)
   end
 end
 return {
-  run = run,
   runString = runString,
   initEnv = initEnv
 }
@@ -980,7 +979,7 @@ if not (content) then
   errors(1, contentErr)
 end
 local runString
-runString = require("alfons").runString
+runString = require("alfons.init").runString
 local alfons, alfonsErr = runString(content)
 if not (alfons) then
   errors(1, alfonsErr)

@@ -133,4 +133,4 @@ runString = (content, environment=ENVIRONMENT, runAlways=true, child=0, genv={},
     -- return
     return env
 
-{ :run, :runString, :initEnv }
+{ :runString, :initEnv }

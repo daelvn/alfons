@@ -46,13 +46,12 @@ content, contentErr = switch LANGUAGE
 unless content then errors 1, contentErr
 
 -- Run the taskfile
-import runString from require "alfons"
+import runString from require "alfons.init"
 alfons, alfonsErr = runString content
 unless alfons then errors 1, alfonsErr
 env = alfons unpack args
 
 -- run tasks, and teardown after each of them
--- TODO consider a variable for letting the task know if it was loaded or run from CLI
 for command in *args.commands
   env.tasks[command]!            if env.tasks[command]
   (rawget env.tasks, "teardown") if rawget env.tasks, "teardown"
