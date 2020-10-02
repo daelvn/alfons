@@ -25,7 +25,10 @@ tasks:
     tasks.pack!
     tasks.clean!
   -- run tests
-  test: => sh "moon test/#{@n or @name or ''}.moon"
+  test: => sh "moon test/#{@n or ''}.moon"
   -- dummy tasks
   hello:  => print "hello!"
   shello: => sh "echo 'hello!'"
+  args:   =>
+    inspect = require "inspect"
+    print inspect args

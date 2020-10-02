@@ -5,6 +5,8 @@ import VERSION   from require "alfons.version"
 import style     from require "ansikit.style"
 fs                  = require "filekit"
 unpack            or= table.unpack
+inspect = require "inspect"
+
 
 -- utils
 prints     = (...)       -> print unpack [style arg for arg in *{...}]
@@ -48,7 +50,7 @@ unless content then errors 1, contentErr
 import runString from require "alfons.init"
 alfons, alfonsErr = runString content
 unless alfons then errors 1, alfonsErr
-env = alfons unpack args
+env = alfons ...
 
 -- run tasks, and teardown after each of them
 for command in *args.commands
