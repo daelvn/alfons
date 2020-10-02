@@ -5,7 +5,6 @@ import getopt               from require "alfons.getopt"
 import look                 from require "alfons.look"
 provide                        = require "alfons.provide"
 unpack                       or= table.unpack
-inspect                        = require "inspect"
 
 -- forward-declare all locals
 local *

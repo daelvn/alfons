@@ -220,7 +220,6 @@ local look
 look = require("alfons.look").look
 local provide = require("alfons.provide")
 local unpack = unpack or table.unpack
-local inspect = require("inspect")
 local PREFIX, initEnv, runString
 PREFIX = "alfons.tasks."
 initEnv = function(run, base, genv, modname)
