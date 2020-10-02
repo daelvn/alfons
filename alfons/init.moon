@@ -25,6 +25,8 @@ initEnv = (run, base=ENVIRONMENT, genv, modname="main") ->
   envmt.__index = (k) =>
     if genv and k == "__ran"
       return (getmetatable genv[modname]).__ran
+    elseif genv and k == "store"
+      return (getmetatable genv).store
     else
       base[k] or provide[k]
   -- set envmt.__newindex to get new tasks
@@ -58,6 +60,8 @@ runString = (content, environment=ENVIRONMENT, runAlways=true, child=0, genv={},
     self.name = name
     self.task = -> run name, task, argl
     task self
+  -- reset genv metatable
+  setmetatable genv, {store: {}} unless getmetatable genv
   -- initialize environment
   env           = initEnv run, environment, genv, modname
   genv[modname] = env
