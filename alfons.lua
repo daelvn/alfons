@@ -901,7 +901,6 @@ VERSION = require("alfons.version").VERSION
 local style
 style = require("ansikit.style").style
 local fs = require("filekit")
-local setfenv = setfenv or require("alfons.setfenv")
 local unpack = unpack or table.unpack
 local prints
 prints = function(...)

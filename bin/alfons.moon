@@ -4,7 +4,6 @@
 import VERSION   from require "alfons.version"
 import style     from require "ansikit.style"
 fs                  = require "filekit"
-setfenv           or= require "alfons.setfenv"
 unpack            or= table.unpack
 
 -- utils
