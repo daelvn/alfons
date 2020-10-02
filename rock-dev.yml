@@ -24,6 +24,8 @@ build:
     alfons.getopt:      alfons/getopt.lua
     alfons.provide:     alfons/provide.lua
     alfons.version:     alfons/version.lua
+    alfons.look:        alfons/look.lua
+    alfons.init:        alfons/init.lua
   install:
     bin:
       alfons: bin/alfons.lua

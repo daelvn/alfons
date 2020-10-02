@@ -2,36 +2,10 @@ do
 
 do
 local _ENV = _ENV
-package.preload[ "alfons.compat" ] = function( ... ) local arg = _G.arg;
-local setfenv = setfenv or function(fn, env)
-  local i = 1
-  while true do
-    local name = debug.getupvalue(fn, i)
-    if name == "_ENV" then
-      debug.upvaluejoin(fn, i, (function()
-        return env
-      end), 1)
-    elseif not name then
-      break
-    end
-    i = i + 1
-  end
-  return fn
-end
-return {
-  setfenv = setfenv
-}
-
-end
-end
-
-do
-local _ENV = _ENV
 package.preload[ "alfons.env" ] = function( ... ) local arg = _G.arg;
-local setfenv
-setfenv = require("alfons.compat").setfenv
 local style
 style = require("ansikit.style").style
+local setfenv = setfenv or require("alfons.setfenv")
 local fs = require("filekit")
 local provide = require("alfons.provide")
 local unpack = unpack or table.unpack
@@ -63,16 +37,6 @@ ENVIRONMENT = {
 for k, v in pairs(provide) do
   ENVIRONMENT[k] = v
 end
-local KEYS
-do
-  local _accum_0 = { }
-  local _len_0 = 1
-  for k, v in pairs(ENVIRONMENT) do
-    _accum_0[_len_0] = k
-    _len_0 = _len_0 + 1
-  end
-  KEYS = _accum_0
-end
 local loadEnv
 loadEnv = function(content, env)
   local fn
@@ -81,23 +45,20 @@ loadEnv = function(content, env)
     local err
     fn, err = loadstring(content)
     if not (fn) then
-      provide.printError("loadEnv-5.1 :: Could not load Alfonsfile content: " .. tostring(err))
-      os.exit(1)
+      return nil, "Could not load Alfonsfile content (5.1): " .. tostring(err)
     end
     setfenv(fn, env)
   elseif "Lua 5.2" == _exp_0 or "Lua 5.3" == _exp_0 or "Lua 5.4" == _exp_0 then
     local err
     fn, err = load(content, "Alfons", "t", env)
     if not (fn) then
-      provide.printError("loadEnv :: Could not load Alfonsfile content: " .. tostring(err))
-      os.exit(1)
+      return nil, "Could not load Alfonsfile content (5.2+): " .. tostring(err)
     end
   end
   return fn
 end
 return {
   ENVIRONMENT = ENVIRONMENT,
-  KEYS = KEYS,
   loadEnv = loadEnv
 }
 
@@ -107,8 +68,6 @@ end
 do
 local _ENV = _ENV
 package.preload[ "alfons.file" ] = function( ... ) local arg = _G.arg;
-local printError
-printError = require("alfons.provide").printError
 local fs = require("filekit")
 local readMoon
 readMoon = function(file)
@@ -116,16 +75,14 @@ readMoon = function(file)
   do
     local _with_0 = fs.safeOpen(file, "r")
     if _with_0.error then
-      printError("loadMoon :: Could not open " .. tostring(file) .. ": " .. tostring(_with_0.error))
-      os.exit(1)
+      return nil, "Could not open " .. tostring(file) .. ": " .. tostring(_with_0.error)
     end
     local to_lua
     to_lua = require("moonscript.base").to_lua
     local err
     content, err = to_lua(_with_0:read("*a"))
     if not (content) then
-      printError("loadMoon :: Could not read or parse " .. tostring(file) .. ": " .. tostring(err))
-      os.exit(1)
+      return nil, "Could not read or parse " .. tostring(file) .. ": " .. tostring(err)
     end
     _with_0:close()
   end
@@ -137,13 +94,11 @@ readLua = function(file)
   do
     local _with_0 = fs.safeOpen(file, "r")
     if _with_0.error then
-      printError("readLua :: Could not open " .. tostring(file) .. ": " .. tostring(_with_0.error))
-      os.exit(1)
+      return nil, "Could not open " .. tostring(file) .. ": " .. tostring(_with_0.error)
     end
     content = _with_0:read("*a")
     if not (content) then
-      printError("readLua :: Could not read " .. tostring(file) .. ": " .. tostring(content))
-      os.exit(1)
+      return nil, "Could not read " .. tostring(file) .. ": " .. tostring(content)
     end
     _with_0:close()
   end
@@ -246,6 +201,282 @@ getopt = function(argl)
 end
 return {
   getopt = getopt
+}
+
+end
+end
+
+do
+local _ENV = _ENV
+package.preload[ "alfons.init" ] = function( ... ) local arg = _G.arg;
+local ENVIRONMENT, loadEnv
+do
+  local _obj_0 = require("alfons.env")
+  ENVIRONMENT, loadEnv = _obj_0.ENVIRONMENT, _obj_0.loadEnv
+end
+local getopt
+getopt = require("alfons.getopt").getopt
+local look
+look = require("alfons.look").look
+local provide = require("alfons.provide")
+local unpack = unpack or table.unpack
+local inspect = require("inspect")
+local PREFIX, initEnv, runString
+PREFIX = "alfons.tasks."
+initEnv = function(run, base, genv, modname)
+  if base == nil then
+    base = ENVIRONMENT
+  end
+  if modname == nil then
+    modname = "main"
+  end
+  local env, envmt = { }, { }
+  local tasksmt
+  env.tasks, tasksmt = { }, { }
+  setmetatable(env, envmt)
+  setmetatable(env.tasks, tasksmt)
+  envmt.__index = function(self, k)
+    if genv and k == "__ran" then
+      return (getmetatable(genv[modname])).__ran
+    elseif genv and k == "store" then
+      return (getmetatable(genv)).store
+    else
+      return base[k] or provide[k]
+    end
+  end
+  envmt.__newindex = function(self, k, v)
+    error("Task '" .. tostring(k) .. "' is not a function.")
+    self.tasks[k] = function(t)
+      if t == nil then
+        t = { }
+      end
+      return run(k, v, t)
+    end
+  end
+  tasksmt.__index = function(self, k)
+    return error("Task '" .. tostring(k) .. "' does not exist.")
+  end
+  envmt.__ran = 0
+  return env
+end
+runString = function(content, environment, runAlways, child, genv, rqueue)
+  if environment == nil then
+    environment = ENVIRONMENT
+  end
+  if runAlways == nil then
+    runAlways = true
+  end
+  if child == nil then
+    child = 0
+  end
+  if genv == nil then
+    genv = { }
+  end
+  if rqueue == nil then
+    rqueue = { }
+  end
+  local modname
+  if (not content:match("\n")) and (content:match("^" .. tostring(PREFIX:gsub('%.', '%%.')))) then
+    modname = content
+    local contentErr
+    content, contentErr = look(content)
+    if contentErr then
+      return nil, contentErr
+    end
+  else
+    modname = "main"
+  end
+  if genv[modname] then
+    return genv[modname]
+  end
+  local run
+  run = function(name, task, argl)
+    (getmetatable(genv[modname])).__ran = (getmetatable(genv[modname])).__ran + 1
+    local self = setmetatable({ }, {
+      __index = argl
+    })
+    self.name = name
+    self.task = function()
+      return run(name, task, argl)
+    end
+    return task(self)
+  end
+  if not (getmetatable(genv)) then
+    setmetatable(genv, {
+      store = { }
+    })
+  end
+  local env = initEnv(run, environment, genv, modname)
+  genv[modname] = env
+  local alf, alfErr = loadEnv(content, env)
+  if alfErr then
+    return nil, "Could not run Taskfile " .. tostring(child) .. ": " .. tostring(alfErr)
+  end
+  return function(...)
+    local argl = {
+      ...
+    }
+    local args = getopt(argl)
+    rawset(env, "args", args)
+    rawset(env, "uses", function(cmdmd)
+      return provide.contains((args.commands or { }), cmdmd)
+    end)
+    local list = alf(args)
+    local tasks = list and (list.tasks and list.tasks or { }) or { }
+    for k, v in pairs(tasks) do
+      env.tasks[k] = function(t)
+        if t == nil then
+          t = { }
+        end
+        return run(k, v, t)
+      end
+    end
+    do
+      local fintask = (rawget(env.tasks, "finalize"))
+      if fintask then
+        rqueue[#rqueue + 1] = fintask
+      end
+    end
+    rawset(env, "load", function(mod)
+      mod = PREFIX .. mod
+      if genv[mod] then
+        return genv[mod]
+      end
+      local subalf, subalfErr = runString(mod, env, runAlways, child + 1, genv, rqueue)
+      if subalfErr then
+        error(subalfErr)
+      end
+      local subenv = subalf(unpack(argl))
+      local tasksmt = getmetatable(env.tasks)
+      tasksmt.__index = function(self, k)
+        return (rawget(self, k)) or (function()
+          for scope, t in pairs(genv) do
+            for name, task in pairs(t.tasks) do
+              if k == name then
+                return task
+              end
+            end
+          end
+          return error("Task '" .. tostring(k) .. "' does not exist.")
+        end)()
+      end
+      local subtasksmt = getmetatable(subenv.tasks)
+      subtasksmt.__index = function(self, k)
+        return (rawget(self, k)) or (function()
+          for scope, t in pairs(genv) do
+            for name, task in pairs(t.tasks) do
+              if k == name then
+                return task
+              end
+            end
+          end
+          return error("Task '" .. tostring(k) .. "' does not exist.")
+        end)()
+      end
+    end)
+    if runAlways and (rawget(env.tasks, "always")) then
+      (rawget(env.tasks, "always"))();
+      (getmetatable(genv[modname])).__ran = (getmetatable(genv[modname])).__ran - 1
+    end
+    rawset(env, "finalize", function()
+      for scope, t in pairs(genv) do
+        if (rawget(t.tasks, "default")) and t.__ran < 1 then
+          (rawget(t.tasks, "default"))()
+        end
+      end
+      for i = #rqueue, 1, -1 do
+        rqueue[i]()
+      end
+    end)
+    return env
+  end
+end
+return {
+  run = run,
+  runString = runString,
+  initEnv = initEnv
+}
+
+end
+end
+
+do
+local _ENV = _ENV
+package.preload[ "alfons.look" ] = function( ... ) local arg = _G.arg;
+local readMoon, readLua
+do
+  local _obj_0 = require("alfons.file")
+  readMoon, readLua = _obj_0.readMoon, _obj_0.readLua
+end
+local fs = require("filekit")
+local sanitize
+sanitize = function(pattern)
+  if pattern == nil then
+    pattern = ""
+  end
+  return pattern:gsub("[%(%)%.%%%+%-%*%?%[%]%^%$]", "%%%0")
+end
+local dirsep, pathsep, wildcard = package.config:match("^(.)\n(.)\n(.)")
+local modsep = "%."
+local swildcard = sanitize(wildcard)
+local makeLook
+makeLook = function(gpath)
+  if gpath == nil then
+    gpath = package.path
+  end
+  local paths
+  do
+    local _accum_0 = { }
+    local _len_0 = 1
+    for path in gpath:gmatch("[^" .. tostring(pathsep) .. "]+") do
+      _accum_0[_len_0] = path
+      _len_0 = _len_0 + 1
+    end
+    paths = _accum_0
+  end
+  local moonpaths
+  do
+    local _accum_0 = { }
+    local _len_0 = 1
+    for path in gpath:gmatch("[^" .. tostring(pathsep) .. "]+") do
+      _accum_0[_len_0] = path:gsub("%.lua$", ".moon")
+      _len_0 = _len_0 + 1
+    end
+    moonpaths = _accum_0
+  end
+  return function(name)
+    local mod = name:gsub(modsep, dirsep)
+    local file = false
+    for _index_0 = 1, #paths do
+      local path = paths[_index_0]
+      local pt = path:gsub(swildcard, mod)
+      if fs.exists(pt) then
+        file = pt
+      end
+    end
+    for _index_0 = 1, #moonpaths do
+      local path = moonpaths[_index_0]
+      local pt = path:gsub(swildcard, mod)
+      if fs.exists(pt) then
+        file = pt
+      end
+    end
+    if file then
+      local read = (file:match("%.lua$")) and readLua or readMoon
+      local content, contentErr = read(file)
+      if content then
+        return content
+      else
+        return nil, contentErr
+      end
+    else
+      return nil, tostring(name) .. " not found."
+    end
+  end
+end
+return {
+  makeLook = makeLook,
+  look = makeLook()
 }
 
 end
@@ -466,7 +697,7 @@ end
 local watch
 watch = function(dirs, exclude, evf, pred, fn)
   if not (inotify) then
-    error("can't load inotify")
+    error("Could not load inotify")
   end
   local handle = inotify.init()
   if evf == "live" then
@@ -635,9 +866,31 @@ end
 
 do
 local _ENV = _ENV
+package.preload[ "alfons.setfenv" ] = function( ... ) local arg = _G.arg;
+return setfenv or function(fn, env)
+  local i = 1
+  while true do
+    local name = debug.getupvalue(fn, i)
+    if name == "_ENV" then
+      debug.upvaluejoin(fn, i, (function()
+        return env
+      end), 1)
+    elseif not name then
+      break
+    end
+    i = i + 1
+  end
+  return fn
+end
+
+end
+end
+
+do
+local _ENV = _ENV
 package.preload[ "alfons.version" ] = function( ... ) local arg = _G.arg;
 return {
-  VERSION = "4.1.4"
+  VERSION = "4.2"
 }
 
 end
@@ -647,14 +900,36 @@ end
 
 local VERSION
 VERSION = require("alfons.version").VERSION
-local prints, printError
-do
-  local _obj_0 = require("alfons.provide")
-  prints, printError = _obj_0.prints, _obj_0.printError
-end
-local setfenv
-setfenv = require("alfons.compat").setfenv
+local style
+style = require("ansikit.style").style
 local fs = require("filekit")
+local setfenv = setfenv or require("alfons.setfenv")
+local unpack = unpack or table.unpack
+local prints
+prints = function(...)
+  return print(unpack((function(...)
+    local _accum_0 = { }
+    local _len_0 = 1
+    local _list_0 = {
+      ...
+    }
+    for _index_0 = 1, #_list_0 do
+      local arg = _list_0[_index_0]
+      _accum_0[_len_0] = style(arg)
+      _len_0 = _len_0 + 1
+    end
+    return _accum_0
+  end)(...)))
+end
+local printError
+printError = function(text)
+  return print(style("%{red}" .. tostring(text)))
+end
+local errors
+errors = function(code, msg)
+  print(style("%{red}" .. tostring(msg)))
+  return os.exit(code)
+end
 prints("%{bold blue}Alfons " .. tostring(VERSION))
 local getopt
 getopt = require("alfons.getopt").getopt
@@ -672,7 +947,7 @@ do
   elseif fs.exists("Alfons.moon") then
     FILE = "Alfons.moon"
   else
-    FILE = error("No Alfonsfile found.")
+    FILE = errors(1, "No Alfonsfile found.")
   end
 end
 local LANGUAGE
@@ -684,7 +959,7 @@ do
   elseif args.type then
     LANGUAGE = args.type
   else
-    LANGUAGE = error("Cannot resolve format for Alfonsfile.")
+    LANGUAGE = errors(1, "Cannot resolve format for Alfonsfile.")
   end
 end
 print("Using " .. tostring(FILE) .. " (" .. tostring(LANGUAGE) .. ")")
@@ -693,117 +968,33 @@ do
   local _obj_0 = require("alfons.file")
   readMoon, readLua = _obj_0.readMoon, _obj_0.readLua
 end
-local ENVIRONMENT, KEYS, loadEnv
-do
-  local _obj_0 = require("alfons.env")
-  ENVIRONMENT, KEYS, loadEnv = _obj_0.ENVIRONMENT, _obj_0.KEYS, _obj_0.loadEnv
-end
-local content
+local content, contentErr
 local _exp_0 = LANGUAGE
 if "moon" == _exp_0 then
-  content = readMoon(FILE)
+  content, contentErr = readMoon(FILE)
 elseif "lua" == _exp_0 then
-  content = readLua(FILE)
+  content, contentErr = readLua(FILE)
 else
-  content = error("Cannot resolve format '" .. tostring(LANGUAGE) .. "' for Alfonsfile.")
+  content, contentErr = errors(1, "Cannot resolve format '" .. tostring(LANGUAGE) .. "' for Alfonsfile.")
 end
-local contains
-contains = require("alfons.provide").contains
-local environment
-do
-  local _tbl_0 = { }
-  for k, v in pairs(ENVIRONMENT) do
-    _tbl_0[k] = v
-  end
-  environment = _tbl_0
+if not (content) then
+  errors(1, contentErr)
 end
-environment.args = args
-environment.uses = function(cmdmd)
-  return contains((args.commands or { }), cmdmd)
+local runString
+runString = require("alfons").runString
+local alfons, alfonsErr = runString(content)
+if not (alfons) then
+  errors(1, alfonsErr)
 end
-local alfons = loadEnv(content, environment)
-local list = alfons(args)
-local tasks
-if list then
-  tasks = list.tasks
-else
-  do
-    local _tbl_0 = { }
-    for k, v in pairs(environment) do
-      if not contains(KEYS, k) then
-        _tbl_0[k] = v
-      end
-    end
-    tasks = _tbl_0
-  end
-end
-for tname, ttask in pairs(tasks) do
-  if "function" ~= type(ttask) then
-    printError("alfons :: Task '" .. tostring(tname) .. "' is not a function")
-    os.exit(1)
-  end
-end
-local tasks_run = 0
-local run
-run = function(name, task, argl)
-  tasks_run = tasks_run + 1
-  local self
-  do
-    local _tbl_0 = { }
-    for k, v in pairs(argl) do
-      _tbl_0[k] = v
-    end
-    self = _tbl_0
-  end
-  self.name = name
-  self.task = function()
-    return run(name, task, argl)
-  end
-  return task(self)
-end
-do
-  local _tbl_0 = { }
-  for k, v in pairs(tasks) do
-    _tbl_0[k] = (function(t)
-      if t == nil then
-        t = { }
-      end
-      return run(k, v, t)
-    end)
-  end
-  environment.tasks = _tbl_0
-end
-environment.load = function(mod)
-  local loadtasks = require("alfons.tasks." .. tostring(mod))
-  for tname, ttask in pairs(loadtasks.tasks) do
-    if "function" == type(ttask) then
-      setfenv(ttask, environment)
-      tasks[tname] = ttask
-      environment.tasks[tname] = function(t)
-        if t == nil then
-          t = { }
-        end
-        return run(tname, ttask, t)
-      end
-    end
-  end
-end
-if tasks.always then
-  prints("%{green}->%{white} always")
-  run("always", tasks.always, args.always or { })
-end
+local env = alfons(unpack(args))
 local _list_0 = args.commands
 for _index_0 = 1, #_list_0 do
   local command = _list_0[_index_0]
-  if tasks[command] then
-    prints("%{green}->%{white} " .. tostring(command))
-    run(command, tasks[command], args[command] or { })
-    if tasks.teardown then
-      run("teardown", tasks.teardown, args.teardown or { })
-    end
+  if env.tasks[command] then
+    env.tasks[command]()
+  end
+  if rawget(env.tasks, "teardown") then
+    local _ = (rawget(env.tasks, "teardown"))
   end
 end
-if tasks.default and tasks_run == 0 then
-  prints("%{green}->%{white} default")
-  return run("default", tasks.default, args.default or { })
-end
+return env.finalize()
