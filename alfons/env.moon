@@ -24,9 +24,6 @@ ENVIRONMENT = {
 for k, v in pairs provide
   ENVIRONMENT[k] = v
 
--- generate keylist
-KEYS = [k for k, v in pairs ENVIRONMENT]
-
 -- load in environment
 -- loadEnv content:string, env:table -> fn:function | nil, err:string
 loadEnv = (content, env) ->
@@ -47,6 +44,6 @@ loadEnv = (content, env) ->
   return fn
 
 {
-  :ENVIRONMENT, :KEYS
+  :ENVIRONMENT
   :loadEnv
 }
