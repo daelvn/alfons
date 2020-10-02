@@ -5,8 +5,6 @@ import VERSION   from require "alfons.version"
 import style     from require "ansikit.style"
 fs                  = require "filekit"
 unpack            or= table.unpack
-inspect = require "inspect"
-
 
 -- utils
 prints     = (...)       -> print unpack [style arg for arg in *{...}]
@@ -54,8 +52,8 @@ env = alfons ...
 
 -- run tasks, and teardown after each of them
 for command in *args.commands
-  env.tasks[command]!            if env.tasks[command]
-  (rawget env.tasks, "teardown") if rawget env.tasks, "teardown"
+  env.tasks[command] args[command] if env.tasks[command]
+  (rawget env.tasks, "teardown")   if rawget env.tasks, "teardown"
 
 -- finalize
 env.finalize!

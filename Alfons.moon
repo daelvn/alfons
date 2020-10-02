@@ -32,3 +32,4 @@ tasks:
   args:   =>
     inspect = require "inspect"
     print inspect args
+    print inspect @
