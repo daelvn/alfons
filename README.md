@@ -37,7 +37,7 @@ Alfons is a task runner to help you manage your project. It's inspired by the wo
 
 - **4.2** (02.10.2020) Internal overhaul.
 
-Alfons 4.2 changes the whole way that Alfons works on the inside.
+Alfons 4.2 changes the whole way that Alfons works on the inside. Please refer to [Loading](docs/loading.md) and [API](docs/api.md) for the most notable work.
 
 ### 4.1
 
