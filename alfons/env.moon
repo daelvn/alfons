@@ -3,7 +3,6 @@
 import style   from require "ansikit.style"
 setfenv         or= require "alfons.setfenv"
 fs                = require "filekit"
-provide           = require "alfons.provide"
 unpack          or= table.unpack
 
 -- forward-declare environment
@@ -19,10 +18,6 @@ ENVIRONMENT = {
   :print, :style                        -- from ansikit
   :io, :math, :string, :table, :os, :fs -- fs is either CC/fs or filekit
 }
-
--- add our own
-for k, v in pairs provide
-  ENVIRONMENT[k] = v
 
 -- load in environment
 -- loadEnv content:string, env:table -> fn:function | nil, err:string

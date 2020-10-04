@@ -195,22 +195,26 @@ $ luarocks install http
 The task gets an URL, and simply returns the contents as a string:
 
 ```lua
-load "fetch"
+function always ()
+  load "fetch"
+end
 function printurl (self)
   print(tasks.fetch{url="https://example.com"})
 end
 ```
 
 ```moon
-load "fetch"
 tasks:
+  always:   => load "fetch"
   printurl: => print tasks.fetch url: "https://example.com"
 ```
 
 If you need to write the contents to a file, you can use `writefile`:
 
 ```lua
-load "fetch"
+function always ()
+  load "fetch"
+end
 function download (self)
   writefile(self.file, tasks.fetch{url = self.url})
 end
@@ -220,8 +224,9 @@ end
 ```
 
 ```moon
-load "fetch"
 tasks:
+  always: =>
+    load "fetch"
   download: =>
     writefile @file, tasks.fetch url: @url
   main: =>

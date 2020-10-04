@@ -75,3 +75,59 @@ end
 $ alfons task subtask
 subtask was called!
 ```
+
+## Argument parsing
+
+Using `getopt`, you get a table `args` which contains the following information:
+
+### Commands
+
+Commands are the tasks to be executed in Alfons. They can be found at the following places:
+
+`getopt {"task1"}` or `alfons task1`
+
+```lua
+args = {
+  task1    = {},         -- task arguments go here, name of field varies.
+  commands = { "task1" } -- in order of use.
+}
+```
+
+### Flags
+
+Flags are arguments without a value. They are all set to `true`.
+
+`getopt {"task", "-a"}` or `alfons task -a`
+
+```lua
+args = {
+  task = {
+    ["a"] = true
+  },
+  commands = { "task" }
+}
+```
+
+### Options
+
+Options are arguments with a value. They are all set to their value.
+
+`getopt {"task", "--opt", "value"}` or `getopt {"task", "--opt=value"}` or `alfons task --opt value` or `alfons task --opt=value`
+
+```lua
+args = {
+  task = {
+    ["opt"] = "value"
+  },
+  commands = { "task" }
+}
+```
+
+### Interpreting arguments
+
+- `--` alone passes the arguments that come after it as they are.
+- `x` will be treated as a **command** and all arguments after it are arguments to it.
+- `-x` will be paired with the argument after it as an **option** unless it is last in the list, in which case it is just a **flag**.
+- `-abc` represents three **flags**: `a`, `b` and `c`.
+- `--xa` will be paired with the next argument as an **option** unless it is last in the list, in which case it is just a **flag**.
+- `--xa=val` uses `val` as a value to an **option** `xa`.

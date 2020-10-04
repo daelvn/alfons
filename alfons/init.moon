@@ -71,7 +71,7 @@ runString = (content, environment=ENVIRONMENT, runAlways=true, child=0, genv={},
   genv[modname] = env
   -- load file
   alf, alfErr = loadEnv content, env
-  if alfErr then return nil, "Could not run Taskfile #{child}: #{alfErr}"
+  if alfErr then return nil, "Could not load Taskfile #{child}: #{alfErr}"
   -- return with wrapper
   return (...) ->
     -- argument handling
