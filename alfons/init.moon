@@ -14,7 +14,7 @@ local *
 sanitize = (pattern) -> pattern\gsub "[%(%)%.%%%+%-%*%?%[%]%^%$]", "%%%0" if pattern
 
 -- prefix for modules
-PREFIX = "test.alfons.graph-proof."
+PREFIX = "test.alfons."
 --PREFIX = "alfons.tasks."
 
 -- initialize a new environment
@@ -34,7 +34,7 @@ initEnv = (run, base=ENVIRONMENT, genv, modname="__main__") ->
       base[k] or provide[k]
   -- set envmt.__newindex to get new tasks
   envmt.__newindex = (k, v) =>
-    error "Task '#{k}' is not a function."
+    error "Task '#{k}' is not a function." if "function" != type v
     @tasks[k] = (t={}) -> run k, v, t
   -- set tasksmt.__index to give friendly messages
   tasksmt.__index = (k) => error "Task '#{k}' does not exist."

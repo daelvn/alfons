@@ -220,14 +220,20 @@ local look
 look = require("alfons.look").look
 local provide = require("alfons.provide")
 local unpack = unpack or table.unpack
-local PREFIX, initEnv, runString
-PREFIX = "alfons.tasks."
+local inspect = require("inspect")
+local sanitize, PREFIX, initEnv, runString
+sanitize = function(pattern)
+  if pattern then
+    return pattern:gsub("[%(%)%.%%%+%-%*%?%[%]%^%$]", "%%%0")
+  end
+end
+PREFIX = "test.alfons."
 initEnv = function(run, base, genv, modname)
   if base == nil then
     base = ENVIRONMENT
   end
   if modname == nil then
-    modname = "main"
+    modname = "__main__"
   end
   local env, envmt = { }, { }
   local tasksmt
@@ -244,7 +250,9 @@ initEnv = function(run, base, genv, modname)
     end
   end
   envmt.__newindex = function(self, k, v)
-    error("Task '" .. tostring(k) .. "' is not a function.")
+    if "function" ~= type(v) then
+      error("Task '" .. tostring(k) .. "' is not a function.")
+    end
     self.tasks[k] = function(t)
       if t == nil then
         t = { }
@@ -274,8 +282,11 @@ runString = function(content, environment, runAlways, child, genv, rqueue)
   if rqueue == nil then
     rqueue = { }
   end
+  if not ("string" == type(content)) then
+    error("Taskfile content must be a string")
+  end
   local modname
-  if (not content:match("\n")) and (content:match("^" .. tostring(PREFIX:gsub('%.', '%%.')))) then
+  if (not content:match("\n")) and (content:match("^" .. tostring(sanitize(PREFIX)))) then
     modname = content
     local contentErr
     content, contentErr = look(content)
@@ -283,7 +294,7 @@ runString = function(content, environment, runAlways, child, genv, rqueue)
       return nil, contentErr
     end
   else
-    modname = "main"
+    modname = "__main__"
   end
   if genv[modname] then
     return genv[modname]
@@ -983,12 +994,12 @@ local alfons, alfonsErr = runString(content)
 if not (alfons) then
   errors(1, alfonsErr)
 end
-local env = alfons(unpack(args))
+local env = alfons(...)
 local _list_0 = args.commands
 for _index_0 = 1, #_list_0 do
   local command = _list_0[_index_0]
   if env.tasks[command] then
-    env.tasks[command]()
+    env.tasks[command](args[command])
   end
   if rawget(env.tasks, "teardown") then
     local _ = (rawget(env.tasks, "teardown"))
