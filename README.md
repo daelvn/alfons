@@ -27,6 +27,7 @@ Alfons is a task runner to help you manage your project. It's inspired by the wo
       - [Importable tasks](#importable-tasks)
   - [Installing](#installing)
     - [Extra features](#extra-features)
+  - [Projects using Alfons](#projects-using-alfons)
   - [License](#license)
   - [Goodbye?](#goodbye)
 
@@ -147,6 +148,14 @@ The preincluded task `fetch` depends on [lua-http](https://github.com/daurnimato
 $ luarocks install http     # lua-http
 $ luarocks install inotify  # linotify
 ```
+
+## Projects using Alfons
+
+- [Moonbuild](https://github.com/natnat-mc/moonbuild) by the one and only [Codinget](https://github.com/natnat-mc)
+- [awlua](https://github.com/Le0Developer/awluas) by [Le0Developer](https://github.com/Le0Developer)
+- [VNDS-LOVE](https://github.com/ajusa/VNDS-LOVE) by [ajusa](https://github.com/ajusa)
+
+Thanks for using the project \<3.
 
 ## License
 

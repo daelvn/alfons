@@ -167,38 +167,9 @@ Returns the parent path of a file or folder.
 
 ### load
 
-`load (name)` imports tasks defined in `alfons.tasks.name` and adds them onto the tasks
-table, so you can run them from the command line and from other tasks. You can create your own LuaRocks modules which export something as `alfons.tasks.*` to add custom tasks, or just create a local folder `alfons/tasks/` and it will load from them too.
+`load (name)` imports tasks defined in `alfons.tasks.name` and lets you access them from the tasks table, so you can run them from the command line and from other tasks. You can create your own LuaRocks modules which export something as `alfons.tasks.*` to add custom tasks, or just create a local folder `alfons/tasks/` and it will load from them too.
 
-`alfons.tasks.sayhi`:
-
-```lua
-return {
-  tasks = {
-    sayhi = function() print "hi!" end
-  }
-}
-```
-
-```moon
-tasks:
-  sayhi: -> print "hi!"
-```
-
-`Alfons.moon`:
-
-```lua
-load "sayhi"
-always = tasks.sayhi
-```
-
-```moon
-load "sayhi"
-tasks:
-  always: tasks.sayhi
-```
-
-These modules are written like a normal Alfonsfile in MoonScript format. Unfortunately, Lua users will have to replicate it in Lua.
+Please look at [Loading](loading.md) for more detailed documentatin.
 
 ### style
 

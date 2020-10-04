@@ -5,16 +5,20 @@ import getopt               from require "alfons.getopt"
 import look                 from require "alfons.look"
 provide                        = require "alfons.provide"
 unpack                       or= table.unpack
+inspect = require "inspect"
 
 -- forward-declare all locals
 local *
 
+-- util
+sanitize = (pattern) -> pattern\gsub "[%(%)%.%%%+%-%*%?%[%]%^%$]", "%%%0" if pattern
+
 -- prefix for modules
---PREFIX = "test.alfons."
-PREFIX = "alfons.tasks."
+PREFIX = "test.alfons.graph-proof."
+--PREFIX = "alfons.tasks."
 
 -- initialize a new environment
-initEnv = (run, base=ENVIRONMENT, genv, modname="main") ->
+initEnv = (run, base=ENVIRONMENT, genv, modname="__main__") ->
   -- create table to be the actual environment
   env, envmt         = {}, {}
   env.tasks, tasksmt = {}, {}
@@ -40,14 +44,15 @@ initEnv = (run, base=ENVIRONMENT, genv, modname="main") ->
 
 -- runs a taskfile
 runString = (content, environment=ENVIRONMENT, runAlways=true, child=0, genv={}, rqueue={}) ->
+  error "Taskfile content must be a string" unless "string" == type content
   -- if content has no newlines and starts with 'alfons.tasks', use look.
   local modname
-  if (not content\match "\n") and (content\match "^#{PREFIX\gsub '%.', '%%.'}")
+  if (not content\match "\n") and (content\match "^#{sanitize PREFIX}")
     modname             = content
     content, contentErr = look content
     if contentErr then return nil, contentErr
   else
-    modname = "main"
+    modname = "__main__"
   -- if modname already exists, return genv[modname]
   return genv[modname] if genv[modname]
   -- add run function
