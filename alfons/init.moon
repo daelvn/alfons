@@ -5,7 +5,6 @@ import getopt               from require "alfons.getopt"
 import look                 from require "alfons.look"
 provide                        = require "alfons.provide"
 unpack                       or= table.unpack
-inspect = require "inspect"
 
 -- forward-declare all locals
 local *
@@ -105,7 +104,6 @@ runString = (content, environment=ENVIRONMENT, runAlways=true, child=0, genv={},
       --tasksmt.__index    = (k) => (rawget @, k) or subenv.tasks[k] or fallback k
       tasksmt         = getmetatable env.tasks
       tasksmt.__index = (k) => (rawget @, k) or do
-        --print inspect genv
         for scope, t in pairs genv
           for name, task in pairs t.tasks
             return task if k == name
