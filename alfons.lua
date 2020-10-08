@@ -7,7 +7,6 @@ local style
 style = require("ansikit.style").style
 local setfenv = setfenv or require("alfons.setfenv")
 local fs = require("filekit")
-local provide = require("alfons.provide")
 local unpack = unpack or table.unpack
 local ENVIRONMENT
 ENVIRONMENT = {
@@ -34,9 +33,6 @@ ENVIRONMENT = {
   os = os,
   fs = fs
 }
-for k, v in pairs(provide) do
-  ENVIRONMENT[k] = v
-end
 local loadEnv
 loadEnv = function(content, env)
   local fn
@@ -220,7 +216,6 @@ local look
 look = require("alfons.look").look
 local provide = require("alfons.provide")
 local unpack = unpack or table.unpack
-local inspect = require("inspect")
 local sanitize, PREFIX, initEnv, runString
 sanitize = function(pattern)
   if pattern then
@@ -320,7 +315,7 @@ runString = function(content, environment, runAlways, child, genv, rqueue)
   genv[modname] = env
   local alf, alfErr = loadEnv(content, env)
   if alfErr then
-    return nil, "Could not run Taskfile " .. tostring(child) .. ": " .. tostring(alfErr)
+    return nil, "Could not load Taskfile " .. tostring(child) .. ": " .. tostring(alfErr)
   end
   return function(...)
     local argl = {
