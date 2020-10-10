@@ -223,12 +223,15 @@ sanitize = function(pattern)
   end
 end
 PREFIX = "test.alfons."
-initEnv = function(run, base, genv, modname)
+initEnv = function(run, base, genv, modname, pretty)
   if base == nil then
     base = ENVIRONMENT
   end
   if modname == nil then
-    modname = "__main__"
+    modname = "main"
+  end
+  if pretty == nil then
+    pretty = false
   end
   local env, envmt = { }, { }
   local tasksmt
@@ -256,12 +259,17 @@ initEnv = function(run, base, genv, modname)
     end
   end
   tasksmt.__index = function(self, k)
-    return error("Task '" .. tostring(k) .. "' does not exist.")
+    if pretty then
+      provide.printError("Taskfile " .. tostring(modname) .. ": Task '" .. tostring(k) .. "' does not exist.")
+      return os.exit(1)
+    else
+      return error("Task '" .. tostring(k) .. "' does not exist.")
+    end
   end
   envmt.__ran = 0
   return env
 end
-runString = function(content, environment, runAlways, child, genv, rqueue)
+runString = function(content, environment, runAlways, child, genv, rqueue, pretty)
   if environment == nil then
     environment = ENVIRONMENT
   end
@@ -277,8 +285,11 @@ runString = function(content, environment, runAlways, child, genv, rqueue)
   if rqueue == nil then
     rqueue = { }
   end
+  if pretty == nil then
+    pretty = false
+  end
   if not ("string" == type(content)) then
-    error("Taskfile content must be a string")
+    return nil, "Taskfile content must be a string"
   end
   local modname
   if (not content:match("\n")) and (content:match("^" .. tostring(sanitize(PREFIX)))) then
@@ -289,7 +300,7 @@ runString = function(content, environment, runAlways, child, genv, rqueue)
       return nil, contentErr
     end
   else
-    modname = "__main__"
+    modname = "main"
   end
   if genv[modname] then
     return genv[modname]
@@ -311,7 +322,7 @@ runString = function(content, environment, runAlways, child, genv, rqueue)
       store = { }
     })
   end
-  local env = initEnv(run, environment, genv, modname)
+  local env = initEnv(run, environment, genv, modname, pretty)
   genv[modname] = env
   local alf, alfErr = loadEnv(content, env)
   if alfErr then
@@ -362,7 +373,12 @@ runString = function(content, environment, runAlways, child, genv, rqueue)
               end
             end
           end
-          return error("Task '" .. tostring(k) .. "' does not exist.")
+          if pretty then
+            provide.printError("Task '" .. tostring(k) .. "' does not exist.")
+            return os.exit(1)
+          else
+            return error("Task '" .. tostring(k) .. "' does not exist.")
+          end
         end)()
       end
       local subtasksmt = getmetatable(subenv.tasks)
@@ -375,7 +391,12 @@ runString = function(content, environment, runAlways, child, genv, rqueue)
               end
             end
           end
-          return error("Task '" .. tostring(k) .. "' does not exist.")
+          if pretty then
+            provide.printError("Task '" .. tostring(k) .. "' does not exist.")
+            return os.exit(1)
+          else
+            return error("Task '" .. tostring(k) .. "' does not exist.")
+          end
         end)()
       end
     end)
@@ -985,7 +1006,7 @@ if not (content) then
 end
 local runString
 runString = require("alfons.init").runString
-local alfons, alfonsErr = runString(content)
+local alfons, alfonsErr = runString(content, nil, true, 0, { }, { }, true)
 if not (alfons) then
   errors(1, alfonsErr)
 end

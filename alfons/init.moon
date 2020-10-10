@@ -17,7 +17,7 @@ PREFIX = "test.alfons."
 --PREFIX = "alfons.tasks."
 
 -- initialize a new environment
-initEnv = (run, base=ENVIRONMENT, genv, modname="__main__") ->
+initEnv = (run, base=ENVIRONMENT, genv, modname="main", pretty=false) ->
   -- create table to be the actual environment
   env, envmt         = {}, {}
   env.tasks, tasksmt = {}, {}
@@ -36,14 +36,19 @@ initEnv = (run, base=ENVIRONMENT, genv, modname="__main__") ->
     error "Task '#{k}' is not a function." if "function" != type v
     @tasks[k] = (t={}) -> run k, v, t
   -- set tasksmt.__index to give friendly messages
-  tasksmt.__index = (k) => error "Task '#{k}' does not exist."
+  tasksmt.__index = (k) =>
+    if pretty
+      provide.printError "Taskfile #{modname}: Task '#{k}' does not exist."
+      os.exit 1
+    else
+      error "Task '#{k}' does not exist."
   -- set __ran value to 0
   envmt.__ran = 0
   return env
 
 -- runs a taskfile
-runString = (content, environment=ENVIRONMENT, runAlways=true, child=0, genv={}, rqueue={}) ->
-  error "Taskfile content must be a string" unless "string" == type content
+runString = (content, environment=ENVIRONMENT, runAlways=true, child=0, genv={}, rqueue={}, pretty=false) ->
+  return nil, "Taskfile content must be a string" unless "string" == type content
   -- if content has no newlines and starts with 'alfons.tasks', use look.
   local modname
   if (not content\match "\n") and (content\match "^#{sanitize PREFIX}")
@@ -51,7 +56,7 @@ runString = (content, environment=ENVIRONMENT, runAlways=true, child=0, genv={},
     content, contentErr = look content
     if contentErr then return nil, contentErr
   else
-    modname = "__main__"
+    modname = "main"
   -- if modname already exists, return genv[modname]
   return genv[modname] if genv[modname]
   -- add run function
@@ -66,7 +71,7 @@ runString = (content, environment=ENVIRONMENT, runAlways=true, child=0, genv={},
   -- reset genv metatable
   setmetatable genv, {store: {}} unless getmetatable genv
   -- initialize environment
-  env           = initEnv run, environment, genv, modname
+  env           = initEnv run, environment, genv, modname, pretty
   genv[modname] = env
   -- load file
   alf, alfErr = loadEnv content, env
@@ -108,7 +113,11 @@ runString = (content, environment=ENVIRONMENT, runAlways=true, child=0, genv={},
           for name, task in pairs t.tasks
             return task if k == name
         -- else
-        return error "Task '#{k}' does not exist."
+        if pretty
+          provide.printError "Task '#{k}' does not exist."
+          os.exit 1
+        else
+          error "Task '#{k}' does not exist."
       -- make the main tasks table accessible to the subloaded task table
       -- direction: up/above
       --subtasksmt         = getmetatable subenv.tasks
@@ -120,7 +129,11 @@ runString = (content, environment=ENVIRONMENT, runAlways=true, child=0, genv={},
           for name, task in pairs t.tasks
             return task if k == name
         -- else
-        return error "Task '#{k}' does not exist."
+        if pretty
+          provide.printError "Task '#{k}' does not exist."
+          os.exit 1
+        else
+          error "Task '#{k}' does not exist."
     -- run always task
     if runAlways and (rawget env.tasks, "always")
       (rawget env.tasks, "always")!

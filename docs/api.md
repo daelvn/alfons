@@ -87,7 +87,7 @@ Provides the main functions required to run a Taskfile.
 
 ### initEnv
 
-`initEnv` takes a `run` function (see below), a base environment (defaults to `alfons.env`'s `ENVIRONMENT`), a private global environment table (referred to as `genv`), and a module name (defaults to `__main__`). It returns an environment ready to use in Taskfiles. This function is internal and should not really be used, so I will not explain it.
+`initEnv` takes a `run` function (see below), a base environment (defaults to `alfons.env`'s `ENVIRONMENT`), a private global environment table (referred to as `genv`), and a module name (defaults to `main`). It returns an environment ready to use in Taskfiles. This function is internal and should not really be used, so I will not explain it.
 
 ### runString
 
@@ -99,6 +99,7 @@ Provides the main functions required to run a Taskfile.
 4. A numeric `child` argument (actually unused) that determines how deep into the loaded Taskfiles you are (defaults to `0` for the main file and increments for children taskfiles when `load` is called).
 5. A `genv`, where the tasks for all modules are neatly stored. Although you can set a starting value for this table (defaults to an empty one), you will not be able to access it again (unless you create the table before passing it and store the reference).
 6. A reverse queue `rqueue` that determines the order in which the `default`, `teardown` and `finalize` tasks should be run. This queue should be reversed before running each task in it.
+7. A boolean value that determines whether to pretty-print errors or not.
 
 It loads the contents of the Taskfile without executing it.
 
@@ -130,8 +131,8 @@ In the last section we mentioned `genv` and how you could initially set its valu
 
 ```lua
 genv = {
-  ["__main__"] = {} -- this is main's environment
-  ["fetch"]    = {} -- environment for a subtaskfile
+  ["main"]  = {} -- this is main's environment
+  ["fetch"] = {} -- environment for a subtaskfile
 }
 <metatable> = {
   store = {} -- global storage is here

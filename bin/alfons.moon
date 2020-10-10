@@ -46,7 +46,7 @@ unless content then errors 1, contentErr
 
 -- Run the taskfile
 import runString from require "alfons.init"
-alfons, alfonsErr = runString content
+alfons, alfonsErr = runString content, nil, true, 0, {}, {}, true
 unless alfons then errors 1, alfonsErr
 env = alfons ...
 
