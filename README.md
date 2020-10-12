@@ -86,7 +86,7 @@ From the command line, simply pass the name of the task you wish to run. Alterna
 
 **Lua:**
 
-```
+```lua
 function test (self)
   print("I am " .. self.name .. " and " .. self.caller .. " called me.")
 end
