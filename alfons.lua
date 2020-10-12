@@ -971,7 +971,7 @@ do
   elseif fs.exists("Alfons.moon") then
     FILE = "Alfons.moon"
   else
-    FILE = errors(1, "No Alfonsfile found.")
+    FILE = errors(1, "No Taskfile found.")
   end
 end
 local LANGUAGE
@@ -983,7 +983,7 @@ do
   elseif args.type then
     LANGUAGE = args.type
   else
-    LANGUAGE = errors(1, "Cannot resolve format for Alfonsfile.")
+    LANGUAGE = errors(1, "Cannot resolve format for Taskfile.")
   end
 end
 print("Using " .. tostring(FILE) .. " (" .. tostring(LANGUAGE) .. ")")
@@ -999,7 +999,7 @@ if "moon" == _exp_0 then
 elseif "lua" == _exp_0 then
   content, contentErr = readLua(FILE)
 else
-  content, contentErr = errors(1, "Cannot resolve format '" .. tostring(LANGUAGE) .. "' for Alfonsfile.")
+  content, contentErr = errors(1, "Cannot resolve format '" .. tostring(LANGUAGE) .. "' for Taskfile.")
 end
 if not (content) then
   errors(1, contentErr)
