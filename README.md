@@ -53,6 +53,8 @@ Run `alfons` in a directory with an `Alfons.lua` or `Alfons.moon` file. Using Mo
 
 To see the documentation, check out the [`docs/`](docs/) folder of this repo.
 
+To get started using Alfons, check out the [Tutorial](docs/tutorial.md) or the [Recipes](docs/recipes.md).
+
 ### Defining tasks
 
 Tasks are obtained by either returning a table `{tasks={}}` where the empty table is a list of named functions, or by exporting globals. The preferred mode for Lua is exporting globals, and the preferred mode for MoonScript is returning a table, although both work in both languages.
