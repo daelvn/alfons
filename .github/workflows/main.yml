@@ -58,7 +58,7 @@ jobs:
     # Pack into single script
     - name: Pack
       run: |
-        amalg.lua -o alfons.lua -s bin/alfons.lua alfons.compat alfons.env alfons.file alfons.getopt alfons.provide alfons.version
+        amalg.lua -o alfons.lua -s bin/alfons.lua alfons.setfenv alfons.env alfons.file alfons.getopt alfons.provide alfons.version alfons.init alfons.look
 
     # Runs a set of commands using the runners shell
     - name: rockbuild -m
