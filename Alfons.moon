@@ -33,3 +33,6 @@ tasks:
     inspect = require "inspect"
     print inspect args
     print inspect @
+  uses: =>
+    if uses "unknown"
+      print "hit"

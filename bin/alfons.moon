@@ -26,14 +26,14 @@ FILE = do
   elseif args.file               then args.file
   elseif fs.exists "Alfons.lua"  then "Alfons.lua"
   elseif fs.exists "Alfons.moon" then "Alfons.moon"
-  else errors 1, "No Alfonsfile found."
+  else errors 1, "No Taskfile found."
 
 -- Also accept a custom language
 LANGUAGE = do
   if     FILE\match "moon$" then "moon"
   elseif FILE\match "lua$"  then "lua"
   elseif args.type          then args.type
-  else errors 1, "Cannot resolve format for Alfonsfile."
+  else errors 1, "Cannot resolve format for Taskfile."
 print "Using #{FILE} (#{LANGUAGE})"
 
 -- Load string
@@ -41,7 +41,7 @@ import readMoon, readLua from require "alfons.file"
 content, contentErr = switch LANGUAGE
   when "moon" then readMoon FILE
   when "lua"  then readLua  FILE
-  else errors 1, "Cannot resolve format '#{LANGUAGE}' for Alfonsfile."
+  else errors 1, "Cannot resolve format '#{LANGUAGE}' for Taskfile."
 unless content then errors 1, contentErr
 
 -- Run the taskfile
