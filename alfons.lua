@@ -1,6 +1,4 @@
 do
-
-do
 local _ENV = _ENV
 package.preload[ "alfons.env" ] = function( ... ) local arg = _G.arg;
 local style
@@ -57,7 +55,6 @@ return {
   ENVIRONMENT = ENVIRONMENT,
   loadEnv = loadEnv
 }
-
 end
 end
 
@@ -104,7 +101,6 @@ return {
   readMoon = readMoon,
   readLua = readLua
 }
-
 end
 end
 
@@ -198,7 +194,6 @@ end
 return {
   getopt = getopt
 }
-
 end
 end
 
@@ -222,7 +217,7 @@ sanitize = function(pattern)
     return pattern:gsub("[%(%)%.%%%+%-%*%?%[%]%^%$]", "%%%0")
   end
 end
-PREFIX = "test.alfons."
+PREFIX = "alfons.tasks."
 initEnv = function(run, base, genv, modname, pretty)
   if base == nil then
     base = ENVIRONMENT
@@ -421,7 +416,6 @@ return {
   runString = runString,
   initEnv = initEnv
 }
-
 end
 end
 
@@ -503,7 +497,6 @@ return {
   makeLook = makeLook,
   look = makeLook()
 }
-
 end
 end
 
@@ -885,7 +878,6 @@ return {
   ask = ask,
   show = show
 }
-
 end
 end
 
@@ -907,7 +899,6 @@ return setfenv or function(fn, env)
   end
   return fn
 end
-
 end
 end
 
@@ -915,12 +906,9 @@ do
 local _ENV = _ENV
 package.preload[ "alfons.version" ] = function( ... ) local arg = _G.arg;
 return {
-  VERSION = "4.2"
+  VERSION = "4.2.1"
 }
-
 end
-end
-
 end
 
 local VERSION
