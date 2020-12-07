@@ -5,12 +5,13 @@ import VERSION   from require "alfons.version"
 import style     from require "ansikit.style"
 fs                  = require "filekit"
 unpack            or= table.unpack
+printerr            = (t) -> io.stderr\write t .. "\n"
 
 -- utils
-prints     = (...)       -> print unpack [style arg for arg in *{...}]
-printError = (text)      -> print style "%{red}#{text}"
+prints     = (...)       -> printerr unpack [style arg for arg in *{...}]
+printError = (text)      -> printerr style "%{red}#{text}"
 errors     = (code, msg) ->
-  print style "%{red}#{msg}"
+  printerr style "%{red}#{msg}"
   os.exit code
   
 -- introduction
@@ -34,7 +35,7 @@ LANGUAGE = do
   elseif FILE\match "lua$"  then "lua"
   elseif args.type          then args.type
   else errors 1, "Cannot resolve format for Taskfile."
-print "Using #{FILE} (#{LANGUAGE})"
+printerr "Using #{FILE} (#{LANGUAGE})"
 
 -- Load string
 import readMoon, readLua from require "alfons.file"

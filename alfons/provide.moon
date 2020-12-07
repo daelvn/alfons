@@ -3,6 +3,7 @@
 import style from require "ansikit.style"
 fs              = require "filekit"
 unpack        or= table.unpack
+printerr        = (t) -> io.stderr\write t .. "\n" 
 
 -- try loading inotify, which is an optional dependancy
 inotify = do
@@ -16,11 +17,11 @@ contains = (t, v) -> #[vv for vv in *t when vv == v] != 0
 --# io #--
 -- prints (...) -> nil
 -- Print + style
-prints = (...) -> print unpack [style arg for arg in *{...}]
+prints = (...) -> printerr unpack [style arg for arg in *{...}]
 
 -- printError (text:string) -> nil
 -- Prints an error
-printError = (text) -> print style "%{red}#{text}"
+printError = (text) -> printerr style "%{red}#{text}"
 
 -- readfile (file:string) -> string
 -- Returns the contents of a file
