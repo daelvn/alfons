@@ -6,7 +6,7 @@ unpack        or= table.unpack
 
 -- try loading inotify, which is an optional dependancy
 inotify = do
-  ok, inotify = pcall -> require "intoify"
+  ok, inotify = pcall -> require "inotify"
   ok and inotify or nil
 
 -- contains (t:table, v:any) -> boolean
