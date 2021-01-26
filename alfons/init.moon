@@ -67,9 +67,12 @@ runString = (content, environment=ENVIRONMENT, runAlways=true, child=0, genv={},
     self      = setmetatable {}, __index: argl
     self.name = name
     self.task = -> run name, task, argl
+    callstack = (getmetatable genv).store.callstack
+    table.insert callstack, name
     task self
+    table.remove callstack, #callstack
   -- reset genv metatable
-  setmetatable genv, {store: {}} unless getmetatable genv
+  setmetatable genv, {store: {callstack: {}}} unless getmetatable genv
   -- initialize environment
   env           = initEnv run, environment, genv, modname, pretty
   genv[modname] = env
@@ -84,6 +87,27 @@ runString = (content, environment=ENVIRONMENT, runAlways=true, child=0, genv={},
     rawset env, "args", args
     -- add utils
     rawset env, "uses",   (cmdmd) -> provide.contains (args.commands or {}), cmdmd
+    rawset env, "calls",  (cmdmd) ->
+      -- get currently running task
+      callstack = (getmetatable genv).store.callstack
+      current   = callstack[#callstack]
+      -- iterate command list and grab non-existing tasks
+      on          = false
+      subcommands = {}
+      i           = 0
+      for cmd in *args.commands
+        i += 1
+        print "IN", cmd, args.commands[i], current, on
+        if on
+          break if rawget env.tasks, cmd
+          subcommands[#subcommands+1] = cmd
+          args.commands[i]            = nil
+        else
+          on = true if cmd == current
+      -- remove taken commands
+      args.commands = [e for i, e in provide.npairs args.commands]
+      -- return
+      return subcommands
     -- run
     list  = alf args
     tasks = list and (list.tasks and list.tasks or {}) or {}
