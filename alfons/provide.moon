@@ -285,6 +285,18 @@ watch = (dirs, exclude, evf, pred, fn) ->
   handle\close!
 --watch {"."}, {".git"}, "live", (glob "*.moon"), => sh "moonc #{@}"
 
+-- npairs (table) -> -> number, *
+-- ipairs, but does not stop if nil is found
+-- TODO document npairs
+npairs = (t) ->
+  keys = [k for k, v in pairs t when "number" == type k]
+  table.sort keys
+  i    = 0
+  n    = #keys
+  ->
+    i += 1
+    return keys[i], t[keys[i]] if i <= n
+
 {
   :contains
   :prints, :printError
@@ -294,4 +306,5 @@ watch = (dirs, exclude, evf, pred, fn) ->
   :basename, :filename, :extension, :pathname
   :build, :watch
   :env, :ask, :show
+  :npairs
 }
