@@ -507,6 +507,10 @@ local style
 style = require("ansikit.style").style
 local fs = require("filekit")
 local unpack = unpack or table.unpack
+local printerr
+printerr = function(t)
+  return io.stderr:write(t .. "\n")
+end
 local inotify
 do
   local ok
@@ -532,7 +536,7 @@ contains = function(t, v)
 end
 local prints
 prints = function(...)
-  return print(unpack((function(...)
+  return printerr(unpack((function(...)
     local _accum_0 = { }
     local _len_0 = 1
     local _list_0 = {
@@ -548,7 +552,7 @@ prints = function(...)
 end
 local printError
 printError = function(text)
-  return print(style("%{red}" .. tostring(text)))
+  return printerr(style("%{red}" .. tostring(text)))
 end
 local readfile
 readfile = function(file)
@@ -906,7 +910,7 @@ do
 local _ENV = _ENV
 package.preload[ "alfons.version" ] = function( ... ) local arg = _G.arg;
 return {
-  VERSION = "4.2.1"
+  VERSION = "4.2.2/stderr"
 }
 end
 end
@@ -917,9 +921,13 @@ local style
 style = require("ansikit.style").style
 local fs = require("filekit")
 local unpack = unpack or table.unpack
+local printerr
+printerr = function(t)
+  return io.stderr:write(t .. "\n")
+end
 local prints
 prints = function(...)
-  return print(unpack((function(...)
+  return printerr(unpack((function(...)
     local _accum_0 = { }
     local _len_0 = 1
     local _list_0 = {
@@ -935,11 +943,11 @@ prints = function(...)
 end
 local printError
 printError = function(text)
-  return print(style("%{red}" .. tostring(text)))
+  return printerr(style("%{red}" .. tostring(text)))
 end
 local errors
 errors = function(code, msg)
-  print(style("%{red}" .. tostring(msg)))
+  printerr(style("%{red}" .. tostring(msg)))
   return os.exit(code)
 end
 prints("%{bold blue}Alfons " .. tostring(VERSION))
@@ -974,7 +982,7 @@ do
     LANGUAGE = errors(1, "Cannot resolve format for Taskfile.")
   end
 end
-print("Using " .. tostring(FILE) .. " (" .. tostring(LANGUAGE) .. ")")
+printerr("Using " .. tostring(FILE) .. " (" .. tostring(LANGUAGE) .. ")")
 local readMoon, readLua
 do
   local _obj_0 = require("alfons.file")
