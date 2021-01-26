@@ -310,11 +310,16 @@ runString = function(content, environment, runAlways, child, genv, rqueue, prett
     self.task = function()
       return run(name, task, argl)
     end
-    return task(self)
+    local callstack = (getmetatable(genv)).store.callstack
+    table.insert(callstack, name)
+    task(self)
+    return table.remove(callstack, #callstack)
   end
   if not (getmetatable(genv)) then
     setmetatable(genv, {
-      store = { }
+      store = {
+        callstack = { }
+      }
     })
   end
   local env = initEnv(run, environment, genv, modname, pretty)
@@ -331,6 +336,40 @@ runString = function(content, environment, runAlways, child, genv, rqueue, prett
     rawset(env, "args", args)
     rawset(env, "uses", function(cmdmd)
       return provide.contains((args.commands or { }), cmdmd)
+    end)
+    rawset(env, "calls", function(cmdmd)
+      local callstack = (getmetatable(genv)).store.callstack
+      local current = callstack[#callstack]
+      local on = false
+      local subcommands = { }
+      local i = 0
+      local _list_0 = args.commands
+      for _index_0 = 1, #_list_0 do
+        local cmd = _list_0[_index_0]
+        i = i + 1
+        print("IN", cmd, args.commands[i], current, on)
+        if on then
+          if rawget(env.tasks, cmd) then
+            break
+          end
+          subcommands[#subcommands + 1] = cmd
+          args.commands[i] = nil
+        else
+          if cmd == current then
+            on = true
+          end
+        end
+      end
+      do
+        local _accum_0 = { }
+        local _len_0 = 1
+        for i, e in provide.npairs(args.commands) do
+          _accum_0[_len_0] = e
+          _len_0 = _len_0 + 1
+        end
+        args.commands = _accum_0
+      end
+      return subcommands
     end)
     local list = alf(args)
     local tasks = list and (list.tasks and list.tasks or { }) or { }
@@ -858,6 +897,30 @@ watch = function(dirs, exclude, evf, pred, fn)
   end
   return handle:close()
 end
+local npairs
+npairs = function(t)
+  local keys
+  do
+    local _accum_0 = { }
+    local _len_0 = 1
+    for k, v in pairs(t) do
+      if "number" == type(k) then
+        _accum_0[_len_0] = k
+        _len_0 = _len_0 + 1
+      end
+    end
+    keys = _accum_0
+  end
+  table.sort(keys)
+  local i = 0
+  local n = #keys
+  return function()
+    i = i + 1
+    if i <= n then
+      return keys[i], t[keys[i]]
+    end
+  end
+end
 return {
   contains = contains,
   prints = prints,
@@ -880,7 +943,8 @@ return {
   watch = watch,
   env = env,
   ask = ask,
-  show = show
+  show = show,
+  npairs = npairs
 }
 end
 end
@@ -1010,7 +1074,7 @@ local env = alfons(...)
 local _list_0 = args.commands
 for _index_0 = 1, #_list_0 do
   local command = _list_0[_index_0]
-  if env.tasks[command] then
+  if rawget(env.tasks, command) then
     env.tasks[command](args[command])
   end
   if rawget(env.tasks, "teardown") then
