@@ -515,7 +515,7 @@ local inotify
 do
   local ok
   ok, inotify = pcall(function()
-    return require("intoify")
+    return require("inotify")
   end)
   inotify = ok and inotify or nil
 end
@@ -910,7 +910,7 @@ do
 local _ENV = _ENV
 package.preload[ "alfons.version" ] = function( ... ) local arg = _G.arg;
 return {
-  VERSION = "4.2.2/stderr"
+  VERSION = "4.2.2"
 }
 end
 end

@@ -1,1 +1,1 @@
-VERSION: "4.2.2/stderr"
+VERSION: "4.2.2"
