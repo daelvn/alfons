@@ -34,10 +34,10 @@ jobs:
         luaVersion: 5.1
 
     - name: Install LuaRocks
-      uses: leafo/gh-actions-luarocks@v2
+      uses: leafo/gh-actions-luarocks@v4
       with:
         # The version of LuaRocks to install, must be available on https://luarocks.github.io/luarocks/releases/
-        luaRocksVersion: 3.3.1
+        luaRocksVersion: 3.5.0
 
     # Runs a single command using the runners shell
     - name: Install dependencies
