@@ -10,6 +10,7 @@ To see the documentation for `build` and `watch`, check out their respective mar
   - [Table of Contents](#table-of-contents)
   - [Tables](#tables)
     - [contains](#contains)
+    - [npairs](#npairs)
     - [env](#env)
   - [IO](#io)
     - [prints](#prints)
@@ -40,6 +41,10 @@ To see the documentation for `build` and `watch`, check out their respective mar
 ### contains
 
 Checks whether a table `t` contains a value `v`.
+
+### npairs
+
+Exactly like [ipairs](https://www.lua.org/manual/5.4/manual.html#pdf-ipairs), but it does not stop after a `nil` value.
 
 ### env
 
