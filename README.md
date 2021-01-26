@@ -16,6 +16,7 @@ Alfons is a task runner to help you manage your project. It's inspired by the wo
 - [Alfons 4](#alfons-4)
   - [Table of contents](#table-of-contents)
   - [Changelog](#changelog)
+    - [4.3](#43)
     - [4.2](#42)
     - [4.1](#41)
   - [Usage](#usage)
@@ -32,6 +33,10 @@ Alfons is a task runner to help you manage your project. It's inspired by the wo
   - [Goodbye?](#goodbye)
 
 ## Changelog
+
+### 4.3
+
+- **4.3** (26.01.2021) Added [`calls`](docs/arguments.md#calls) and [`npairs`](docs/provide.md#npairs).
 
 ### 4.2
 
