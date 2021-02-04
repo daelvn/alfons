@@ -56,7 +56,7 @@ env = alfons ...
 
 -- run tasks, and teardown after each of them
 for command in *args.commands
-  env.tasks[command] args[command] if rawget env.tasks, command
+  env.tasks[command] args[command]
   (rawget env.tasks, "teardown")   if rawget env.tasks, "teardown"
 
 -- finalize
