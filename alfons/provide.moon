@@ -287,7 +287,6 @@ watch = (dirs, exclude, evf, pred, fn) ->
 
 -- npairs (table) -> -> number, *
 -- ipairs, but does not stop if nil is found
--- TODO document npairs
 npairs = (t) ->
   keys = [k for k, v in pairs t when "number" == type k]
   table.sort keys
