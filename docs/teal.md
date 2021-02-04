@@ -30,7 +30,7 @@ end
 
 The `alfons-teal` rock (included in this repo but installed separately) provides a `teal` plugin that you can use via `load` (see more [here](loading.md)). The functionality for that plugin is described here.
 
-This plugin exports the following commands, which you should not overwrite: **`install`, `build`, `watch`**.
+This plugin exports the following commands, which you should not overwrite: **`install`, `build`, `watch`, `typings`**.
 
 ### Installing LuaRocks dependencies
 
@@ -46,6 +46,10 @@ global function always()
 end
 ```
 
+### Building
+
+The `build` task is simply a wrapper for `tl build`, since I figured that implementing this as an Alfons plugin would be way overkill.
+
 ### Hooks
 
 The `teal` plugin can run several kinds of hooks:
@@ -59,4 +63,26 @@ Simply define these tasks, and they will be run accordingly!
 
 ### Downloading typings.
 
-The `alfons-teal` can automatically down
+> **WARNING:** This task requires the `dkjson` and `http` packages, which you must install before using this. Otherwise, there would be no way of fetching the content.
+
+The `alfons-teal` can download type definitions from the [teal-types](//github.com/teal-language/teal-types) repository and into your current working directory, using the `typings` task.
+
+### CLI
+
+You can do this from the CLI by just loading the `teal` plugin and doing:
+
+```
+$ alfons typings -m <rock>
+```
+
+### Taskfile
+
+When you load the plugin, it will automatically try to use `store.typings` (a list of strings) as a source for what rocks to fetch type definitions for. You can turn off this behavior by setting `store.install` to `false`, and then running it later like this:
+
+```lua
+-- Lua
+tasks.typings{ modules = {"..."} }
+-- MoonScript
+tasks.typings modules: {"..."}
+```
+

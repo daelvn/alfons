@@ -38,8 +38,5 @@ tasks:
   reargs: => tasks.args!
   -- teal
   always: =>
-    store.hooks.teal_preinstall = -> prints "e"
-    store.dependencies = {"tl"}
+    store.install = false
     load "teal"
-  teal_preinstall: =>
-    print "preinstall hook!"
