@@ -77,7 +77,6 @@ runString = (content, environment=ENVIRONMENT, runAlways=true, child=0, genv={},
     table.remove callstack, #callstack
     return ret
   -- reset genv metatable
-  -- TODO document hooks
   setmetatable genv, {store: {callstack: {}}} unless getmetatable genv
   -- initialize environment
   env           = initEnv run, environment, genv, modname, pretty
