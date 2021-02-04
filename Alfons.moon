@@ -41,5 +41,5 @@ tasks:
     store.hooks.teal_preinstall = -> prints "e"
     store.dependencies = {"tl"}
     load "teal"
-  --teal_preinstall: =>
-    --print "preinstall hook!"
+  teal_preinstall: =>
+    print "preinstall hook!"
