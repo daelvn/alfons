@@ -18,6 +18,17 @@ ENVIRONMENT = {
 
 Any defined task can be called using the `tasks` table. Just do `task.name!` to call it or pass a table if you want to use arguments. You can access any task, anywhere; it is allowed to call tasks from taskfiles you included, and those taskfiles will be able to use tasks of the parent taskfile. Metatable magic is used to that "local" tasks are always preferred over tasks from other taskfiles.
 
+You can check if a task exists by using the `exists` function, that takes a string (the requested task name).
+
+### Global tasks
+
+The `tasks` table can only access tasks that are at the same level or below it (subtasks). Because of how Alfons' internals work, it is possible to access higher tasks. As of 4.4, you can do this via the magic table `gtasks`. It appears to be empty, but indexing it will return the first task that has the same name. To check if a task exists globally, use `gexists` (takes a string, the requested task name).
+
+```moon
+tasks:
+  always: => gtasks.example!
+```
+
 ## Store
 
 `store` is a table shared across all tables that you can use to pass data to other taskfiles or generally just create configuration fields.

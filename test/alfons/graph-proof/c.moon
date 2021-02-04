@@ -1,5 +1,5 @@
 tasks:
-  always: => load "f"
+  always: => load "graph-proof.f"
   c: => print @name
   doc: =>
     tasks.a!

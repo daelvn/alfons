@@ -1,6 +1,6 @@
 tasks:
   always: =>
-    load "a"
-    load "b"
-    load "c"
+    load "graph-proof.a"
+    load "graph-proof.b"
+    load "graph-proof.c"
   main: => print @name

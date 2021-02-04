@@ -1,7 +1,7 @@
 tasks:
   always: =>
-    load "d"
-    load "e"
+    load "graph-proof.d"
+    load "graph-proof.e"
   a: => print @name
   doa: =>
     tasks.a!
