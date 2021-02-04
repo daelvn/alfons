@@ -40,7 +40,7 @@ $ luarocks install amalg
 # Create the runnable file
 $ alfons produce
 # Build the rockspec locally
-$ rockbuild -f rock-dev.yml -m --delete 4.2 # or change the version if you want
+$ rockbuild -f rock-dev.yml -m --delete 4.4 # or change the version if you want
 ```
 
 If there is enough demand, I'll upload the dev rockspec to LuaRocks with every release in form of an `alfons-extra` package or similar.
