@@ -72,7 +72,8 @@ runString = (content, environment=ENVIRONMENT, runAlways=true, child=0, genv={},
     task self
     table.remove callstack, #callstack
   -- reset genv metatable
-  setmetatable genv, {store: {callstack: {}}} unless getmetatable genv
+  -- TODO document hooks
+  setmetatable genv, {store: {callstack: {}, hooks: {}}} unless getmetatable genv
   -- initialize environment
   env           = initEnv run, environment, genv, modname, pretty
   genv[modname] = env
@@ -93,11 +94,11 @@ runString = (content, environment=ENVIRONMENT, runAlways=true, child=0, genv={},
         for name, task in pairs t.tasks
           return true if wants == name
       return false
-    rawset env, "gcall",  (wants, ...) ->
+    rawset env, "gtasks", setmetatable {}, __index: (wants) =>
       for scope, t in pairs genv
         for name, task in pairs t.tasks
-          return task ... if wants == name
-      return false
+          return task if wants == name
+      return -> error "Task '#{wants}' does not exist."
     rawset env, "calls",  (cmdmd) ->
       -- get currently running task
       callstack = (getmetatable genv).store.callstack
