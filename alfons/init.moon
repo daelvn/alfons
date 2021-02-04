@@ -89,16 +89,6 @@ runString = (content, environment=ENVIRONMENT, runAlways=true, child=0, genv={},
     -- add utils
     rawset env, "uses",    (cmdmd) -> provide.contains (args.commands or {}), cmdmd
     rawset env, "exists",  (wants) -> (rawget env.tasks, wants) ~= nil
-    rawset env, "gexists", (wants) ->
-      for scope, t in pairs genv
-        for name, task in pairs t.tasks
-          return true if wants == name
-      return false
-    rawset env, "gtasks", setmetatable {}, __index: (wants) =>
-      for scope, t in pairs genv
-        for name, task in pairs t.tasks
-          return task if wants == name
-      return -> error "Task '#{wants}' does not exist."
     rawset env, "calls",  (cmdmd) ->
       -- get currently running task
       callstack = (getmetatable genv).store.callstack
