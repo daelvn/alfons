@@ -1,5 +1,5 @@
 # Alfons 4
-<a href="https://discord.gg/Y75ZXrD"><img src="https://img.shields.io/static/v1?label=discord&message=chat&color=brightgreen&style=flat-square"></a> 
+<a href="https://discord.gg/3KGDznrEjC"><img src="https://img.shields.io/static/v1?label=discord&message=chat&color=brightgreen&style=flat-square"></a> 
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/daelvn/alfons/CI?style=flat-square)
 ![GitHub stars](https://img.shields.io/github/stars/daelvn/alfons?style=flat-square)
 ![GitHub tag (latest SemVer pre-release)](https://img.shields.io/github/v/tag/daelvn/alfons?include_prereleases&label=release&style=flat-square)
