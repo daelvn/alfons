@@ -1,6 +1,6 @@
 # Teal support
 
-> **WARNING:** Teal support is **experimental** and relies on the Teal Compiler API that is subject to change. Use this at your own risk. It may be deprecated at any moment.
+> **WARNING:** Teal support is **experimental** and relies on the Teal Compiler API that is subject to change. Use this at your own risk. It may be deprecated at any moment. To use, install the `tl` rock.
 
 ## Taskfiles
 
