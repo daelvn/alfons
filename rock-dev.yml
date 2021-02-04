@@ -18,6 +18,7 @@ build:
   type: builtin
   modules:
     alfons.tasks.fetch: alfons/tasks/fetch.lua
+    alfons.tasks.teal:  alfons/tasks/teal.lua
     alfons.setfenv:     alfons/setfenv.lua
     alfons.env:         alfons/env.lua
     alfons.file:        alfons/file.lua

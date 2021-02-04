@@ -97,9 +97,32 @@ readLua = function(file)
   end
   return content
 end
+local readTeal
+readTeal = function(file)
+  local content
+  do
+    local _with_0 = fs.safeOpen(file, "r")
+    if _with_0.error then
+      return nil, "Could not open " .. tostring(file) .. ": " .. tostring(_with_0.error)
+    end
+    local init_env, gen
+    do
+      local _obj_0 = require("tl")
+      init_env, gen = _obj_0.init_env, _obj_0.gen
+    end
+    local gwe = init_env(true, false)
+    content = gen((_with_0:read("*a")), gwe)
+    if not (content) then
+      return nil, "Could not read " .. tostring(file) .. ": " .. tostring(content)
+    end
+    _with_0:close()
+  end
+  return content
+end
 return {
   readMoon = readMoon,
-  readLua = readLua
+  readLua = readLua,
+  readTeal = readTeal
 }
 end
 end
@@ -254,12 +277,21 @@ initEnv = function(run, base, genv, modname, pretty)
     end
   end
   tasksmt.__index = function(self, k)
-    if pretty then
-      provide.printError("Taskfile " .. tostring(modname) .. ": Task '" .. tostring(k) .. "' does not exist.")
-      return os.exit(1)
-    else
-      return error("Task '" .. tostring(k) .. "' does not exist.")
-    end
+    return (rawget(self, k)) or (function()
+      for scope, t in pairs(genv) do
+        for name, task in pairs(t.tasks) do
+          if k == name then
+            return task
+          end
+        end
+      end
+      if pretty then
+        provide.printError("Task '" .. tostring(k) .. "' does not exist.")
+        return os.exit(1)
+      else
+        return error("Task '" .. tostring(k) .. "' does not exist.")
+      end
+    end)()
   end
   envmt.__ran = 0
   return env
@@ -312,8 +344,9 @@ runString = function(content, environment, runAlways, child, genv, rqueue, prett
     end
     local callstack = (getmetatable(genv)).store.callstack
     table.insert(callstack, name)
-    task(self)
-    return table.remove(callstack, #callstack)
+    local ret = task(self)
+    table.remove(callstack, #callstack)
+    return ret
   end
   if not (getmetatable(genv)) then
     setmetatable(genv, {
@@ -337,6 +370,16 @@ runString = function(content, environment, runAlways, child, genv, rqueue, prett
     rawset(env, "uses", function(cmdmd)
       return provide.contains((args.commands or { }), cmdmd)
     end)
+    rawset(env, "exists", function(wants)
+      for scope, t in pairs(genv) do
+        for name, task in pairs(t.tasks) do
+          if wants == name then
+            return true
+          end
+        end
+      end
+      return false
+    end)
     rawset(env, "calls", function(cmdmd)
       local callstack = (getmetatable(genv)).store.callstack
       local current = callstack[#callstack]
@@ -347,7 +390,6 @@ runString = function(content, environment, runAlways, child, genv, rqueue, prett
       for _index_0 = 1, #_list_0 do
         local cmd = _list_0[_index_0]
         i = i + 1
-        print("IN", cmd, args.commands[i], current, on)
         if on then
           if rawget(env.tasks, cmd) then
             break
@@ -972,9 +1014,118 @@ end
 
 do
 local _ENV = _ENV
+package.preload[ "alfons.tasks.fetch" ] = function( ... ) local arg = _G.arg;
+return {
+  tasks = {
+    fetch = function(self)
+      local http = require("http.request")
+      local headers, stream = assert((http.new_from_uri(self.url)):go())
+      local body = assert(stream:get_body_as_string())
+      if "200" ~= headers:get(":status") then
+        return error(body)
+      else
+        return body
+      end
+    end
+  }
+}
+end
+end
+
+do
+local _ENV = _ENV
+package.preload[ "alfons.tasks.teal" ] = function( ... ) local arg = _G.arg;
+return {
+  tasks = {
+    always = function(self)
+      load("fetch")
+      if not (store.install == false) then
+        tasks.install()
+        return tasks.typings({
+          modules = store.typings
+        })
+      end
+    end,
+    install = function(self)
+      if exists("teal_preinstall") then
+        prints("%{cyan}Teal:%{white} Running pre-install hook.")
+        tasks.teal_preinstall()
+      end
+      prints("%{cyan}Teal:%{white} Installing dependencies.")
+      local _list_0 = store.dependencies
+      for _index_0 = 1, #_list_0 do
+        local dep = _list_0[_index_0]
+        prints("%{green}+ " .. tostring(dep))
+        sh("luarocks install " .. tostring(dep))
+      end
+      if exists("teal_postinstall") then
+        prints("%{cyan}Teal:%{white} Running post-install hook.")
+        return tasks.teal_postinstall()
+      end
+    end,
+    build = function(self)
+      if exists("teal_prebuild") then
+        prints("%{cyan}Teal:%{white} Running pre-build hook.")
+        tasks.teal_prebuild()
+      end
+      prints("%{cyan}Teal:%{white} Building project.")
+      sh("tl build")
+      if exists("teal_postbuild") then
+        prints("%{cyan}Teal:%{white} Running post-build hook.")
+        return tasks.teal_postbuild()
+      end
+    end,
+    typings = function(self)
+      local json = require("dkjson")
+      local fetchdefs
+      fetchdefs = function(mod)
+        prints("%{cyan}Teal:%{white} Fetching type definitions for " .. tostring(mod) .. ".")
+        local unjson = tasks.fetch({
+          url = "https://api.github.com/repos/teal-language/teal-types/contents/types/" .. tostring(mod)
+        })
+        local files = json.decode(unjson)
+        for _index_0 = 1, #files do
+          local _continue_0 = false
+          repeat
+            local file = files[_index_0]
+            if not (file.type == "file") then
+              _continue_0 = true
+              break
+            end
+            local name = file.name
+            local def = tasks.fetch({
+              url = "https://raw.githubusercontent.com/teal-language/teal-types/master/types/" .. tostring(mod) .. "/" .. tostring(name)
+            })
+            writefile(name, def)
+            _continue_0 = true
+          until true
+          if not _continue_0 then
+            break
+          end
+        end
+      end
+      local mod = self.m or self.module
+      local mods = self.modules
+      if mod then
+        return fetchdefs(mod)
+      elseif mods then
+        local _list_0 = mods
+        for _index_0 = 1, #_list_0 do
+          local md = _list_0[_index_0]
+          fetchdefs(md)
+        end
+      end
+    end
+  }
+}
+end
+end
+
+do
+local _ENV = _ENV
 package.preload[ "alfons.version" ] = function( ... ) local arg = _G.arg;
 return {
-  VERSION = "4.3"
+  VERSION = "4.4"
 }
 end
 end
@@ -1030,6 +1181,8 @@ do
     FILE = "Alfons.lua"
   elseif fs.exists("Alfons.moon") then
     FILE = "Alfons.moon"
+  elseif fs.exists("Alfons.tl") then
+    FILE = "Alfons.tl"
   else
     FILE = errors(1, "No Taskfile found.")
   end
@@ -1040,6 +1193,8 @@ do
     LANGUAGE = "moon"
   elseif FILE:match("lua$") then
     LANGUAGE = "lua"
+  elseif FILE:match("tl$") then
+    LANGUAGE = "teal"
   elseif args.type then
     LANGUAGE = args.type
   else
@@ -1047,10 +1202,10 @@ do
   end
 end
 printerr("Using " .. tostring(FILE) .. " (" .. tostring(LANGUAGE) .. ")")
-local readMoon, readLua
+local readMoon, readLua, readTeal
 do
   local _obj_0 = require("alfons.file")
-  readMoon, readLua = _obj_0.readMoon, _obj_0.readLua
+  readMoon, readLua, readTeal = _obj_0.readMoon, _obj_0.readLua, _obj_0.readTeal
 end
 local content, contentErr
 local _exp_0 = LANGUAGE
@@ -1058,6 +1213,8 @@ if "moon" == _exp_0 then
   content, contentErr = readMoon(FILE)
 elseif "lua" == _exp_0 then
   content, contentErr = readLua(FILE)
+elseif "teal" == _exp_0 then
+  content, contentErr = readTeal(FILE)
 else
   content, contentErr = errors(1, "Cannot resolve format '" .. tostring(LANGUAGE) .. "' for Taskfile.")
 end
@@ -1074,9 +1231,7 @@ local env = alfons(...)
 local _list_0 = args.commands
 for _index_0 = 1, #_list_0 do
   local command = _list_0[_index_0]
-  if rawget(env.tasks, command) then
-    env.tasks[command](args[command])
-  end
+  env.tasks[command](args[command])
   if rawget(env.tasks, "teardown") then
     local _ = (rawget(env.tasks, "teardown"))
   end

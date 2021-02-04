@@ -17,8 +17,9 @@ tasks:
     show "Packing using amalg.lua"
     @o    or= @output or "alfons.lua"
     @s    or= @entry or "bin/alfons.lua"
-    modules = for file in wildcard "alfons/*.moon" do "alfons.#{filename file}" 
-    sh "amalg.lua -o #{@o} -s #{@s} #{table.concat modules, ' '}"
+    modules = for file in wildcard "alfons/*.moon" do "alfons.#{filename file}"
+    tasks   = for file in wildcard "alfons/tasks/*.moon" do "alfons.tasks.#{filename file}"
+    sh "amalg.lua -o #{@o} -s #{@s} #{table.concat modules, ' '} #{table.concat tasks, ' '}"
   -- generate only alfons.lua
   produce: =>
     tasks.compile!

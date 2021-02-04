@@ -3,7 +3,10 @@ return {
     always = function(self)
       load("fetch")
       if not (store.install == false) then
-        return tasks.install()
+        tasks.install()
+        return tasks.typings({
+          modules = store.typings
+        })
       end
     end,
     install = function(self)
@@ -36,23 +39,44 @@ return {
       end
     end,
     typings = function(self)
-      print("hey")
       local json = require("dkjson")
       local fetchdefs
       fetchdefs = function(mod)
-        print(tasks.fetch({
-          url = "https://google.com"
-        }))
-        return print(tasks.fetch({
+        prints("%{cyan}Teal:%{white} Fetching type definitions for " .. tostring(mod) .. ".")
+        local unjson = tasks.fetch({
           url = "https://api.github.com/repos/teal-language/teal-types/contents/types/" .. tostring(mod)
-        }))
+        })
+        local files = json.decode(unjson)
+        for _index_0 = 1, #files do
+          local _continue_0 = false
+          repeat
+            local file = files[_index_0]
+            if not (file.type == "file") then
+              _continue_0 = true
+              break
+            end
+            local name = file.name
+            local def = tasks.fetch({
+              url = "https://raw.githubusercontent.com/teal-language/teal-types/master/types/" .. tostring(mod) .. "/" .. tostring(name)
+            })
+            writefile(name, def)
+            _continue_0 = true
+          until true
+          if not _continue_0 then
+            break
+          end
+        end
       end
       local mod = self.m or self.module
+      local mods = self.modules
       if mod then
-        prints("%{cyan}Teal:%{white} Fetching type definitions for " .. tostring(mod) .. ".")
         return fetchdefs(mod)
-      else
-        return prints("%{cyan}Teal:%{white} Fetching type definitions.")
+      elseif mods then
+        local _list_0 = mods
+        for _index_0 = 1, #_list_0 do
+          local md = _list_0[_index_0]
+          fetchdefs(md)
+        end
       end
     end
   }

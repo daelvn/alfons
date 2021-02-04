@@ -86,3 +86,9 @@ tasks.typings{ modules = {"..."} }
 tasks.typings modules: {"..."}
 ```
 
+## Showcase
+
+This is a short "tutorial" on how to use the `teal` plugin.
+
+### Installing
+
