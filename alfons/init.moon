@@ -86,7 +86,18 @@ runString = (content, environment=ENVIRONMENT, runAlways=true, child=0, genv={},
     args = getopt argl
     rawset env, "args", args
     -- add utils
-    rawset env, "uses",   (cmdmd) -> provide.contains (args.commands or {}), cmdmd
+    rawset env, "uses",    (cmdmd) -> provide.contains (args.commands or {}), cmdmd
+    rawset env, "exists",  (wants) -> (rawget env.tasks, wants) ~= nil
+    rawset env, "gexists", (wants) ->
+      for scope, t in pairs genv
+        for name, task in pairs t.tasks
+          return true if wants == name
+      return false
+    rawset env, "gcall",  (wants, ...) ->
+      for scope, t in pairs genv
+        for name, task in pairs t.tasks
+          return task ... if wants == name
+      return false
     rawset env, "calls",  (cmdmd) ->
       -- get currently running task
       callstack = (getmetatable genv).store.callstack
@@ -97,7 +108,6 @@ runString = (content, environment=ENVIRONMENT, runAlways=true, child=0, genv={},
       i           = 0
       for cmd in *args.commands
         i += 1
-        print "IN", cmd, args.commands[i], current, on
         if on
           break if rawget env.tasks, cmd
           subcommands[#subcommands+1] = cmd
@@ -119,6 +129,7 @@ runString = (content, environment=ENVIRONMENT, runAlways=true, child=0, genv={},
     -- add function for subloading
     rawset env, "load", (mod) ->
       -- add prefix to mod
+      -- TODO add configurable prefix
       mod = PREFIX .. mod
       -- avoid mutual loading
       return genv[mod] if genv[mod]
