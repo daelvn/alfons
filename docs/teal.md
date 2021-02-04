@@ -90,5 +90,39 @@ tasks.typings modules: {"..."}
 
 This is a short "tutorial" on how to use the `teal` plugin.
 
-### Installing
+### Loading
 
+Like any other module, you put the load declaration in the `always` task.
+
+```lua
+global function always()
+  load "teal"
+end
+```
+
+### Defining dependencies
+
+Before your `load` call, simply define `store.dependencies` to be a table containing strings, each a valid LuaRocks package. When you execute `alfons` via the CLI, it will automatically download the dependencies. You can turn this behavior off by setting `store.install` to `false` right above the `store.dependencies` assignment. Then, you can install those dependencies any other time by calling `tasks.install()` in the Taskfile, or `alfons install` in the command-line.
+
+### Building
+
+`alfons build` (or `tasks.build()`) becomes an alias to `tl build` on the command-line.
+
+### Downloading type definitions
+
+See [Downloading typings](#downloading-typings).
+
+### Declaring hooks
+
+To define a hook, simply define another global function with the names specified in [Hooks](#hooks).
+
+```lua
+global function always()
+  store.install = false
+  load "teal"
+end
+
+global function teal_postinstall()
+  prints "Dependencies installed!"
+end
+```
