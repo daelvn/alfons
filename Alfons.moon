@@ -36,18 +36,10 @@ tasks:
     print inspect store
     print inspect calls!
   reargs: => tasks.args!
-  uses: =>
-    if uses "unknown"
-      print "hit"
-  A: =>
-    inspect = require "inspect"
-    print inspect calls!
-    print inspect args
-    print inspect @
-    print inspect store
-  --b: =>
-  --c: =>
-  D: =>
-  --e: =>
-  F: =>
-  --g: =>
+  -- teal
+  always: =>
+    store.hooks.teal_preinstall = -> prints "e"
+    store.dependencies = {"tl"}
+    load "teal"
+  --teal_preinstall: =>
+    --print "preinstall hook!"
