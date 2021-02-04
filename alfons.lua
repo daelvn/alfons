@@ -1039,7 +1039,7 @@ return {
   tasks = {
     always = function(self)
       load("fetch")
-      if not (store.install == false) then
+      if not (store.teal_auto == true) then
         tasks.install()
         return tasks.typings({
           modules = store.typings
@@ -1125,7 +1125,7 @@ do
 local _ENV = _ENV
 package.preload[ "alfons.version" ] = function( ... ) local arg = _G.arg;
 return {
-  VERSION = "4.4"
+  VERSION = "4.5"
 }
 end
 end

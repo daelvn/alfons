@@ -2,7 +2,7 @@ return {
   tasks = {
     always = function(self)
       load("fetch")
-      if not (store.install == false) then
+      if not (store.teal_auto == true) then
         tasks.install()
         return tasks.typings({
           modules = store.typings

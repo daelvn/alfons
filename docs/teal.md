@@ -30,19 +30,18 @@ end
 
 The `alfons-teal` rock (included in this repo but installed separately) provides a `teal` plugin that you can use via `load` (see more [here](loading.md)). The functionality for that plugin is described here.
 
-This plugin exports the following commands, which you should not overwrite: **`install`, `build`, `watch`, `typings`**.
+This plugin exports the following commands, which you should not overwrite: **`install`, `build`, `typings`**.
 
 ### Installing LuaRocks dependencies
 
 > **WARNING:** LuaRocks does **not** have an official updated API, so this task resorts to running `sh "luarocks install dependency"`. LuaRocks must therefore be a command available in your PATH. If you are a LuaRocks developer and know how to fix this, PRs welcome!
 
-Upon loading Teal, it will install all dependencies from `store.dependencies`, which must be a list of strings, each a valid LuaRocks package. You can turn off this feature by doing `store.install = false`, and then later installing the dependencies by running the `install` task.
+Upon calling the `install` task, it will install all dependencies from `store.dependencies`, which must be a list of strings, each a valid LuaRocks package. You can make it execute automatically by doing `store.teal_auto = true`.
 
 ```lua
-store.dependencies = {"tl", "busted"}
-
 global function always()
   load "teal"
+  store.dependencies = {"tl", "busted"}
 end
 ```
 
@@ -77,7 +76,7 @@ $ alfons typings -m <rock>
 
 ### Taskfile
 
-When you load the plugin, it will automatically try to use `store.typings` (a list of strings) as a source for what rocks to fetch type definitions for. You can turn off this behavior by setting `store.install` to `false`, and then running it later like this:
+When you call `tasks.typings()`, it will automatically try to use `store.typings` (a list of strings) as a source for what rocks to fetch type definitions for. You can make it do this automatically by setting `store.teal_auto` to `true`.
 
 ```lua
 -- Lua
@@ -102,7 +101,7 @@ end
 
 ### Defining dependencies
 
-Before your `load` call, simply define `store.dependencies` to be a table containing strings, each a valid LuaRocks package. When you execute `alfons` via the CLI, it will automatically download the dependencies. You can turn this behavior off by setting `store.install` to `false` right above the `store.dependencies` assignment. Then, you can install those dependencies any other time by calling `tasks.install()` in the Taskfile, or `alfons install` in the command-line.
+Simply set `store.dependencies` to a table containing strings, each a valid LuaRocks package before calling the `tasks.install()` tasks in the Taskfile (or `alfons install` in the command-line). You can make it do this automatically every time you open Alfons by setting `store.teal_auto = true`.
 
 ### Building
 

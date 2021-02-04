@@ -2,7 +2,7 @@ tasks:
   -- always
   always: =>
     load "fetch"
-    unless store.install == false
+    unless store.teal_auto == true
       tasks.install!
       tasks.typings modules: store.typings
   -- install dependencies

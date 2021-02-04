@@ -37,7 +37,3 @@ tasks:
     print inspect store
     print inspect calls!
   reargs: => tasks.args!
-  -- teal
-  always: =>
-    store.install = false
-    load "teal"
