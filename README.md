@@ -16,6 +16,7 @@ Alfons is a task runner to help you manage your project. It's inspired by the wo
 - [Alfons 4](#alfons-4)
   - [Table of contents](#table-of-contents)
   - [Changelog](#changelog)
+    - [4.4](#44)
     - [4.3](#43)
     - [4.2](#42)
     - [4.1](#41)
@@ -33,6 +34,12 @@ Alfons is a task runner to help you manage your project. It's inspired by the wo
   - [Goodbye?](#goodbye)
 
 ## Changelog
+
+### 4.4
+
+- **4.4** (04.02.2021) Added [`exists`](docs/environment.md) and **Experimental Teal Support**.
+
+Some critical bugs in the loading of taskfiles and the invocation of tasks have been fixed.
 
 ### 4.3
 

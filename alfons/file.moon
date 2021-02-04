@@ -33,4 +33,21 @@ readLua = (file) ->
   -- return
   return content
 
-{ :readMoon, :readLua }
+readTeal = (file) ->
+  local content
+  with fs.safeOpen file, "r"
+    -- check that we could open correctly
+    if .error
+      return nil, "Could not open #{file}: #{.error}"
+    -- read and compile
+    import init_env, gen from require "tl"
+    gwe     = init_env true, false -- lax:true, compat:false
+    content = gen (\read "*a"), gwe
+    -- check that we could compile correctly
+    unless content
+      return nil, "Could not read #{file}: #{content}"
+    \close!
+  -- return
+  return content
+
+{ :readMoon, :readLua, :readTeal }

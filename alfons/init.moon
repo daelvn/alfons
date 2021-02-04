@@ -36,9 +36,13 @@ initEnv = (run, base=ENVIRONMENT, genv, modname="main", pretty=false) ->
     error "Task '#{k}' is not a function." if "function" != type v
     @tasks[k] = (t={}) -> run k, v, t
   -- set tasksmt.__index to give friendly messages
-  tasksmt.__index = (k) =>
+  tasksmt.__index = (k) => (rawget @, k) or do
+    for scope, t in pairs genv
+      for name, task in pairs t.tasks
+        return task if k == name
+    -- else
     if pretty
-      provide.printError "Taskfile #{modname}: Task '#{k}' does not exist."
+      provide.printError "Task '#{k}' does not exist."
       os.exit 1
     else
       error "Task '#{k}' does not exist."
@@ -69,11 +73,12 @@ runString = (content, environment=ENVIRONMENT, runAlways=true, child=0, genv={},
     self.task = -> run name, task, argl
     callstack = (getmetatable genv).store.callstack
     table.insert callstack, name
-    task self
+    ret = task self
     table.remove callstack, #callstack
+    return ret
   -- reset genv metatable
   -- TODO document hooks
-  setmetatable genv, {store: {callstack: {}, hooks: {}}} unless getmetatable genv
+  setmetatable genv, {store: {callstack: {}}} unless getmetatable genv
   -- initialize environment
   env           = initEnv run, environment, genv, modname, pretty
   genv[modname] = env
@@ -88,17 +93,11 @@ runString = (content, environment=ENVIRONMENT, runAlways=true, child=0, genv={},
     rawset env, "args", args
     -- add utils
     rawset env, "uses",    (cmdmd) -> provide.contains (args.commands or {}), cmdmd
-    rawset env, "exists",  (wants) -> (rawget env.tasks, wants) ~= nil
-    rawset env, "gexists", (wants) ->
+    rawset env, "exists",  (wants) ->
       for scope, t in pairs genv
         for name, task in pairs t.tasks
           return true if wants == name
       return false
-    rawset env, "gtasks", setmetatable {}, __index: (wants) =>
-      for scope, t in pairs genv
-        for name, task in pairs t.tasks
-          return task if wants == name
-      return -> error "Task '#{wants}' does not exist."
     rawset env, "calls",  (cmdmd) ->
       -- get currently running task
       callstack = (getmetatable genv).store.callstack
