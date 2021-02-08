@@ -18,6 +18,23 @@ readMoon = (file) ->
   -- return
   return content
 
+readFennel = (file) ->
+  local content
+  with fs.safeOpen file, "r"
+    -- check that we could open correctly
+    if .error
+      return nil, "Could not open #{file}: #{.error}"
+    import compileFennel from require "alfons.fennel"
+    -- read and compile
+    _, err = pcall ->
+      content = compileFennel \read "*a"
+    -- check that we could compile correctly
+    unless content
+      return nil, "Could not read or parse #{file}: #{err}"
+    \close!
+    -- return
+    return content
+
 readLua = (file) ->
   local content
   with fs.safeOpen file, "r"
@@ -50,4 +67,4 @@ readTeal = (file) ->
   -- return
   return content
 
-{ :readMoon, :readLua, :readTeal }
+{ :readMoon, :readLua, :readTeal, :readFennel }
