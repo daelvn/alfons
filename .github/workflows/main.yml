@@ -6,9 +6,9 @@ name: CI
 # events but only for the master branch
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -19,54 +19,55 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-    - uses: actions/checkout@v2
-    
-    # Install glibc and yaml
-    - name: Install libyaml
-      run: |
-        sudo apt install libyaml-dev
-    
-    # Lua
-    - name: Install Lua/LuaJIT
-      uses: leafo/gh-actions-lua@v8.0.0
-      with:
-        luaVersion: 5.1
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
 
-    - name: Install LuaRocks
-      uses: leafo/gh-actions-luarocks@v4
-      with:
-        # The version of LuaRocks to install, must be available on https://luarocks.github.io/luarocks/releases/
-        luaRocksVersion: 3.5.0
+      # Install glibc and yaml
+      - name: Install libyaml
+        run: |
+          sudo apt install libyaml-dev
 
-    # Runs a single command using the runners shell
-    - name: Install dependencies
-      run: |
-        luarocks install moonscript
-        luarocks install filekit
-        luarocks install ansikit
-        luarocks install http
-        luarocks install rockbuild
-        luarocks install amalg
+      # Lua
+      - name: Install Lua/LuaJIT
+        uses: leafo/gh-actions-lua@v8.0.0
+        with:
+          luaVersion: 5.1
 
-    # Compile MoonScript
-    - name: Compile
-      run: |
-        moonc alfons/
-        moonc bin/
-        
-    # Pack into single script
-    - name: Pack
-      run: |
-        amalg.lua -o alfons.lua -s bin/alfons.lua alfons.setfenv alfons.env alfons.file alfons.getopt alfons.provide alfons.version alfons.init alfons.look
+      - name: Install LuaRocks
+        uses: leafo/gh-actions-luarocks@v4
+        with:
+          # The version of LuaRocks to install, must be available on https://luarocks.github.io/luarocks/releases/
+          luaRocksVersion: 3.5.0
 
-    # Runs a set of commands using the runners shell
-    - name: rockbuild -m
-      run: |
-        rockbuild -m "$GITHUB_SHA"
-        
-    # Upload artifacts
-    - uses: actions/upload-artifact@v2
-      with:
-        name: alfons
-        path: alfons.lua
+      # Runs a single command using the runners shell
+      - name: Install dependencies
+        run: |
+          luarocks install moonscript
+          luarocks install filekit
+          luarocks install lpath
+          luarocks install ansikit
+          luarocks install http
+          luarocks install rockbuild
+          luarocks install amalg
+
+      # Compile MoonScript
+      - name: Compile
+        run: |
+          moonc alfons/
+          moonc bin/
+
+      # Pack into single script
+      - name: Pack
+        run: |
+          amalg.lua -o alfons.lua -s bin/alfons.lua alfons.setfenv alfons.env alfons.file alfons.getopt alfons.provide alfons.version alfons.init alfons.look
+
+      # Runs a set of commands using the runners shell
+      - name: rockbuild -m
+        run: |
+          rockbuild -m "$GITHUB_SHA"
+
+      # Upload artifacts
+      - uses: actions/upload-artifact@v2
+        with:
+          name: alfons
+          path: alfons.lua
