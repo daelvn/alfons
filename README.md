@@ -1,5 +1,6 @@
-# Alfons 4
-<a href="https://discord.gg/3KGDznrEjC"><img src="https://img.shields.io/static/v1?label=discord&message=chat&color=brightgreen&style=flat-square"></a> 
+# Alfons 5
+
+<a href="https://discord.gg/3KGDznrEjC"><img src="https://img.shields.io/static/v1?label=discord&message=chat&color=brightgreen&style=flat-square"></a>
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/daelvn/alfons/CI?style=flat-square)
 ![GitHub stars](https://img.shields.io/github/stars/daelvn/alfons?style=flat-square)
 ![GitHub tag (latest SemVer pre-release)](https://img.shields.io/github/v/tag/daelvn/alfons?include_prereleases&label=release&style=flat-square)
@@ -8,14 +9,16 @@
 <img align="left" width="128" height="128" src=".github/alfons-logo.svg">
 <!-- <img src=".github/alfons-banner.png"> -->
 
-> Alfons 4 is a rewrite of the original Alfons, written to be much more modular and usable. For the old Alfons 3, see the [`three`](https://github.com/daelvn/alfons/tree/three) GitHub branch.
+> Alfons 5 is a rewrite of the original Alfons, written to be much more modular and usable. For the old Alfons 3, see the [`three`](https://github.com/daelvn/alfons/tree/three) GitHub branch.
 
 Alfons is a task runner to help you manage your project. It's inspired by the worst use cases of Make (this means using `make` instead of shell scripts), it will read an Alfonsfile, extract the exported functions and run the tasks in order. I would tell you that there is no real reason to use this thing, but it's becoming surprisingly useful, so actually try it out.
 
 ## Table of contents
-- [Alfons 4](#alfons-4)
+
+- [Alfons 5](#alfons-5)
   - [Table of contents](#table-of-contents)
   - [Changelog](#changelog)
+    - [5](#5)
     - [4.4](#44)
     - [4.3](#43)
     - [4.2](#42)
@@ -34,6 +37,12 @@ Alfons is a task runner to help you manage your project. It's inspired by the wo
   - [Goodbye?](#goodbye)
 
 ## Changelog
+
+### 5
+
+- **5.0** (23.01.2023) Switched out [filekit](https://github.com/daelvn/filekit) in favor of [lpath](https://github.com/starwing/lpath).
+
+I am back to life and filekit errored on me. Filekit is terribly inefficient anyway and I don't know why I ever made it. Now I am using an actually good filesystem library. It's a breaking change, though.
 
 ### 4.4
 
@@ -133,6 +142,7 @@ Some functions are either not implemented or not yet ported.
 `fetch`/`fetchs` is now just `fetch`, and `ms-compile` has been removed and will probably not come back. Write a compile task manually. This should work as a dropin replacement:
 
 **Lua:**
+
 ```lua
 compile = function()
   for file in wildcard "**.moon" do sh "moonc ".. file end
@@ -140,6 +150,7 @@ end
 ```
 
 **MoonScript:**
+
 ```moon
 compile: => sh "moonc #{file}" for file in wildcard "**.moon"
 ```
