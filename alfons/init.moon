@@ -13,8 +13,9 @@ local *
 sanitize = (pattern) -> pattern\gsub "[%(%)%.%%%+%-%*%?%[%]%^%$]", "%%%0" if pattern
 
 -- prefix for modules
---PREFIX = "test.alfons."
-PREFIX = "alfons.tasks."
+-- FIXME roll back from test
+PREFIX = "test.alfons."
+--PREFIX = "alfons.tasks."
 
 -- initialize a new environment
 initEnv = (run, base=ENVIRONMENT, genv, modname="main", pretty=false) ->
