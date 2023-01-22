@@ -2,7 +2,10 @@
 -- Loading and custom environment
 import style   from require "ansikit.style"
 setfenv         or= require "alfons.setfenv"
-fs                = require "filekit"
+path              = require "path"
+fs              or= require "path.fs"
+env               = require "path.env"
+fsinfo            = require "path.info"
 unpack          or= table.unpack
 
 -- forward-declare environment
@@ -16,7 +19,9 @@ ENVIRONMENT = {
   :select, :type, :pairs, :ipairs, :next, :unpack
   :require
   :print, :style                        -- from ansikit
-  :io, :math, :string, :table, :os, :fs -- fs is either CC/fs or filekit
+  :io, :math, :string, :table, :os
+  :fs                                   -- fs is either CC/fs or lpath.fs
+  :path, :env, :fsinfo                  -- lpath, lpath.env and lpath.info respectively
 }
 
 -- load in environment

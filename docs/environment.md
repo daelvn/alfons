@@ -3,6 +3,7 @@
 This is the environment being passed to Alfonsfiles, along with everything on `provide`.
 
 ```moon
+-- environment for alfons files
 ENVIRONMENT = {
   :_VERSION
   :assert, :error, :pcall, :xpcall
@@ -10,7 +11,9 @@ ENVIRONMENT = {
   :select, :type, :pairs, :ipairs, :next, :unpack
   :require
   :print, :style                        -- from ansikit
-  :io, :math, :string, :table, :os, :fs -- fs is either CC/fs or filekit
+  :io, :math, :string, :table, :os
+  :fs                                   -- fs is either CC/fs or lpath.fs
+  :path, :env, :fsinfo                  -- lpath, lpath.env and lpath.info respectively
 }
 ```
 
