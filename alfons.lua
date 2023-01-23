@@ -252,7 +252,7 @@ sanitize = function(pattern)
     return pattern:gsub("[%(%)%.%%%+%-%*%?%[%]%^%$]", "%%%0")
   end
 end
-PREFIX = "test.alfons."
+PREFIX = "alfons.tasks."
 initEnv = function(run, base, genv, modname, pretty)
   if base == nil then
     base = ENVIRONMENT
