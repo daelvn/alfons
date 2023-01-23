@@ -24,6 +24,7 @@ build:
     alfons.file: alfons/file.lua
     alfons.getopt: alfons/getopt.lua
     alfons.provide: alfons/provide.lua
+    alfons.wildcard: alfons/wildcard.lua
     alfons.version: alfons/version.lua
     alfons.look: alfons/look.lua
     alfons.init: alfons/init.lua
