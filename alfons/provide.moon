@@ -157,7 +157,7 @@ copy = (fr, to) ->
 build = (iter, fn) ->
   -- get modification times
   times = {}
-  if fs.exists ".alfons"
+  if path.exists ".alfons"
     prints "%{cyan}:%{white} using .alfons"
     times = dofile ".alfons"
     times = {k, tonumber v for k, v in pairs times}

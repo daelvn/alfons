@@ -11,7 +11,7 @@ tasks:
     for file in wildcard "**.lua"
       continue if (file\match "alfons.lua") and not (file\match "bin")
       continue if (file\match "tasks")
-      fs.delete file
+      delete file
   -- use amalg to pack Alfons
   pack: =>
     show "Packing using amalg.lua"
