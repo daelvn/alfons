@@ -11,7 +11,7 @@ description:
     moonscript rock.
   homepage: https://github.com/daelvn/alfons
 dependencies:
-  - filekit >= 1.3
+  - lpath
   - ansikit
   - lua >= 5.1
 build:
