@@ -40,9 +40,25 @@ Alfons is a task runner to help you manage your project. It's inspired by the wo
 
 ### 5
 
+- **5.0.2** (23.01.2023) Rolled back test mode
+- **5.0.1** (23.01.2023) Fixed rockspec dependencies
 - **5.0** (23.01.2023) Switched out [filekit](https://github.com/daelvn/filekit) in favor of [lpath](https://github.com/starwing/lpath).
 
 I am back to life and filekit errored on me. Filekit is terribly inefficient anyway and I don't know why I ever made it. Now I am using an actually good filesystem library. It's a breaking change, though.
+
+- **Compatibility with ComputerCraft has been removed.** Alfons 5 is not compatible with it.
+- **Replaced filekit with lpath**
+  - `fs` in the environment no longer points to `filekit`, but to `path.fs`
+  - `path`, `fsinfo` and `env` have been added to the environment, corresponding to `path`, `path.info` and `path.env` respectively.
+- Additions to the environment
+  - `safeOpen`: Open IO handles safely
+  - `listAll`: Returns a list of all files and directories recursively.
+  - `copy`: Recursive file copy
+  - `delete`: Recursive delete
+  - `isEmpty`: Checks if a directory is empty
+- Changes to the environment
+  - All FS operations don't deal in absolute paths anymore
+  - `wildcard` and `iwildcard` may exhibit slightly different behavior.
 
 ### 4.4
 
