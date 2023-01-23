@@ -17,7 +17,7 @@ fromGlob = (glob) ->
     mid = \gsub "%%%*%%%*",    ".*"
     mid = mid\gsub "%%%*",     "[^/]*"
     mid = mid\gsub "%%%?",     "." -- TODO this should be [^/]
-    print "==> #{mid}"
+    --print "==> #{mid}"
     return "#{mid}$"
 
 -- TODO alias this to testGlob

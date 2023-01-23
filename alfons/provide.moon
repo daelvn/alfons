@@ -124,11 +124,15 @@ isEmpty = (path) ->
 delete = (loc) ->
   return unless Path.exists loc
   if Path.isfile loc or isEmpty loc
+    --print "DELFILE #{loc}"
     fs.remove loc
   else
+    --print "DELDIR #{loc}"
     for node in fs.dir loc
+      --print "SUBDEL #{node}"
       continue if node\match "%.%."
-      delete Path loc, node
+      --delete Path loc, node
+      delete node
     fs.remove loc
 
 -- copy (source:string, target:string)
@@ -139,7 +143,8 @@ copy = (fr, to) ->
     error "copy $ #{to} already exists" if Path.exists to
     fs.mkdir to
     for node in fs.dir fr
-      copy (Path fr, node), (Path to, node)
+      --copy (Path fr, node), (Path to, node)
+      copy node, (Path to, (Path.name node))
   elseif Path.isfile fr
     fs.copy fr, to
 
