@@ -101,10 +101,10 @@ wildcard = fs.glob
 
 -- iwildcard (paths:table) -> function (iterator)
 -- Multiple fs.iglob paths
-iwildcard = (paths) ->
+iwildcard = (paths, depth) ->
   all = {}
   for path in *paths
-    for globbed in fs.glob path
+    for globbed in fs.glob path, depth
       table.insert all, globbed
   --
   i, n = 0, #all
