@@ -24,6 +24,9 @@ To see the documentation for `build` and `watch`, check out their respective mar
     - [cmd](#cmd)
     - [cmdfail](#cmdfail)
   - [FS](#fs)
+    - [isEmpty](#isempty)
+    - [delete](#delete)
+    - [copy](#copy)
     - [wildcard](#wildcard)
     - [iwildcard](#iwildcard)
     - [listAll](#listall)
@@ -120,6 +123,24 @@ Displays a message, but fancy.
 `cmdfail`/`shfail` is a wrapper around `os.execute` that will exit the program with the code returned by `os.execute` if it is not 0. For example, trying to run a program that does not exist will exit alfons with code 127.
 
 ## FS
+
+### isEmpty
+
+`isEmpty (dir:string) -> boolean`
+
+Checks if a directory is empty
+
+### delete
+
+`delete (path:string)`
+
+Deletes a file or folder recursively.
+
+### copy
+
+`copy (fr:string, to:string)`
+
+Copies a file or folder recursively.
 
 ### wildcard
 

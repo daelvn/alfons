@@ -11,12 +11,6 @@ inotify = do
   ok, inotify = pcall -> require "inotify"
   ok and inotify or nil
 
--- safeOpen (path:string, mode:string) -> io | table
--- Filekit's safeOpen
-safeOpen = (path, mode) ->
-  a, b = io.open path, mode
-  return a and a or {error: b}
-
 -- contains (t:table, v:any) -> boolean
 -- Checks whether a table contains a value
 contains = (t, v) -> #[vv for vv in *t when vv == v] != 0
@@ -29,6 +23,12 @@ prints = (...) -> printerr unpack [style arg for arg in *{...}]
 -- printError (text:string) -> nil
 -- Prints an error
 printError = (text) -> printerr style "%{red}#{text}"
+
+-- safeOpen (path:string, mode:string) -> io | table
+-- Filekit's safeOpen
+safeOpen = (path, mode) ->
+  a, b = io.open path, mode
+  return a and a or {error: b}
 
 -- readfile (file:string) -> string
 -- Returns the contents of a file
@@ -111,6 +111,40 @@ iwildcard = (paths) ->
   ->
     i += 1
     return all[i] if i <= n
+
+-- listAll (dir:string) -> [string]
+-- Filekit's listAll
+listAll = (dir) -> [node for node in fs.scandir dir]
+
+-- isEmpty (path:string) -> boolean
+-- Checks if a directory is empty
+isEmpty = (path) ->
+  return false unless isDir path
+  return 0 == #(listAll path)
+
+-- delete (loc:string)
+-- Recursive delete
+delete = (loc) ->
+  return unless path.exists loc
+  if path.isfile loc or isEmpty loc
+    fs.remove loc
+  else
+    for node in fs.dir loc
+      continue if node\match "%.%."
+      delete path loc, node
+    fs.remove loc
+
+-- copy (source:string, target:string)
+-- Recursive copy
+copy = (fr, to) ->
+  error "copy $ #{fr} does not exist" unless path.exists fr
+  if path.isdir fr
+    error "copy $ #{to} already exists" if path.exists to
+    fs.mkdir to
+    for node in fs.dir fr
+      copy (path fr, node), (path to, node)
+  elseif path.isfile fr
+    fs.copy fr, to
 
 -- glob (glob:string) -> (path:string) -> boolean
 -- Curried fs.matchGlob
@@ -222,10 +256,6 @@ bit_band = (a, b) ->
 --   -- close it
 --   handle\close!
 
--- listAll (dir:string) -> [string]
--- Filekit's listAll
-listAll = (dir) -> [node for node in fs.scandir dir]
-
 -- watch (dirs:{string}, exclude:{string}, evf:{string}, pred:(file -> boolean), fn:(file -> nil)) -> nil
 watch = (dirs, exclude, evf, pred, fn) ->
   error "Could not load inotify" unless inotify
@@ -321,4 +351,5 @@ npairs = (t) ->
   :env, :ask, :show
   :npairs
   :listAll, :safeOpen
+  :isEmpty, :delete, :copy
 }
