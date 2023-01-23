@@ -1,10 +1,11 @@
 -- alfons.provide
 -- Functions provided to the environment
-import style from require "ansikit.style"
-Path            = require "path"
-fs              = require "path.fs"
-unpack        or= table.unpack
-printerr        = (t) -> io.stderr\write t .. "\n" 
+import style                from require "ansikit.style"
+import listAll, glob, iglob from require "alfons.wildcard"
+Path                           = require "path"
+fs                             = require "path.fs"
+unpack                       or= table.unpack
+printerr                       = (t) -> io.stderr\write t .. "\n" 
 
 -- try loading inotify, which is an optional dependancy
 inotify = do
@@ -96,25 +97,21 @@ isAbsolute = (path) -> path\match "^/"           -- isAbsolute (path:string) -> 
 
 --# fs #--
 -- wildcard (path:string) -> function (iterator)
--- path.fs.glob
-wildcard = fs.glob
+-- Implements old wildcard behavior
+wildcard = iglob
 
 -- iwildcard (paths:table) -> function (iterator)
 -- Multiple fs.iglob paths
-iwildcard = (paths, depth) ->
+iwildcard = (paths) ->
   all = {}
   for path in *paths
-    for globbed in fs.glob path, depth
+    for globbed in iglob path
       table.insert all, globbed
   --
   i, n = 0, #all
   ->
     i += 1
     return all[i] if i <= n
-
--- listAll (dir:string) -> [string]
--- Filekit's listAll
-listAll = (dir) -> [node for node in fs.scandir dir]
 
 -- isEmpty (path:string) -> boolean
 -- Checks if a directory is empty
