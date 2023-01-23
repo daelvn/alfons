@@ -1,10 +1,12 @@
 -- alfons.file
 -- Gets the contents of a taskfile
-fs = require "filekit"
+safeOpen = (path, mode) ->
+  a, b = io.open path, mode
+  return a and a or {error: b}
 
 readMoon = (file) ->
   local content
-  with fs.safeOpen file, "r"
+  with safeOpen file, "r"
     -- check that we could open correctly
     if .error
       return nil, "Could not open #{file}: #{.error}"
@@ -20,7 +22,7 @@ readMoon = (file) ->
 
 readLua = (file) ->
   local content
-  with fs.safeOpen file, "r"
+  with safeOpen file, "r"
     -- check that we could open correctly
     if .error
       return nil, "Could not open #{file}: #{.error}"
@@ -33,9 +35,10 @@ readLua = (file) ->
   -- return
   return content
 
+-- REQUIRES "tl" MODULE
 readTeal = (file) ->
   local content
-  with fs.safeOpen file, "r"
+  with safeOpen file, "r"
     -- check that we could open correctly
     if .error
       return nil, "Could not open #{file}: #{.error}"

@@ -1,7 +1,8 @@
 -- alfons.provide
 -- Functions provided to the environment
 import style from require "ansikit.style"
-fs              = require "filekit"
+path            = require "path"
+fs              = require "path.fs"
 unpack        or= table.unpack
 printerr        = (t) -> io.stderr\write t .. "\n" 
 
@@ -9,6 +10,12 @@ printerr        = (t) -> io.stderr\write t .. "\n"
 inotify = do
   ok, inotify = pcall -> require "inotify"
   ok and inotify or nil
+
+-- safeOpen (path:string, mode:string) -> io | table
+-- Filekit's safeOpen
+safeOpen = (path, mode) ->
+  a, b = io.open path, mode
+  return a and a or {error: b}
 
 -- contains (t:table, v:any) -> boolean
 -- Checks whether a table contains a value
@@ -26,7 +33,7 @@ printError = (text) -> printerr style "%{red}#{text}"
 -- readfile (file:string) -> string
 -- Returns the contents of a file
 readfile = (file) ->
-  with fs.safeOpen file, "r"
+  with safeOpen file, "r"
     if .error
       error .error
     else
@@ -37,7 +44,7 @@ readfile = (file) ->
 -- writefile (file:string, content:string) -> nil
 -- Writes into a file
 writefile = (file, content) ->
-  with fs.safeOpen file, "w"
+  with safeOpen file, "w"
     if .error
       error .error
     else
@@ -82,22 +89,22 @@ shfail  = cmdfail
 
 --# path #--
 basename   = (file) -> file\match "(.+)%..+"     -- basename   (file:string) -> string
-filename   = (file) -> file\match ".+/(.+)%..+"  -- filename   (file:string) -> string
-extension  = (file) -> file\match ".+%.(.+)"     -- extension  (file:string) -> string
-pathname   = (file) -> file\match "(.+/).+"      -- pathname   (file:string) -> string
+filename   = path.stem                           -- filename   (file:string) -> string
+extension  = path.suffix                         -- extension  (file:string) -> string
+pathname   = path.parent                         -- pathname   (file:string) -> string
 isAbsolute = (path) -> path\match "^/"           -- isAbsolute (path:string) -> string
 
 --# fs #--
 -- wildcard (path:string) -> function (iterator)
--- fs.iglob
-wildcard = fs.iglob
+-- path.fs.glob
+wildcard = fs.glob
 
 -- iwildcard (paths:table) -> function (iterator)
 -- Multiple fs.iglob paths
 iwildcard = (paths) ->
   all = {}
   for path in *paths
-    for globbed in fs.iglob path
+    for globbed in fs.glob path
       table.insert all, globbed
   --
   i, n = 0, #all
@@ -107,7 +114,8 @@ iwildcard = (paths) ->
 
 -- glob (glob:string) -> (path:string) -> boolean
 -- Curried fs.matchGlob
-glob = (glob) -> (path) -> fs.matchGlob (fs.fromGlob glob), path
+-- NOTE deleted in 5.0
+--glob = (glob) -> (path) -> fs.matchGlob (fs.fromGlob glob), path
 
 -- build (iter:function, fn:function) -> nil
 -- Compares last modification times with a cache, and if the file was
@@ -121,7 +129,7 @@ build = (iter, fn) ->
     times = {k, tonumber v for k, v in pairs times}
   --
   for file in iter
-    mtime = fs.getLastModification file
+    mtime = fs.mtime file
     if times[file]
       -- previously built
       fn file if mtime > times[file]
@@ -214,6 +222,10 @@ bit_band = (a, b) ->
 --   -- close it
 --   handle\close!
 
+-- listAll (dir:string) -> [string]
+-- Filekit's listAll
+listAll = (dir) -> [node for node in fs.scandir dir]
+
 -- watch (dirs:{string}, exclude:{string}, evf:{string}, pred:(file -> boolean), fn:(file -> nil)) -> nil
 watch = (dirs, exclude, evf, pred, fn) ->
   error "Could not load inotify" unless inotify
@@ -222,21 +234,23 @@ watch = (dirs, exclude, evf, pred, fn) ->
   if evf == "live"
     evf = {"write", "movein"}
   -- convert all into absolute
-  cdir = fs.currentDir!
+  cdir = path.cwd!
   for i, dir in ipairs dirs
     unless isAbsolute dir
-      dirs[i] = fs.reduce fs.combine cdir, dir
+      --dirs[i] = fs.reduce fs.combine cdir, dir
+      dirs[i] = path cdir, dir
   for i, dir in ipairs exclude
     unless isAbsolute dir
-      exclude[i] = fs.reduce fs.combine cdir, dir
+      --exclude[i] = fs.reduce fs.combine cdir, dir
+      exclude[i] = path cdir, dir
   -- recurse into subdirectories
   for i, dir in ipairs dirs
-    for ii, subdir in ipairs fs.listAll dir
-      br8k = false
+    for ii, subdir in ipairs listAll dir
+      doBreak = false
       for exclusion in *exclude
-        br8k = true if subdir\match "^#{exclusion}"
-      continue if br8k
-      table.insert dirs, subdir if fs.isDir subdir
+        doBreak = true if subdir\match "^#{exclusion}"
+      continue if doBreak
+      table.insert dirs, subdir if path.isdir subdir
   -- print dirs
   prints "%{cyan}:%{white} Watching for:"
   for dir in *dirs
@@ -262,9 +276,9 @@ watch = (dirs, exclude, evf, pred, fn) ->
     -- iterate fetched events
     for ev in *evts
       -- get full path
-      full = fs.combine reversed[ev.wd], (ev.name or "")
+      full = path reversed[ev.wd], (ev.name or "")
       -- if dir, add watcher
-      if (fs.isDir full) and (bit_band ev.mask, inotify.IN_CREATE) and not watchers[full]
+      if (path.isdir full) and (bit_band ev.mask, inotify.IN_CREATE) and not watchers[full]
         prints "%{cyan}:%{white} Added to watchlist: %{green}#{full}"
         watchers[full]           = handle\addwatch full, unpack events
         reversed[watchers[full]] = full
@@ -306,4 +320,5 @@ npairs = (t) ->
   :build, :watch
   :env, :ask, :show
   :npairs
+  :listAll, :safeOpen
 }
