@@ -1,7 +1,7 @@
 -- alfons.provide
 -- Functions provided to the environment
 import style from require "ansikit.style"
-path            = require "path"
+Path            = require "path"
 fs              = require "path.fs"
 unpack        or= table.unpack
 printerr        = (t) -> io.stderr\write t .. "\n" 
@@ -89,9 +89,9 @@ shfail  = cmdfail
 
 --# path #--
 basename   = (file) -> file\match "(.+)%..+"     -- basename   (file:string) -> string
-filename   = path.stem                           -- filename   (file:string) -> string
-extension  = path.suffix                         -- extension  (file:string) -> string
-pathname   = path.parent                         -- pathname   (file:string) -> string
+filename   = Path.stem                           -- filename   (file:string) -> string
+extension  = Path.suffix                         -- extension  (file:string) -> string
+pathname   = Path.parent                         -- pathname   (file:string) -> string
 isAbsolute = (path) -> path\match "^/"           -- isAbsolute (path:string) -> string
 
 --# fs #--
@@ -119,31 +119,31 @@ listAll = (dir) -> [node for node in fs.scandir dir]
 -- isEmpty (path:string) -> boolean
 -- Checks if a directory is empty
 isEmpty = (path) ->
-  return false unless isDir path
+  return false unless Path.isdir path
   return 0 == #(listAll path)
 
 -- delete (loc:string)
 -- Recursive delete
 delete = (loc) ->
-  return unless path.exists loc
-  if path.isfile loc or isEmpty loc
+  return unless Path.exists loc
+  if Path.isfile loc or isEmpty loc
     fs.remove loc
   else
     for node in fs.dir loc
       continue if node\match "%.%."
-      delete path loc, node
+      delete Path loc, node
     fs.remove loc
 
 -- copy (source:string, target:string)
 -- Recursive copy
 copy = (fr, to) ->
-  error "copy $ #{fr} does not exist" unless path.exists fr
-  if path.isdir fr
-    error "copy $ #{to} already exists" if path.exists to
+  error "copy $ #{fr} does not exist" unless Path.exists fr
+  if Path.isdir fr
+    error "copy $ #{to} already exists" if Path.exists to
     fs.mkdir to
     for node in fs.dir fr
-      copy (path fr, node), (path to, node)
-  elseif path.isfile fr
+      copy (Path fr, node), (Path to, node)
+  elseif Path.isfile fr
     fs.copy fr, to
 
 -- glob (glob:string) -> (path:string) -> boolean
@@ -157,7 +157,7 @@ copy = (fr, to) ->
 build = (iter, fn) ->
   -- get modification times
   times = {}
-  if path.exists ".alfons"
+  if Path.exists ".alfons"
     prints "%{cyan}:%{white} using .alfons"
     times = dofile ".alfons"
     times = {k, tonumber v for k, v in pairs times}
@@ -264,15 +264,15 @@ watch = (dirs, exclude, evf, pred, fn) ->
   if evf == "live"
     evf = {"write", "movein"}
   -- convert all into absolute
-  cdir = path.cwd!
+  cdir = Path.cwd!
   for i, dir in ipairs dirs
     unless isAbsolute dir
       --dirs[i] = fs.reduce fs.combine cdir, dir
-      dirs[i] = path cdir, dir
+      dirs[i] = Path cdir, dir
   for i, dir in ipairs exclude
     unless isAbsolute dir
       --exclude[i] = fs.reduce fs.combine cdir, dir
-      exclude[i] = path cdir, dir
+      exclude[i] = Path cdir, dir
   -- recurse into subdirectories
   for i, dir in ipairs dirs
     for ii, subdir in ipairs listAll dir
@@ -280,7 +280,7 @@ watch = (dirs, exclude, evf, pred, fn) ->
       for exclusion in *exclude
         doBreak = true if subdir\match "^#{exclusion}"
       continue if doBreak
-      table.insert dirs, subdir if path.isdir subdir
+      table.insert dirs, subdir if Path.isdir subdir
   -- print dirs
   prints "%{cyan}:%{white} Watching for:"
   for dir in *dirs
@@ -306,9 +306,9 @@ watch = (dirs, exclude, evf, pred, fn) ->
     -- iterate fetched events
     for ev in *evts
       -- get full path
-      full = path reversed[ev.wd], (ev.name or "")
+      full = Path reversed[ev.wd], (ev.name or "")
       -- if dir, add watcher
-      if (path.isdir full) and (bit_band ev.mask, inotify.IN_CREATE) and not watchers[full]
+      if (Path.isdir full) and (bit_band ev.mask, inotify.IN_CREATE) and not watchers[full]
         prints "%{cyan}:%{white} Added to watchlist: %{green}#{full}"
         watchers[full]           = handle\addwatch full, unpack events
         reversed[watchers[full]] = full

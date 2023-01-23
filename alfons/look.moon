@@ -1,7 +1,7 @@
 -- alfons.look
 -- Gets the path for a module, specifically tailored for Alfons
 import readMoon, readLua from require "alfons.file"
-path                        = require "path"
+Path                        = require "path"
 
 sanitize = (pattern="") -> pattern\gsub "[%(%)%.%%%+%-%*%?%[%]%^%$]", "%%%0"
 
@@ -19,10 +19,10 @@ makeLook = (gpath=package.path) ->
     file = false
     for path in *paths
       pt   = path\gsub swildcard, mod
-      file = pt if path.exists pt
+      file = pt if Path.exists pt
     for path in *moonpaths
       pt   = path\gsub swildcard, mod
-      file = pt if path.exists pt
+      file = pt if Path.exists pt
     --
     if file
       read                = (file\match "%.lua$") and readLua or readMoon

@@ -3,7 +3,7 @@
 -- By daelvn
 import VERSION   from require "alfons.version"
 import style     from require "ansikit.style"
-path                = require "path"
+Path                = require "path"
 unpack            or= table.unpack
 printerr            = (t) -> io.stderr\write t .. "\n"
 
@@ -25,9 +25,9 @@ args = getopt {...}
 FILE = do
   if     args.f                  then args.f
   elseif args.file               then args.file
-  elseif path.exists "Alfons.lua"  then "Alfons.lua"
-  elseif path.exists "Alfons.moon" then "Alfons.moon"
-  elseif path.exists "Alfons.tl"   then "Alfons.tl"
+  elseif Path.exists "Alfons.lua"  then "Alfons.lua"
+  elseif Path.exists "Alfons.moon" then "Alfons.moon"
+  elseif Path.exists "Alfons.tl"   then "Alfons.tl"
   else errors 1, "No Taskfile found."
 
 -- Also accept a custom language
