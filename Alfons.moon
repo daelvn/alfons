@@ -37,3 +37,6 @@ tasks:
     print inspect store
     print inspect calls!
   reargs: => tasks.args!
+  wild: =>
+    for file in fs.dir "."
+      print file
