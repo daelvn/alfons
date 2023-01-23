@@ -15,6 +15,7 @@ To see the documentation for `build` and `watch`, check out their respective mar
   - [IO](#io)
     - [prints](#prints)
     - [printError](#printerror)
+    - [safeOpen](#safeopen)
     - [readfile](#readfile)
     - [writefile](#writefile)
     - [serialize](#serialize)
@@ -25,8 +26,8 @@ To see the documentation for `build` and `watch`, check out their respective mar
   - [FS](#fs)
     - [wildcard](#wildcard)
     - [iwildcard](#iwildcard)
+    - [listAll](#listall)
   - [Path](#path)
-    - [glob](#glob)
     - [basename](#basename)
     - [extension](#extension)
     - [filename](#filename)
@@ -69,6 +70,12 @@ You can access `TEST` by using `env.TEST`.
 `printError (text:string) -> nil`
 
 Prints a string in red.
+
+### safeOpen
+
+`safeOpen (file:string, mode:string) -> io | {["error"]:string}`
+
+Returns a table with an error string if the file could not be opened properly.
 
 ### readfile
 
@@ -138,13 +145,13 @@ seeall: =>
     sh "cat #{file}"
 ```
 
+### listAll
+
+`listAll (path:string) -> [string]`
+
+Returns a list of all nodes in `path` recursively.
+
 ## Path
-
-### glob
-
-`glob (glob:string) -> (path:string) -> boolean`
-
-Matches a glob with a path.
 
 ### basename
 
