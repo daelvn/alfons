@@ -4,7 +4,10 @@ package.preload[ "alfons.env" ] = function( ... ) local arg = _G.arg;
 local style
 style = require("ansikit.style").style
 local setfenv = setfenv or require("alfons.setfenv")
-local fs = require("filekit")
+local path = require("path")
+local fs = fs or require("path.fs")
+local env = require("path.env")
+local fsinfo = require("path.info")
 local unpack = unpack or table.unpack
 local ENVIRONMENT
 ENVIRONMENT = {
@@ -29,7 +32,10 @@ ENVIRONMENT = {
   string = string,
   table = table,
   os = os,
-  fs = fs
+  fs = fs,
+  path = path,
+  env = env,
+  fsinfo = fsinfo
 }
 local loadEnv
 loadEnv = function(content, env)
@@ -61,12 +67,18 @@ end
 do
 local _ENV = _ENV
 package.preload[ "alfons.file" ] = function( ... ) local arg = _G.arg;
-local fs = require("filekit")
+local safeOpen
+safeOpen = function(path, mode)
+  local a, b = io.open(path, mode)
+  return a and a or {
+    error = b
+  }
+end
 local readMoon
 readMoon = function(file)
   local content
   do
-    local _with_0 = fs.safeOpen(file, "r")
+    local _with_0 = safeOpen(file, "r")
     if _with_0.error then
       return nil, "Could not open " .. tostring(file) .. ": " .. tostring(_with_0.error)
     end
@@ -85,7 +97,7 @@ local readLua
 readLua = function(file)
   local content
   do
-    local _with_0 = fs.safeOpen(file, "r")
+    local _with_0 = safeOpen(file, "r")
     if _with_0.error then
       return nil, "Could not open " .. tostring(file) .. ": " .. tostring(_with_0.error)
     end
@@ -101,7 +113,7 @@ local readTeal
 readTeal = function(file)
   local content
   do
-    local _with_0 = fs.safeOpen(file, "r")
+    local _with_0 = safeOpen(file, "r")
     if _with_0.error then
       return nil, "Could not open " .. tostring(file) .. ": " .. tostring(_with_0.error)
     end
@@ -240,7 +252,7 @@ sanitize = function(pattern)
     return pattern:gsub("[%(%)%.%%%+%-%*%?%[%]%^%$]", "%%%0")
   end
 end
-PREFIX = "alfons.tasks."
+PREFIX = "test.alfons."
 initEnv = function(run, base, genv, modname, pretty)
   if base == nil then
     base = ENVIRONMENT
@@ -508,7 +520,7 @@ do
   local _obj_0 = require("alfons.file")
   readMoon, readLua = _obj_0.readMoon, _obj_0.readLua
 end
-local fs = require("filekit")
+local Path = require("path")
 local sanitize
 sanitize = function(pattern)
   if pattern == nil then
@@ -550,14 +562,14 @@ makeLook = function(gpath)
     for _index_0 = 1, #paths do
       local path = paths[_index_0]
       local pt = path:gsub(swildcard, mod)
-      if fs.exists(pt) then
+      if Path.exists(pt) then
         file = pt
       end
     end
     for _index_0 = 1, #moonpaths do
       local path = moonpaths[_index_0]
       local pt = path:gsub(swildcard, mod)
-      if fs.exists(pt) then
+      if Path.exists(pt) then
         file = pt
       end
     end
@@ -586,7 +598,13 @@ local _ENV = _ENV
 package.preload[ "alfons.provide" ] = function( ... ) local arg = _G.arg;
 local style
 style = require("ansikit.style").style
-local fs = require("filekit")
+local listAll, glob, iglob
+do
+  local _obj_0 = require("alfons.wildcard")
+  listAll, glob, iglob = _obj_0.listAll, _obj_0.glob, _obj_0.iglob
+end
+local Path = require("path")
+local fs = require("path.fs")
 local unpack = unpack or table.unpack
 local printerr
 printerr = function(t)
@@ -635,10 +653,17 @@ local printError
 printError = function(text)
   return printerr(style("%{red}" .. tostring(text)))
 end
+local safeOpen
+safeOpen = function(path, mode)
+  local a, b = io.open(path, mode)
+  return a and a or {
+    error = b
+  }
+end
 local readfile
 readfile = function(file)
   do
-    local _with_0 = fs.safeOpen(file, "r")
+    local _with_0 = safeOpen(file, "r")
     if _with_0.error then
       error(_with_0.error)
     else
@@ -652,7 +677,7 @@ end
 local writefile
 writefile = function(file, content)
   do
-    local _with_0 = fs.safeOpen(file, "w")
+    local _with_0 = safeOpen(file, "w")
     if _with_0.error then
       error(_with_0.error)
     else
@@ -699,29 +724,20 @@ local basename
 basename = function(file)
   return file:match("(.+)%..+")
 end
-local filename
-filename = function(file)
-  return file:match(".+/(.+)%..+")
-end
-local extension
-extension = function(file)
-  return file:match(".+%.(.+)")
-end
-local pathname
-pathname = function(file)
-  return file:match("(.+/).+")
-end
+local filename = Path.stem
+local extension = Path.suffix
+local pathname = Path.parent
 local isAbsolute
 isAbsolute = function(path)
   return path:match("^/")
 end
-local wildcard = fs.iglob
+local wildcard = iglob
 local iwildcard
 iwildcard = function(paths)
   local all = { }
   for _index_0 = 1, #paths do
     local path = paths[_index_0]
-    for globbed in fs.iglob(path) do
+    for globbed in iglob(path) do
       table.insert(all, globbed)
     end
   end
@@ -733,16 +749,59 @@ iwildcard = function(paths)
     end
   end
 end
-local glob
-glob = function(glob)
-  return function(path)
-    return fs.matchGlob((fs.fromGlob(glob)), path)
+local isEmpty
+isEmpty = function(path)
+  if not (Path.isdir(path)) then
+    return false
+  end
+  return 0 == #(listAll(path))
+end
+local delete
+delete = function(loc)
+  if not (Path.exists(loc)) then
+    return 
+  end
+  if Path.isfile(loc or isEmpty(loc)) then
+    return fs.remove(loc)
+  else
+    for node in fs.dir(loc) do
+      local _continue_0 = false
+      repeat
+        if node:match("%.%.") then
+          _continue_0 = true
+          break
+        end
+        delete(node)
+        _continue_0 = true
+      until true
+      if not _continue_0 then
+        break
+      end
+    end
+    return fs.remove(loc)
+  end
+end
+local copy
+copy = function(fr, to)
+  if not (Path.exists(fr)) then
+    error("copy $ " .. tostring(fr) .. " does not exist")
+  end
+  if Path.isdir(fr) then
+    if Path.exists(to) then
+      error("copy $ " .. tostring(to) .. " already exists")
+    end
+    fs.mkdir(to)
+    for node in fs.dir(fr) do
+      copy(node, (Path(to, (Path.name(node)))))
+    end
+  elseif Path.isfile(fr) then
+    return fs.copy(fr, to)
   end
 end
 local build
 build = function(iter, fn)
   local times = { }
-  if fs.exists(".alfons") then
+  if Path.exists(".alfons") then
     prints("%{cyan}:%{white} using .alfons")
     times = dofile(".alfons")
     do
@@ -754,7 +813,7 @@ build = function(iter, fn)
     end
   end
   for file in iter do
-    local mtime = fs.getLastModification(file)
+    local mtime = fs.mtime(file)
     if times[file] then
       if mtime > times[file] then
         fn(file)
@@ -809,33 +868,33 @@ watch = function(dirs, exclude, evf, pred, fn)
       "movein"
     }
   end
-  local cdir = fs.currentDir()
+  local cdir = Path.cwd()
   for i, dir in ipairs(dirs) do
     if not (isAbsolute(dir)) then
-      dirs[i] = fs.reduce(fs.combine(cdir, dir))
+      dirs[i] = Path(cdir, dir)
     end
   end
   for i, dir in ipairs(exclude) do
     if not (isAbsolute(dir)) then
-      exclude[i] = fs.reduce(fs.combine(cdir, dir))
+      exclude[i] = Path(cdir, dir)
     end
   end
   for i, dir in ipairs(dirs) do
-    for ii, subdir in ipairs(fs.listAll(dir)) do
+    for ii, subdir in ipairs(listAll(dir)) do
       local _continue_0 = false
       repeat
-        local br8k = false
+        local doBreak = false
         for _index_0 = 1, #exclude do
           local exclusion = exclude[_index_0]
           if subdir:match("^" .. tostring(exclusion)) then
-            br8k = true
+            doBreak = true
           end
         end
-        if br8k then
+        if doBreak then
           _continue_0 = true
           break
         end
-        if fs.isDir(subdir) then
+        if Path.isdir(subdir) then
           table.insert(dirs, subdir)
         end
         _continue_0 = true
@@ -895,8 +954,8 @@ watch = function(dirs, exclude, evf, pred, fn)
       local _continue_0 = false
       repeat
         local ev = evts[_index_0]
-        local full = fs.combine(reversed[ev.wd], (ev.name or ""))
-        if (fs.isDir(full)) and (bit_band(ev.mask, inotify.IN_CREATE)) and not watchers[full] then
+        local full = Path(reversed[ev.wd], (ev.name or ""))
+        if (Path.isdir(full)) and (bit_band(ev.mask, inotify.IN_CREATE)) and not watchers[full] then
           prints("%{cyan}:%{white} Added to watchlist: %{green}" .. tostring(full))
           watchers[full] = handle:addwatch(full, unpack(events))
           reversed[watchers[full]] = full
@@ -986,7 +1045,12 @@ return {
   env = env,
   ask = ask,
   show = show,
-  npairs = npairs
+  npairs = npairs,
+  listAll = listAll,
+  safeOpen = safeOpen,
+  isEmpty = isEmpty,
+  delete = delete,
+  copy = copy
 }
 end
 end
@@ -1130,11 +1194,95 @@ return {
 end
 end
 
+do
+local _ENV = _ENV
+package.preload[ "alfons.wildcard" ] = function( ... ) local arg = _G.arg;
+local Path = require("path")
+local fs = require("path.fs")
+local listAll
+listAll = function(dir)
+  local _accum_0 = { }
+  local _len_0 = 1
+  for node in fs.scandir(dir) do
+    _accum_0[_len_0] = node
+    _len_0 = _len_0 + 1
+  end
+  return _accum_0
+end
+local fromGlob
+fromGlob = function(glob)
+  local sanitize
+  sanitize = function(pattern)
+    if pattern then
+      return pattern:gsub("[%(%)%.%%%+%-%*%?%[%]%^%$]", "%%%0")
+    end
+  end
+  local saglob = sanitize(glob)
+  do
+    local _with_0 = saglob
+    local mid = _with_0:gsub("%%%*%%%*", ".*")
+    mid = mid:gsub("%%%*", "[^/]*")
+    mid = mid:gsub("%%%?", ".")
+    return tostring(mid) .. "$"
+  end
+end
+local matchGlob
+matchGlob = function(glob, path)
+  return nil ~= path:match(glob)
+end
+local glob
+glob = function(path, all)
+  if all == nil then
+    all = { }
+  end
+  if not (path:match("%*")) then
+    return path
+  end
+  local currentpath = "."
+  local fullpath = path
+  local correctpath = ""
+  for i = 1, #fullpath do
+    if (fullpath:sub(i, i)) == (currentpath:sub(i, i)) then
+      correctpath = correctpath .. currentpath:sub(i, i)
+    end
+  end
+  local toglob = fromGlob(fullpath)
+  local _list_0 = listAll(correctpath)
+  for _index_0 = 1, #_list_0 do
+    local node = _list_0[_index_0]
+    if node:match(toglob) then
+      table.insert(all, node)
+    end
+  end
+  return all
+end
+local iglob
+iglob = function(path)
+  local globbed = glob(path)
+  local i = 0
+  local n = #globbed
+  return function()
+    i = i + 1
+    if i <= n then
+      return globbed[i]
+    end
+  end
+end
+return {
+  listAll = listAll,
+  fromGlob = fromGlob,
+  matchGlob = matchGlob,
+  glob = glob,
+  iglob = iglob
+}
+end
+end
+
 local VERSION
 VERSION = require("alfons.version").VERSION
 local style
 style = require("ansikit.style").style
-local fs = require("filekit")
+local Path = require("path")
 local unpack = unpack or table.unpack
 local printerr
 printerr = function(t)
@@ -1177,11 +1325,11 @@ do
     FILE = args.f
   elseif args.file then
     FILE = args.file
-  elseif fs.exists("Alfons.lua") then
+  elseif Path.exists("Alfons.lua") then
     FILE = "Alfons.lua"
-  elseif fs.exists("Alfons.moon") then
+  elseif Path.exists("Alfons.moon") then
     FILE = "Alfons.moon"
-  elseif fs.exists("Alfons.tl") then
+  elseif Path.exists("Alfons.tl") then
     FILE = "Alfons.tl"
   else
     FILE = errors(1, "No Taskfile found.")
