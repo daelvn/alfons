@@ -46,7 +46,7 @@ Could not open example.txt: example.txt: No such file or directory
 
 ## Taskfiles
 
-Now, the moment we were all waiting for. What does this piece of garbage *actually* do? It just runs defined and named snippets of code. Tasks, if you will. It runs tasks. It takes the names of the tasks you want to run, and runs them. You can make tasks depend on other tasks. You can have tasks for practically anything. We put them in a Taskfile. We will be using `Alfons.lua`. Create that file and then just put this in it:
+Now, the moment we were all waiting for. What does this piece of garbage _actually_ do? It just runs defined and named snippets of code. Tasks, if you will. It runs tasks. It takes the names of the tasks you want to run, and runs them. You can make tasks depend on other tasks. You can have tasks for practically anything. We put them in a Taskfile. We will be using `Alfons.lua`. Create that file and then just put this in it:
 
 ```lua
 function hello()
@@ -75,11 +75,11 @@ function build()
 end
 
 function clean()
-  fs.delete("build.txt")
+  delete("build.txt")
 end
 ```
 
-Here there are two functions that you might not recognize. You can read about `writefile` [here](provide.md#writefile) and `fs` [here](https://github.com/daelvn/filekit). It's recommended that you familiarize yourself with the functions that come with Alfons as they will make your life much easier.
+Here there are two functions that you might not recognize. You can read about `writefile` [here](provide.md#writefile) and `fs` [here](provide.md#delete). It's recommended that you familiarize yourself with the functions that come with Alfons as they will make your life much easier.
 
 Now you can just call them one after each other: `alfons build clean`
 
@@ -114,7 +114,7 @@ My favorite word is oboe
 
 ## Calling other tasks
 
-Writing many tasks is fun until you start to have to reuse code. You could still make local functions, there's nothing stopping you from doing that, I promise, but chances are that at one point you will want to call another task. In Lua, I *think* you might be able to call the function directly? It won't have the `name` and `task` fields that's for sure. I also think it won't count towards the total tasks-run number. For your own protection, please use the following method, which is just the `tasks` table:
+Writing many tasks is fun until you start to have to reuse code. You could still make local functions, there's nothing stopping you from doing that, I promise, but chances are that at one point you will want to call another task. In Lua, I _think_ you might be able to call the function directly? It won't have the `name` and `task` fields that's for sure. I also think it won't count towards the total tasks-run number. For your own protection, please use the following method, which is just the `tasks` table:
 
 ```lua
 function main()
