@@ -24,7 +24,7 @@ pack: =>
   show "Packing using amalg.lua"
   @o    or= @output or "alfons.lua"
   @s    or= @entry or "bin/alfons.lua"
-  modules = for file in wildcard "alfons/*.moon" do "alfons.#{filename file}" 
+  modules = for file in wildcard "alfons/*.moon" do "alfons.#{filename file}"
   sh "amalg.lua -o #{@o} -s #{@s} #{table.concat modules, ' '}"
 ```
 
@@ -79,5 +79,5 @@ watch: => watch {"."}, {".git"}, "live", (glob "*.moon"), (file, ev) -> sh "moon
 ### Clean
 
 ```moon
-clean: => fs.delete file for file in wildcard "**.lua"
+clean: => delete file for file in wildcard "**.lua"
 ```
