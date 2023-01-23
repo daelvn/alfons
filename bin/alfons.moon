@@ -1,4 +1,4 @@
--- alfons 4.2
+-- alfons 5.0
 -- Task execution with Lua and MoonScript
 -- By daelvn
 import VERSION   from require "alfons.version"
