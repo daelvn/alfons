@@ -21,6 +21,6 @@ end
 
 ```moon
 tasks:
-  compile:
+  compile: =>
     build (wildcard "**.moon"), -> sh "moonc #{file}"
 ```
