@@ -16,6 +16,7 @@ To see the documentation for `build` and `watch`, check out their respective mar
     - [prints](#prints)
     - [printError](#printerror)
     - [safeOpen](#safeopen)
+    - [safePopen](#safepopen)
     - [readfile](#readfile)
     - [writefile](#writefile)
     - [serialize](#serialize)
@@ -23,6 +24,7 @@ To see the documentation for `build` and `watch`, check out their respective mar
     - [show](#show)
     - [cmd](#cmd)
     - [cmdfail](#cmdfail)
+    - [cmdread](#cmdread)
   - [FS](#fs)
     - [isEmpty](#isempty)
     - [delete](#delete)
@@ -80,6 +82,12 @@ Prints a string in red.
 
 Returns a table with an error string if the file could not be opened properly.
 
+### safePopen
+
+`safePopen (command:string, mode:string) -> io | {["error"]:string}`
+
+Equivalent to `safeOpen`, but for `io.popen`.
+
 ### readfile
 
 `readfile (file:string) -> string`
@@ -121,6 +129,12 @@ Displays a message, but fancy.
 `cmdfail (str:string) -> nil`
 
 `cmdfail`/`shfail` is a wrapper around `os.execute` that will exit the program with the code returned by `os.execute` if it is not 0. For example, trying to run a program that does not exist will exit alfons with code 127.
+
+### cmdread
+
+`cmdread (command:string) -> string`
+
+`cmdread` uses `safePopen` (`io.popen`) to execute a command and return all of its output. If `popen` did not work, it returns the error as a string.
 
 ## FS
 
