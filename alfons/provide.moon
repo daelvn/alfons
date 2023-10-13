@@ -31,6 +31,12 @@ safeOpen = (path, mode) ->
   a, b = io.open path, mode
   return a and a or {error: b}
 
+-- safePopen (path:string, mode:string) -> io | table
+safePopen = (path, mode) ->
+  return {error: "io.popen is not available"} unless io.popen
+  handle = io.popen path, mode
+  return handle or {error: "Could not io.popen #{path}"}
+
 -- readfile (file:string) -> string
 -- Returns the contents of a file
 readfile = (file) ->
@@ -87,6 +93,19 @@ cmdfail = (str) ->
   code = cmd str
   os.exit code unless code == 0
 shfail  = cmdfail
+
+-- cmdread (cmd:string) -> string
+-- opens a command and returns its output or error message
+cmdread = (cmd, raw) ->
+  with safePopen cmd, "r"
+    if .error
+      error .error
+      return .error
+    else
+      contents = \read "*a"
+      \close!
+      return contents
+shread = cmdread
 
 --# path #--
 basename   = (file) -> file\match "(.+)%..+"     -- basename   (file:string) -> string
@@ -346,12 +365,12 @@ npairs = (t) ->
   :contains
   :prints, :printError
   :readfile, :writefile, :serialize
-  :cmd, :cmdfail, :sh, :shfail
+  :cmd, :cmdfail, :sh, :shfail, :cmdread, :shread
   :wildcard, :iwildcard, :glob
   :basename, :filename, :extension, :pathname
   :build, :watch
   :env, :ask, :show
   :npairs
-  :listAll, :safeOpen
+  :listAll, :safeOpen, :safePopen
   :isEmpty, :delete, :copy
 }
