@@ -41,3 +41,5 @@ tasks:
   wild: =>
     for file in wildcard "./**.moon"
       print file
+  cmdread: =>
+    show cmdread "echo 'hi'"
