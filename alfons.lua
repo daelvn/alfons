@@ -660,6 +660,18 @@ safeOpen = function(path, mode)
     error = b
   }
 end
+local safePopen
+safePopen = function(path, mode)
+  if not (io.popen) then
+    return {
+      error = "io.popen is not available"
+    }
+  end
+  local handle = io.popen(path, mode)
+  return handle or {
+    error = "Could not io.popen " .. tostring(path)
+  }
+end
 local readfile
 readfile = function(file)
   do
@@ -720,6 +732,22 @@ cmdfail = function(str)
   end
 end
 local shfail = cmdfail
+local cmdread
+cmdread = function(cmd, raw)
+  do
+    local _with_0 = safePopen(cmd, "r")
+    if _with_0.error then
+      error(_with_0.error)
+      return _with_0.error
+    else
+      local contents = _with_0:read("*a")
+      _with_0:close()
+      return contents
+    end
+    return _with_0
+  end
+end
+local shread = cmdread
 local basename
 basename = function(file)
   return file:match("(.+)%..+")
@@ -1033,6 +1061,8 @@ return {
   cmdfail = cmdfail,
   sh = sh,
   shfail = shfail,
+  cmdread = cmdread,
+  shread = shread,
   wildcard = wildcard,
   iwildcard = iwildcard,
   glob = glob,
@@ -1048,6 +1078,7 @@ return {
   npairs = npairs,
   listAll = listAll,
   safeOpen = safeOpen,
+  safePopen = safePopen,
   isEmpty = isEmpty,
   delete = delete,
   copy = copy
@@ -1189,7 +1220,7 @@ do
 local _ENV = _ENV
 package.preload[ "alfons.version" ] = function( ... ) local arg = _G.arg;
 return {
-  VERSION = "5.0.1"
+  VERSION = "5.2"
 }
 end
 end
@@ -1313,12 +1344,15 @@ errors = function(code, msg)
   printerr(style("%{red}" .. tostring(msg)))
   return os.exit(code)
 end
-prints("%{bold blue}Alfons " .. tostring(VERSION))
 local getopt
 getopt = require("alfons.getopt").getopt
 local args = getopt({
   ...
 })
+local LIST_TASKS = not not args.list
+if not (LIST_TASKS) then
+  prints("%{bold blue}Alfons " .. tostring(VERSION))
+end
 local FILE
 do
   if args.f then
@@ -1349,7 +1383,9 @@ do
     LANGUAGE = errors(1, "Cannot resolve format for Taskfile.")
   end
 end
-printerr("Using " .. tostring(FILE) .. " (" .. tostring(LANGUAGE) .. ")")
+if not (LIST_TASKS) then
+  printerr("Using " .. tostring(FILE) .. " (" .. tostring(LANGUAGE) .. ")")
+end
 local readMoon, readLua, readTeal
 do
   local _obj_0 = require("alfons.file")
@@ -1376,6 +1412,12 @@ if not (alfons) then
   errors(1, alfonsErr)
 end
 local env = alfons(...)
+if LIST_TASKS then
+  for k, v in pairs(env.tasks) do
+    io.write(k .. ' ')
+  end
+  os.exit()
+end
 local _list_0 = args.commands
 for _index_0 = 1, #_list_0 do
   local command = _list_0[_index_0]
