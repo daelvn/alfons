@@ -1,0 +1,11 @@
+alfons:
+- --version
+- --list
+- --list-options
+- --file
+- -f
+- $(alfons --list)
+
+alfons --file: &opt-file
+- <file>
+alfons -f: *opt-file

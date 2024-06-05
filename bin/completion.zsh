@@ -4,6 +4,9 @@ _alfons() {
   local state
   
   _arguments \
+    '--list[list available tasks]::' \
+    '--list-options[list available options for a task]:listopt:->listopt' \
+    '(--file -f)'{--file=,-f}"[taskfile to use]:taskfile:_files" \
     '*:task:->task'
 
   case "$state" in

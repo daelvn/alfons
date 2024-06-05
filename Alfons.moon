@@ -28,6 +28,10 @@ tasks:
     tasks.clean!
   -- run tests
   test: => sh "moon test/#{@n or ''}.moon"
+  -- generate completions
+  completions: =>
+    completely = 'docker run --rm -it --user $(id -u):$(id -g) --volume "$PWD:/app" dannyben/completely'
+    sh "#{completely} generate bin/completely.yaml bin/completion.bash"
   -- dummy tasks
   hello:  => print "hello!"
   shello: => sh "echo 'hello!'"
