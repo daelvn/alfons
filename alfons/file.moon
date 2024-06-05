@@ -20,7 +20,7 @@ readMoon = (file) ->
   -- return
   return content
 
-readLua = (file) ->
+readFile = (file) ->
   local content
   with safeOpen file, "r"
     -- check that we could open correctly
@@ -34,6 +34,8 @@ readLua = (file) ->
     \close!
   -- return
   return content
+
+readLua = readFile
 
 -- REQUIRES "tl" MODULE
 readTeal = (file) ->
@@ -53,4 +55,4 @@ readTeal = (file) ->
   -- return
   return content
 
-{ :readMoon, :readLua, :readTeal }
+{ :readMoon, :readLua, :readTeal, :readFile }
