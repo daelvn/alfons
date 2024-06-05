@@ -14,14 +14,19 @@ errors     = (code, msg) ->
   printerr style "%{red}#{msg}"
   os.exit code
   
--- introduction
-prints "%{bold blue}Alfons #{VERSION}"
-
 -- get arguments
 import getopt from require "alfons.getopt"
 args = getopt {...}
 
--- optionally accept a custom file
+-- List known tasks for autocompletion
+LIST_TASKS = not not args.list
+
+-- introduction
+unless LIST_TASKS
+  prints "%{bold blue}Alfons #{VERSION}"
+
+
+-- Optionally accept a custom file
 FILE = do
   if     args.f                  then args.f
   elseif args.file               then args.file
@@ -37,7 +42,9 @@ LANGUAGE = do
   elseif FILE\match "tl$"   then "teal"
   elseif args.type          then args.type
   else errors 1, "Cannot resolve format for Taskfile."
-printerr "Using #{FILE} (#{LANGUAGE})"
+
+unless LIST_TASKS
+  printerr "Using #{FILE} (#{LANGUAGE})"
 
 -- Load string
 import readMoon, readLua, readTeal from require "alfons.file"
@@ -53,6 +60,12 @@ import runString from require "alfons.init"
 alfons, alfonsErr = runString content, nil, true, 0, {}, {}, true
 unless alfons then errors 1, alfonsErr
 env = alfons ...
+
+-- If we have to list tasks, print them and exit
+if LIST_TASKS
+  for k, v in pairs env.tasks
+    io.write k .. ' '
+  os.exit!
 
 -- run tasks, and teardown after each of them
 for command in *args.commands
