@@ -361,6 +361,65 @@ npairs = (t) ->
     i += 1
     return keys[i], t[keys[i]] if i <= n
 
+
+--# utils #--
+
+-- lines (string) -> [string]
+-- Split a string into lines
+lines = (str) -> [line for line in str\gmatch "[^\r\n]+"]
+
+-- split (str:string, re:pattern, plain:boolean, n:number) -> [string]
+--   str - String to split
+--   re - Pattern to split the text by
+--   plain - Whether to treat `re` as plaintext or a Lua pattern (defaults to false)
+--   n - Maximum matches (defaults to none)
+-- https://github.com/lunarmodules/Penlight/blob/master/lua/pl/utils.lua
+split = (str, re, plain, n) ->
+  i1, ls = 1, {}
+  if not re then re = '%s+'
+  if re == '' then return { str }
+  while true
+    i2, i3 = string.find str, re, i1, plain
+    if not i2
+      last = string.sub str, i1
+      if last != '' then table.insert ls, last
+      if #ls == 1 and ls[1] == ''
+        return {}
+      else
+        return ls
+
+    table.insert ls, string.sub str, i1, i2-1
+
+    if n and #ls == n then
+      ls[#ls] = string.sub str, i1
+      return ls
+
+    i1 = i3+1
+
+-- filter (arr:{*:*}, predicate:((value:*, key:*) -> boolean)) -> {*}
+-- Filters a table using a predicate
+filter = (arr, predicate) -> {k, v for k, v in pairs arr when predicate v, k}
+
+-- map (arr:{*:*}, predicate:((value: *, key: *) -> *)) -> {*}
+-- Normal map over a table
+map = (arr, predicate) -> {k, predicate v for k, v in pairs arr}
+
+-- slice (arr:[*], start:number?, end:number?) -> [*]
+-- Creates a slice of an array
+slice = (arr, start, _end) -> 
+  if not start and not _end return arr
+  if start and not _end return [v for v in *arr[start,]]
+  if not start and _end return [v for v in *arr[,_end]]
+  return [v for v in *arr[start,_end]]
+
+-- keys (tbl:{*:*}) -> [*]
+-- Returns all the keys of a table
+keys = (tbl) -> [k for k, v in pairs tbl]
+
+-- sanitize (string) -> string
+-- Pattern-escapes a string
+sanitize = (pattern="") -> pattern\gsub "[%(%)%.%%%+%-%*%?%[%]%^%$]", "%%%0"
+
 {
   :contains
   :prints, :printError
@@ -373,4 +432,6 @@ npairs = (t) ->
   :npairs
   :listAll, :safeOpen, :safePopen
   :isEmpty, :delete, :copy
+  :lines, :split, :filter, :map, :slice, :keys
+  :sanitize,
 }
