@@ -78,6 +78,7 @@ if HELP
   import readFile from require "alfons.file"
   import parseComments from require "alfons.parser"
   import Paragraph, Spacer, Columns, Row, Cells, generateHelp from require "alfons.help"
+  import contains from require "alfons.provide"
   -- Read the file (since MoonScript compiler deletes comments)
   raw_content = readFile FILE
   -- Parse the content
@@ -117,7 +118,7 @@ if HELP
   extra_message = {}
   if HELP != true
     task = state.tasks[HELP]
-    unless task
+    if not task or (task.flags and contains task.flags, "hide")
       errors 2, "Error: Task '#{HELP}' does not exist."
     -- NOTE: We are purposefully replacing the original
     help_message = {
@@ -136,7 +137,7 @@ if HELP
       (Paragraph 'Loaded tasks:     (Use %{magenta}`alfons --help task`%{reset} to know more about said task)')
       (Columns {padding: 2}, [(
         Task task_name, task.description
-      ) for task_name, task in pairs state.tasks])
+      ) for task_name, task in pairs state.tasks when not (task.flags and contains task.flags, 'hide')])
       (Spacer!)
       (Paragraph 'Undocumented tasks:')
       (Paragraph "  %{cyan}#{table.concat undocumented_tasks, '  '}")

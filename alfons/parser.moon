@@ -25,10 +25,8 @@ errors = (code, msg) ->
 -- --- @argument status [info i] <> Shows status information.
 -- == Enabling flags for a task ==
 -- --- @flag task_name flags
--- --- @flag compile builtin-help -- Shows help
 -- --- @flag * hide
 -- = Builtin flags =
---   builtin-help - Allows alfons to display a message on `alfons task --help`
 --   hide         - Hides the task from autocompletion and help
 
 parseDirective = (directive) ->
@@ -95,17 +93,16 @@ parseComments = (content, marker = '---') ->
       when "flag"
         table.insert state.flags, value
       when "task-flag"
+        unless state.tasks[key]
+          state.tasks[key] = {}
         if "table" == type state.tasks[key].flags
           table.insert state.tasks[key].flags, value
         else
           state.tasks[key].flags = {value}
       when "argument"
         -- print "argument", inspect {:key, :value, :state}
-        -- error out if we are declaring an argument before a task
         unless state.tasks[key]
-          errors 2, 'Documentation error: Tried to document an argument for a task not yet documented\n' ..
-            "  Argument: [#{value.argument_names[1]}]\n" ..
-            "  Task: #{key}"
+          state.tasks[key] = {}
         state.tasks[key].arguments[value.argument_names[1]] = {
           names: value.argument_names,
           values: value.argument_values,
