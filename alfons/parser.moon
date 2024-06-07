@@ -1,8 +1,13 @@
 -- alfons.parser
 -- Parses comments and other information in a taskfile
 import lines, sanitize, map, filter, split, slice, keys from require "alfons.provide"
+import style from require "ansikit.style"
 inspect = require "inspect"
 
+printerr = (t) -> io.stderr\write t .. "\n"
+errors = (code, msg) ->
+  printerr style "%{red}#{msg}"
+  os.exit code
 --# Comments #--
 -- Comments are untied from the code itself, to avoid having to
 -- parse every language with comment ASTs, with MoonScript does
@@ -56,7 +61,13 @@ parseDirective = (directive) ->
         if in_argument_names
           table.insert argument_names, stripped_part
         if in_argument_values
-          table.insert argument_values, stripped_part
+          -- set as optional if ends with ?
+          part_object = value: stripped_part
+          if stripped_part\match '%?$'
+            part_object =
+              value: (stripped_part\match "([^%?]+)%?$"),
+              optional: true
+          table.insert argument_values, part_object
         if in_description
           description ..= part .. " "
         -- realize where we are OUT
@@ -89,17 +100,22 @@ parseComments = (content, marker = '---') ->
         else
           state.tasks[key].flags = {value}
       when "argument"
-        for argument_name in *value.argument_names
-          state.tasks[key].arguments[argument_name] = {
-            names: value.argument_names,
-            values: value.argument_values,
-            description: value.description,
-          }
-  print inspect state
+        -- print "argument", inspect {:key, :value, :state}
+        -- error out if we are declaring an argument before a task
+        unless state.tasks[key]
+          errors 2, 'Documentation error: Tried to document an argument for a task not yet documented\n' ..
+            "  Argument: [#{value.argument_names[1]}]\n" ..
+            "  Task: #{key}"
+        state.tasks[key].arguments[value.argument_names[1]] = {
+          names: value.argument_names,
+          values: value.argument_values,
+          description: value.description,
+        }
+  return state
 
-parseComments [[
---- @task pack Use amalg to pack Alfons
---- @argument pack [output o] <file:string> Output file
-]]
+-- parseComments [[
+-- --- @task pack Use amalg to pack Alfons
+-- --- @argument pack [output o] <file:string> Output file
+-- ]]
 
 { :parseComments }

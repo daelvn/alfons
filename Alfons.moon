@@ -1,18 +1,24 @@
 tasks:
+  --- @task make Install a local version of a version
+  --- @argument make [v] <version:string> Current version
   make:    => sh "rockbuild -m --delete #{@v}" if @v
+  --- @task release Create and upload a release of Alfons using %{magenta}`rockbuild`%{reset}.
+  --- @argument release [v] <version:string> Current version
   release: => sh "rockbuild -m -t #{@v} u"     if @v
-  -- compile everything
+  --- @task compile Compile all MoonScript files
   compile: =>
     sh "moonc #{file}" for file in wildcard "alfons/**.moon"
     sh "moonc bin/alfons.moon"
-  -- clean everything
+  --- @task clean Clean all built files
   clean: =>
     show "Cleaning files"
     for file in wildcard "**.lua"
       continue if (file\match "alfons.lua") and not (file\match "bin")
       continue if (file\match "tasks")
       delete file
-  -- use amalg to pack Alfons
+  --- @task pack Pack an Alfons build using amalg.lua
+  --- @argument pack [output o] <file> Output file (Default: %{green}"alfons.lua"%{reset})
+  --- @argument pack [entry s] <file> Entry file (Default: %{green}"bin/alfons.lua"%{reset})
   pack: =>
     show "Packing using amalg.lua"
     @o    or= @output or "alfons.lua"
@@ -21,14 +27,15 @@ tasks:
     tasks   = for file in wildcard "./alfons/tasks/*.moon" do "alfons.tasks.#{filename file}"
     show "amalg.lua -o #{@o} -s #{@s} #{table.concat modules, ' '} #{table.concat tasks, ' '}"
     sh "amalg.lua -o #{@o} -s #{@s} #{table.concat modules, ' '} #{table.concat tasks, ' '}"
-  -- generate only alfons.lua
+  --- @task produce Generate %{green}`alfons.lua`%{reset}
   produce: =>
     tasks.compile!
     tasks.pack!
     tasks.clean!
-  -- run tests
+  --- @task test Run an Alfons test
+  --- @argument test [n] <name> Name of the test to run
   test: => sh "moon test/#{@n or ''}.moon"
-  -- generate completions
+  --- @task completions Generate Bash completions using %{magenta}completely%{reset}.
   completions: =>
     completely = 'docker run --rm -it --user $(id -u):$(id -g) --volume "$PWD:/app" dannyben/completely'
     sh "#{completely} generate bin/completely.yaml bin/completion.bash"
