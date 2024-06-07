@@ -396,13 +396,22 @@ split = (str, re, plain, n) ->
 
     i1 = i3+1
 
--- filter (arr:{*:*}, predicate:((value:*, key:*) -> boolean)) -> {*}
+-- filter (arr:[*], predicate:((value:*, key:*) -> boolean)) -> [*]
 -- Filters a table using a predicate
-filter = (arr, predicate) -> {k, v for k, v in pairs arr when predicate v, k}
+filter = (arr, predicate) -> [v for k, v in ipairs arr when predicate v, k]
 
--- map (arr:{*:*}, predicate:((value: *, key: *) -> *)) -> {*}
+-- map (arr:[*], predicate:((value: *, key: *) -> *)) -> [*]
 -- Normal map over a table
-map = (arr, predicate) -> {k, predicate v for k, v in pairs arr}
+map = (arr, predicate) -> [predicate v, k for k, v in ipairs arr]
+
+-- reduce (arr:[*], predicate:((accum:*, value: *) -> *), initial:*) -> *
+-- reduce/foldl
+reduce = (arr, predicate, initial) ->
+  accumulator = initial or arr[1]
+  start = initial and 0 or 1
+  for i = start, i < #arr
+    accumulator = predicate accumulator, arr[i]
+  return accumulator
 
 -- slice (arr:[*], start:number?, end:number?) -> [*]
 -- Creates a slice of an array
@@ -432,6 +441,7 @@ sanitize = (pattern="") -> pattern\gsub "[%(%)%.%%%+%-%*%?%[%]%^%$]", "%%%0"
   :npairs
   :listAll, :safeOpen, :safePopen
   :isEmpty, :delete, :copy
-  :lines, :split, :filter, :map, :slice, :keys
-  :sanitize,
+  :lines, :split, :filter, :map, :reduce
+  :slice, :keys
+  :sanitize
 }
