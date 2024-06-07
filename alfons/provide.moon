@@ -421,6 +421,11 @@ slice = (arr, start, _end) ->
   if not start and _end return [v for v in *arr[,_end]]
   return [v for v in *arr[start,_end]]
 
+-- contains (arr:[*], value:*) -> boolean
+-- Check if an array contains a value
+contains = (arr, value) -> for v in *arr
+  return true if v == value
+
 -- keys (tbl:{*:*}) -> [*]
 -- Returns all the keys of a table
 keys = (tbl) -> [k for k, v in pairs tbl]
@@ -442,6 +447,6 @@ sanitize = (pattern="") -> pattern\gsub "[%(%)%.%%%+%-%*%?%[%]%^%$]", "%%%0"
   :listAll, :safeOpen, :safePopen
   :isEmpty, :delete, :copy
   :lines, :split, :filter, :map, :reduce
-  :slice, :keys
+  :slice, :keys, :contains
   :sanitize
 }
