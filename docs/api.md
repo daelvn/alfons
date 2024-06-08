@@ -14,6 +14,8 @@ Starting with 4.2, Alfons provides an API to embed Alfons functionality in your 
   - [alfons.provide](#alfonsprovide)
   - [alfons.setfenv](#alfonssetfenv)
   - [alfons.version](#alfonsversion)
+  - [alfons.help](#alfonshelp)
+  - [alfons.parser](#alfonsparser)
   - [alfons.init](#alfonsinit)
     - [initEnv](#initenv)
     - [runString](#runstring)
@@ -53,8 +55,7 @@ The rock also installs optional dependencies for Alfons like `http` or `linotify
 
 ## alfons.file
 
-Contains just two functions, `readLua`, which takes a filename and returns its contents; and `readMoon`, which does the same, but compiling the file contents as MoonScript.
-
+Contains a generic function `readFile` that reads a file content and loads it, an alias `readLua`, and then `readMoon` which compiles MoonScript content from a file before returning the Lua value, and `readTeal` for a Teal equivalent.
 ## alfons.getopt
 
 Contains a single function, `getopt`, which takes a list of arguments, and returns a table of parsed options. 
@@ -80,6 +81,14 @@ Returns a function (not a table). The function is simply a reimplementation of s
 ## alfons.version
 
 Returns a table with a field `VERSION` which contains the current Alfons version.
+
+## alfons.help
+
+Contains functions to generate help messages, including a column formatter.
+
+## alfons.parser
+
+Contains the comment parser for documenting Taskfiles.
 
 ## alfons.init
 

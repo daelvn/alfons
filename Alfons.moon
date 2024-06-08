@@ -1,9 +1,9 @@
 tasks:
   --- @task make Install a local version of a version
-  --- @argument make [v] <version:string> Current version
+  --- @option make [v] <version:string> Current version
   make:    => sh "rockbuild -m --delete #{@v}" if @v
   --- @task release Create and upload a release of Alfons using %{magenta}`rockbuild`%{reset}.
-  --- @argument release [v] <version:string> Current version
+  --- @option release [v] <version:string> Current version
   release: => sh "rockbuild -m -t #{@v} u"     if @v
   --- @task compile Compile all MoonScript files
   compile: =>
@@ -17,8 +17,8 @@ tasks:
       continue if (file\match "tasks")
       delete file
   --- @task pack Pack an Alfons build using amalg.lua
-  --- @argument pack [output o] <file> Output file (Default: %{green}"alfons.lua"%{reset})
-  --- @argument pack [entry s] <file> Entry file (Default: %{green}"bin/alfons.lua"%{reset})
+  --- @option pack [output o] <file> Output file (Default: %{green}"alfons.lua"%{reset})
+  --- @option pack [entry s] <file> Entry file (Default: %{green}"bin/alfons.lua"%{reset})
   pack: =>
     show "Packing using amalg.lua"
     @o    or= @output or "alfons.lua"
@@ -33,7 +33,7 @@ tasks:
     tasks.pack!
     tasks.clean!
   --- @task test Run an Alfons test
-  --- @argument test [n] <name> Name of the test to run
+  --- @option test [n] <name> Name of the test to run
   test: => sh "moon test/#{@n or ''}.moon"
   -- dummy tasks
   hello:  => print "hello!"

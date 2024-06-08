@@ -12,11 +12,16 @@
 
 Alfons is a task runner to help you manage your project. It's inspired by the worst use cases of Make (this means using `make` instead of shell scripts), it will read an Alfonsfile, extract the exported functions and run the tasks in order. I would tell you that there is no real reason to use this thing, but it's becoming surprisingly useful, so actually try it out.
 
+> [!TIP]
+> Check out the 5.2 update!
+> Shell autocompletions, help messages, Taskfile documentations and extra environment functions have been added.
+
 ## Table of contents
 
 - [Alfons 5](#alfons-5)
   - [Table of contents](#table-of-contents)
   - [Changelog](#changelog)
+    - [5.2](#52)
     - [5](#5)
     - [4.4](#44)
     - [4.3](#43)
@@ -37,6 +42,26 @@ Alfons is a task runner to help you manage your project. It's inspired by the wo
 
 ## Changelog
 
+### 5.2
+- **5.2** (08.06.2024) Implemented Taskfile documentation, help messages and autocompletion
+
+- **Taskfile documentation.** You can now document your Taskfiles for automatic help messages and shell completion.
+  - Check [the documentation](docs/documenting.md) for more info.
+- **Help messages.** You can now display a help message with `--help`, or even get help for a specific task with `--help [task]`.
+  - This help message can be automatically generated from the detected tasks in the Taskfile.
+  - It works best when you document your Taskfile, so you can add descriptions and options.
+- **Shell autocompletion.** Shell autocompletion is now available in Zsh and Bash flavors.
+  - The Zsh flavor is by far the most complete, since Zsh's completion system is slightly more capable.
+  - Bash is only able to list tasks, and sometimes options or flags for those tasks. Use Zsh.
+  - Check [the documentation](docs/autocompletion.md) for more info and install instructions.
+- **Additions to the environment.**
+  - `lines`: Split a string into lines
+  - `split`: Split any string by any pattern
+  - `sanitize`: Neutralizes pattern magic characters in strings
+  - `keys`: Get the keys of a table as an array
+  - `slice`: Creates a slice of an array
+  - `map`, `reduce`, `filter` do to arrays what you would expect
+  - `contains` has been rewritten
 ### 5
 
 - **5.0.2** (23.01.2023) Rolled back test mode

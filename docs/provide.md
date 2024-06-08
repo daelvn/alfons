@@ -9,9 +9,19 @@ To see the documentation for `build` and `watch`, check out their respective mar
 - [Functions](#functions)
   - [Table of Contents](#table-of-contents)
   - [Tables](#tables)
-    - [contains](#contains)
     - [npairs](#npairs)
     - [env](#env)
+    - [keys](#keys)
+  - [Arrays](#arrays)
+    - [map](#map)
+    - [reduce](#reduce)
+    - [filter](#filter)
+    - [slice](#slice)
+    - [contains](#contains)
+  - [Strings](#strings)
+    - [lines](#lines)
+    - [split](#split)
+    - [sanitize](#sanitize)
   - [IO](#io)
     - [prints](#prints)
     - [printError](#printerror)
@@ -44,10 +54,6 @@ To see the documentation for `build` and `watch`, check out their respective mar
 
 ## Tables
 
-### contains
-
-Checks whether a table `t` contains a value `v`.
-
 ### npairs
 
 Exactly like [ipairs](https://www.lua.org/manual/5.4/manual.html#pdf-ipairs), but it does not stop after a `nil` value.
@@ -61,6 +67,64 @@ $ TEST=5 alfons
 ```
 
 You can access `TEST` by using `env.TEST`.
+
+### keys
+
+`keys (table:{*:*}) -> [*]`
+
+Returns all the keys in a table.
+
+## Arrays
+
+### map
+
+`map (arr:[*], predicate:(value:*, key:*) -> *) -> [*]`
+
+Maps over an array.
+
+### reduce
+
+`reduce (arr:[*], predicate:(accumulator:*, value:*) -> *, initial: *?) -> *`
+
+Reduces an array to a single value using an accumulator. Equivalent to `foldl`.
+
+### filter
+
+`filter (arr:[*], predicate:(value:*, key: *) -> boolean) -> [*]`
+
+Creates a new array with only the values that pass the predicate.
+
+### slice
+
+`slice (arr:[*], start:number?, end:number?) -> [*]`
+
+Creates a slice of an array that starts at `start` and ends at `end`.
+
+### contains
+
+`contains (arr:[*], value:*) -> boolean`
+
+Checks if an array contains a certain value.
+
+## Strings
+
+### lines
+
+`lines (string) -> [string]`
+
+Splits a string into lines.
+
+### split
+
+`split (str:string, re:string, plain:boolean, matches:number) -> [string]`
+
+Splits a string `str` into parts by a pattern `re`, which is interpreted as a Lua pattern except if the `plain` flag is set to true. Additionally, a maximum number of matches can be set with the `matches` argument.
+
+### sanitize
+
+`sanitize (string) -> string`
+
+Makes sure that a string is safe to use in patterns without magic characters.
 
 ## IO
 

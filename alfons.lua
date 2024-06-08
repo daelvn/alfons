@@ -711,7 +711,6 @@ do
 end
 local style
 style = require("ansikit.style").style
-local inspect = require("inspect")
 local printerr
 printerr = function(t)
   return io.stderr:write(t .. "\n")
@@ -735,30 +734,30 @@ parseDirective = function(directive)
     local description = table.concat((slice(parts, 2)), ' ')
     return "task", name, {
       description = description,
-      arguments = { }
+      options = { }
     }
   elseif "flag" == _exp_0 then
     local parts = split(rest, '%s+')
     local name, flag = parts[1], parts[2]
     return (name == '*' and "flag" or "task-flag"), name, flag
-  elseif "argument" == _exp_0 then
+  elseif "option" == _exp_0 then
     local parts = split(rest, '%s+')
     local task = parts[1]
-    local argument_names, argument_values, description = { }, { }, ""
-    local in_argument_names, in_argument_values, in_description = false, false, false
+    local option_names, option_values, description = { }, { }, ""
+    local in_option_names, in_option_values, in_description = false, false, false
     for _index_0 = 2, #parts do
       local part = parts[_index_0]
       local stripped_part = part:match("([^%[%]%<%>]+)")
-      if not in_argument_names and part:match("^%[") then
-        in_argument_names = true
+      if not in_option_names and part:match("^%[") then
+        in_option_names = true
       end
-      if not in_argument_values and part:match("^%<") then
-        in_argument_values = true
+      if not in_option_values and part:match("^%<") then
+        in_option_values = true
       end
-      if in_argument_names then
-        table.insert(argument_names, stripped_part)
+      if in_option_names then
+        table.insert(option_names, stripped_part)
       end
-      if in_argument_values then
+      if in_option_values then
         local part_object = {
           value = stripped_part
         }
@@ -768,22 +767,22 @@ parseDirective = function(directive)
             optional = true
           }
         end
-        table.insert(argument_values, part_object)
+        table.insert(option_values, part_object)
       end
       if in_description then
         description = description .. (part .. " ")
       end
-      if in_argument_names and part:match("%]$") then
-        in_argument_names = false
+      if in_option_names and part:match("%]$") then
+        in_option_names = false
       end
-      if in_argument_values and part:match("%>$") then
-        in_argument_values = false
+      if in_option_values and part:match("%>$") then
+        in_option_values = false
         in_description = true
       end
     end
-    return "argument", task, {
-      argument_names = argument_names,
-      argument_values = argument_values,
+    return "option", task, {
+      option_names = option_names,
+      option_values = option_values,
       description = description
     }
   end
@@ -821,13 +820,13 @@ parseComments = function(content, marker)
           value
         }
       end
-    elseif "argument" == _exp_0 then
+    elseif "option" == _exp_0 then
       if not (state.tasks[key]) then
         state.tasks[key] = { }
       end
-      state.tasks[key].arguments[value.argument_names[1]] = {
-        names = value.argument_names,
-        values = value.argument_values,
+      state.tasks[key].options[value.option_names[1]] = {
+        names = value.option_names,
+        values = value.option_values,
         description = value.description
       }
     end
@@ -864,21 +863,6 @@ do
     return require("inotify")
   end)
   inotify = ok and inotify or nil
-end
-local contains
-contains = function(t, v)
-  return #(function()
-    local _accum_0 = { }
-    local _len_0 = 1
-    for _index_0 = 1, #t do
-      local vv = t[_index_0]
-      if vv == v then
-        _accum_0[_len_0] = vv
-        _len_0 = _len_0 + 1
-      end
-    end
-    return _accum_0
-  end)() ~= 0
 end
 local prints
 prints = function(...)
@@ -1406,6 +1390,7 @@ slice = function(arr, start, _end)
   end
   return _accum_0
 end
+local contains
 contains = function(arr, value)
   for _index_0 = 1, #arr do
     local v = arr[_index_0]
@@ -1933,7 +1918,7 @@ if LIST_OPTIONS then
       return _accum_0
     end)()), ' '))
   end
-  for option_name, option in pairs(task.arguments) do
+  for option_name, option in pairs(task.options) do
     local _list_0 = option.names
     for _index_0 = 1, #_list_0 do
       local name = _list_0[_index_0]
@@ -1957,7 +1942,7 @@ if GET_OPTION_TYPE then
   local parseComments
   parseComments = require("alfons.parser").parseComments
   local task_name, raw_option = GET_OPTION_TYPE:match("([^;]+)::([^;]+)")
-  local option = raw_option:gsub('%-', '')
+  local needed_option = raw_option:gsub('%-', '')
   if 'string' ~= type(GET_OPTION_TYPE) then
     errors(2, "Error: --get-option-type must be used with a task name and option in the format `task;option`.")
   end
@@ -1967,12 +1952,12 @@ if GET_OPTION_TYPE then
   if not task or (task.flags and contains(task.flags, "hide")) then
     errors(2, "Error: Task '" .. tostring(task_name) .. "' does not exist.")
   end
-  for argument_name, argument in pairs(task.arguments) do
-    if contains(argument.names, option) then
-      local _list_0 = argument.values
+  for option_name, option in pairs(task.options) do
+    if contains(option.names, needed_option) then
+      local _list_0 = option.values
       for _index_0 = 1, #_list_0 do
         local value = _list_0[_index_0]
-        print(ZSH_OPTION_TYPES[value] or "")
+        print(ZSH_OPTION_TYPES[value.value] or "")
       end
     end
   end
@@ -2072,7 +2057,7 @@ if HELP then
       }, ((function()
         local _accum_0 = { }
         local _len_0 = 1
-        for option_name, option in pairs(task.arguments) do
+        for option_name, option in pairs(task.options) do
           _accum_0[_len_0] = Option((formatOptions(option)), option.description)
           _len_0 = _len_0 + 1
         end
