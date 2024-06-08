@@ -134,7 +134,7 @@ if LIST_OPTIONS
       value.value
   ), ' ')
   -- Print arguments
-  for option_name, option in pairs task.arguments
+  for option_name, option in pairs task.options
     for name in *option.names
       if ZSH_LIST_OPTIONS
         print "#{formatOptionName name}\\:'#{removeColorCodes option.description}'"
@@ -152,7 +152,7 @@ if GET_OPTION_TYPE
   import readFile from require "alfons.file"
   import parseComments from require "alfons.parser"
   task_name, raw_option = GET_OPTION_TYPE\match "([^;]+)::([^;]+)"
-  option = raw_option\gsub '%-', ''
+  needed_option = raw_option\gsub '%-', ''
   -- argument needs to be a task
   if 'string' != type GET_OPTION_TYPE
     errors 2, "Error: --get-option-type must be used with a task name and option in the format `task;option`."
@@ -165,12 +165,11 @@ if GET_OPTION_TYPE
   if not task or (task.flags and contains task.flags, "hide")
     errors 2, "Error: Task '#{task_name}' does not exist."
   -- Find matching option
-  for argument_name, argument in pairs task.arguments
-    if contains argument.names, option
-      for value in *argument.values
-        print ZSH_OPTION_TYPES[value] or ""
+  for option_name, option in pairs task.options
+    if contains option.names, needed_option
+      for value in *option.values
+        print ZSH_OPTION_TYPES[value.value] or ""
   os.exit!
-
  
 -- If we have to show the help message, print that and exit
 if HELP
@@ -222,7 +221,7 @@ if HELP
     help_message = {
       (Paragraph "%{bold cyan}#{HELP}  %{reset}-  #{task.description}")
       (Columns {padding: 2}, (
-        for option_name, option in pairs task.arguments
+        for option_name, option in pairs task.options
           Option (formatOptions option), option.description
       ))
     }

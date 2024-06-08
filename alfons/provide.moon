@@ -12,10 +12,6 @@ inotify = do
   ok, inotify = pcall -> require "inotify"
   ok and inotify or nil
 
--- contains (t:table, v:any) -> boolean
--- Checks whether a table contains a value
-contains = (t, v) -> #[vv for vv in *t when vv == v] != 0
-
 --# io #--
 -- prints (...) -> nil
 -- Print + style

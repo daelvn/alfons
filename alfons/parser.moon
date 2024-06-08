@@ -2,7 +2,6 @@
 -- Parses comments and other information in a taskfile
 import lines, sanitize, map, filter, split, slice, keys from require "alfons.provide"
 import style from require "ansikit.style"
-inspect = require "inspect"
 
 printerr = (t) -> io.stderr\write t .. "\n"
 errors = (code, msg) ->
@@ -19,10 +18,10 @@ errors = (code, msg) ->
 -- == Describing a task ==
 -- --- @task task_name Description
 -- --- @task compile Compiles the code.
--- == Describing task arguments ==
--- --- @argument task_name [argument] <input?> Description
--- --- @argument release [version v] <version:string> Version of the release.
--- --- @argument status [info i] <> Shows status information.
+-- == Describing task option ==
+-- --- @option task_name [argument] <input?> Description
+-- --- @option release [version v] <version:string> Version of the release.
+-- --- @option status [info i] <> Shows status information.
 -- == Enabling flags for a task ==
 -- --- @flag task_name flags
 -- --- @flag * hide
@@ -38,43 +37,43 @@ parseDirective = (directive) ->
       parts = split rest, '%s+'
       name = parts[1]
       description = table.concat (slice parts, 2), ' '
-      return "task", name, { :description, arguments: {} } 
+      return "task", name, { :description, options: {} } 
     when "flag"
       parts = split rest, '%s+'
       name, flag = parts[1], parts[2]
       return (name == '*' and "flag" or "task-flag"), name, flag
-    when "argument"
+    when "option"
       parts = split rest, '%s+'
       task = parts[1]
-      argument_names, argument_values, description = {}, {}, ""
-      in_argument_names, in_argument_values, in_description = false, false, false
+      option_names, option_values, description = {}, {}, ""
+      in_option_names, in_option_values, in_description = false, false, false
       for part in *parts[2,]
         stripped_part = part\match "([^%[%]%<%>]+)"
         -- realize where we are IN
-        if not in_argument_names and part\match "^%["
-          in_argument_names = true
-        if not in_argument_values and part\match "^%<"
-          in_argument_values = true
+        if not in_option_names and part\match "^%["
+          in_option_names = true
+        if not in_option_values and part\match "^%<"
+          in_option_values = true
         -- add part depending in area
-        if in_argument_names
-          table.insert argument_names, stripped_part
-        if in_argument_values
+        if in_option_names
+          table.insert option_names, stripped_part
+        if in_option_values
           -- set as optional if ends with ?
           part_object = value: stripped_part
           if stripped_part\match '%?$'
             part_object =
               value: (stripped_part\match "([^%?]+)%?$"),
               optional: true
-          table.insert argument_values, part_object
+          table.insert option_values, part_object
         if in_description
           description ..= part .. " "
         -- realize where we are OUT
-        if in_argument_names and part\match "%]$"
-          in_argument_names = false
-        if in_argument_values and part\match "%>$"
-          in_argument_values = false
+        if in_option_names and part\match "%]$"
+          in_option_names = false
+        if in_option_values and part\match "%>$"
+          in_option_values = false
           in_description = true
-      return "argument", task, { :argument_names, :argument_values, :description }
+      return "option", task, { :option_names, :option_values, :description }
 
 -- Parses all comments starting with a certain marker '---'
 parseComments = (content, marker = '---') ->
@@ -99,20 +98,14 @@ parseComments = (content, marker = '---') ->
           table.insert state.tasks[key].flags, value
         else
           state.tasks[key].flags = {value}
-      when "argument"
-        -- print "argument", inspect {:key, :value, :state}
+      when "option"
         unless state.tasks[key]
           state.tasks[key] = {}
-        state.tasks[key].arguments[value.argument_names[1]] = {
-          names: value.argument_names,
-          values: value.argument_values,
+        state.tasks[key].options[value.option_names[1]] = {
+          names: value.option_names,
+          values: value.option_values,
           description: value.description,
         }
   return state
-
--- parseComments [[
--- --- @task pack Use amalg to pack Alfons
--- --- @argument pack [output o] <file:string> Output file
--- ]]
 
 { :parseComments }
