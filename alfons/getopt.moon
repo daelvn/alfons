@@ -44,13 +44,13 @@ getopt = (argl) ->
         push chr, true
       continue
     -- add option with value
-    if arg\match "^%-%-?(%w+)=(.+)$"
-      opt, value = arg\match "^%-%-?(%w+)=(.+)"
-      push opt, value
+    if arg\match "^%-%-?([a-zA-Z0-9%-_]+)=(.+)$"
+      opt, value = arg\match "^%-%-?([a-zA-Z0-9%-_]+)=(.+)"
+      push (opt\gsub "%-", "_"), value
       continue
     -- add option with next value
-    if opt = arg\match "^%-%-(%w+)$"
-      flags.wait = opt
+    if opt = arg\match "^%-%-([a-zA-Z0-9%-_]+)$"
+      flags.wait = opt\gsub "%-", "_"
   -- push if waiting
   if flags.wait
     push flags.wait, true
