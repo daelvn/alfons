@@ -13,22 +13,31 @@ printError = (text)      -> printerr style "%{red}#{text}"
 errors     = (code, msg) ->
   printerr style "%{red}#{msg}"
   os.exit code
+removeColorCodes = (str) -> str\gsub "%%{[a-z ]-}", ""
   
 -- get arguments
 import getopt from require "alfons.getopt"
 args = getopt {...}
 
 -- List known tasks for autocompletion
-LIST_TASKS = not not args.list
+ZSH_LIST_TASKS = not not args.zsh_list
+LIST_TASKS = ZSH_LIST_TASKS or not not args.list
 
 -- Read task description/arguments of a task for autocompletion
-LIST_OPTIONS = args.list_options
+ZSH_LIST_OPTIONS = args.zsh_list_options
+LIST_OPTIONS = ZSH_LIST_OPTIONS or args.list_options
+
+-- Get task argument type for autocompletion
+ZSH_GET_OPTION_TYPE = args.zsh_get_option_type
+GET_OPTION_TYPE = ZSH_GET_OPTION_TYPE or args.get_option_type
+
+COMPLETING = LIST_TASKS or LIST_OPTIONS or GET_OPTION_TYPE
 
 -- Show help message
 HELP = args.help
 
 -- introduction
-unless LIST_TASKS or LIST_OPTIONS
+unless COMPLETING
   prints "%{bold blue}Alfons #{VERSION}"
 
 -- Optionally accept a custom file
@@ -48,7 +57,7 @@ LANGUAGE = do
   elseif args.type          then args.type
   else errors 1, "Cannot resolve format for Taskfile."
 
-unless LIST_TASKS or LIST_OPTIONS
+unless COMPLETING
   printerr "Using #{FILE} (#{LANGUAGE})"
 
 -- Load string
@@ -67,18 +76,93 @@ unless alfons then errors 1, alfonsErr
 env = alfons ...
 
 -- If we have to list tasks, print them and exit
+import contains from require "alfons.provide"
+
+if ZSH_LIST_TASKS
+  import readFile from require "alfons.file"
+  import parseComments from require "alfons.parser"
+  -- Read the file (since MoonScript compiler deletes comments)
+  raw_content = readFile FILE
+  -- Parse the content
+  state = parseComments raw_content
+  -- Return
+  tasks = ["#{task_name}:#{removeColorCodes task.description or ''}" for task_name, task in pairs state.tasks when not (task.flag and contains task.flag, 'hide')]
+  for task in *tasks do print task
+  undocumented_tasks = [k for k, v in pairs env.tasks when not state.tasks[k]]
+  for task in *undocumented_tasks
+    sanitized_task = removeColorCodes task
+    print sanitized_task
+  os.exit!
+
 if LIST_TASKS
   for k, v in pairs env.tasks
     io.write k .. ' '
   os.exit!
 
+-- If we have to list the options, print them and exit
+if LIST_OPTIONS
+  import readFile from require "alfons.file"
+  import parseComments from require "alfons.parser"
+  list_options = ZSH_LIST_OPTIONS or LIST_OPTIONS
+  -- argument needs to be a task
+  if 'string' != type list_options
+    errors 2, "Error: --list-options must be used with a task name."
+  -- Read the file (since MoonScript compiler deletes comments)
+  raw_content = readFile FILE
+  -- Parse the content
+  state = parseComments raw_content
+  -- Access task
+  task = state.tasks[list_options]
+  if not task or (task.flags and contains task.flags, "hide")
+    errors 2, "Error: Task '#{list_options}' does not exist."
+  -- Helpers
+  formatOptionName = (name) -> ((string.len name) > 1) and ('--' .. name) or ('-' .. name)
+  formatOptionValues = (option) -> (table.concat (
+    for value in *option.values
+      value.value
+  ), ' ')
+  -- Print arguments
+  optstring = ""
+  for option_name, option in pairs task.arguments
+    for name in *option.names
+      print "#{formatOptionName name}\\:'#{removeColorCodes option.description}'"
+
+ZSH_OPTION_TYPES =
+  file: '_files'
+  path: '_path_files'
+  user: '_users'
+  group: '_groups'
+
+-- Retrieve option type, if asked
+if GET_OPTION_TYPE
+  import readFile from require "alfons.file"
+  import parseComments from require "alfons.parser"
+  task_name, raw_option = GET_OPTION_TYPE\match "([^;]+)::([^;]+)"
+  option = raw_option\gsub '%-', ''
+  -- argument needs to be a task
+  if 'string' != type GET_OPTION_TYPE
+    errors 2, "Error: --get-option-type must be used with a task name and option in the format `task;option`."
+  -- Read the file (since MoonScript compiler deletes comments)
+  raw_content = readFile FILE
+  -- Parse the content
+  state = parseComments raw_content
+  -- Access task
+  task = state.tasks[task_name]
+  if not task or (task.flags and contains task.flags, "hide")
+    errors 2, "Error: Task '#{task_name}' does not exist."
+  -- Find matching option
+  for argument_name, argument in pairs task.arguments
+    if contains argument.names, option
+      for value in *argument.values
+        print ZSH_OPTION_TYPES[value] or ""
+  os.exit!
+
+ 
 -- If we have to show the help message, print that and exit
 if HELP
-  inspect = require "inspect"
   import readFile from require "alfons.file"
   import parseComments from require "alfons.parser"
   import Paragraph, Spacer, Columns, Row, Cells, generateHelp from require "alfons.help"
-  import contains from require "alfons.provide"
   -- Read the file (since MoonScript compiler deletes comments)
   raw_content = readFile FILE
   -- Parse the content
