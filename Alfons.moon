@@ -35,10 +35,6 @@ tasks:
   --- @task test Run an Alfons test
   --- @argument test [n] <name> Name of the test to run
   test: => sh "moon test/#{@n or ''}.moon"
-  --- @task completions Generate Bash completions using %{magenta}completely%{reset}.
-  completions: =>
-    completely = 'docker run --rm -it --user $(id -u):$(id -g) --volume "$PWD:/app" dannyben/completely'
-    sh "#{completely} generate bin/completely.yaml bin/completion.bash"
   -- dummy tasks
   hello:  => print "hello!"
   shello: => sh "echo 'hello!'"
