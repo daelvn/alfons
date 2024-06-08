@@ -21,11 +21,13 @@ args = getopt {...}
 
 -- List known tasks for autocompletion
 ZSH_LIST_TASKS = not not args.zsh_list
-LIST_TASKS = ZSH_LIST_TASKS or not not args.list
+BASH_LIST_TASKS = not not args.bash_list
+LIST_TASKS = ZSH_LIST_TASKS or BASH_LIST_TASKS or not not args.list
 
 -- Read task description/arguments of a task for autocompletion
 ZSH_LIST_OPTIONS = args.zsh_list_options
-LIST_OPTIONS = ZSH_LIST_OPTIONS or args.list_options
+BASH_LIST_OPTIONS = args.bash_list_options
+LIST_OPTIONS = ZSH_LIST_OPTIONS or BASH_LIST_OPTIONS or args.list_options
 
 -- Get task argument type for autocompletion
 ZSH_GET_OPTION_TYPE = args.zsh_get_option_type
@@ -95,8 +97,18 @@ if ZSH_LIST_TASKS
   os.exit!
 
 if LIST_TASKS
-  for k, v in pairs env.tasks
-    io.write k .. ' '
+  import readFile from require "alfons.file"
+  import parseComments from require "alfons.parser"
+  -- Read the file (since MoonScript compiler deletes comments)
+  raw_content = readFile FILE
+  -- Parse the content
+  state = parseComments raw_content
+  -- Return
+  tasks = ["#{task_name} " for task_name, task in pairs state.tasks when not (task.flag and contains task.flag, 'hide')]
+  for task in *tasks do io.write task
+  undocumented_tasks = [k for k, v in pairs env.tasks when not state.tasks[k]]
+  for task in *undocumented_tasks
+    io.write task .. ' '
   os.exit!
 
 -- If we have to list the options, print them and exit
@@ -122,10 +134,12 @@ if LIST_OPTIONS
       value.value
   ), ' ')
   -- Print arguments
-  optstring = ""
   for option_name, option in pairs task.arguments
     for name in *option.names
-      print "#{formatOptionName name}\\:'#{removeColorCodes option.description}'"
+      if ZSH_LIST_OPTIONS
+        print "#{formatOptionName name}\\:'#{removeColorCodes option.description}'"
+      else
+        io.write (formatOptionName name) .. ' '
 
 ZSH_OPTION_TYPES =
   file: '_files'
