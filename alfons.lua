@@ -744,7 +744,7 @@ parseDirective = function(directive)
     local parts = split(rest, '%s+')
     local task = parts[1]
     local option_names, option_values, description = { }, { }, ""
-    local in_option_names, in_option_values, in_description = false, false, false
+    local in_option_names, in_option_values, maybe_description, in_description = false, false, false, false
     for _index_0 = 2, #parts do
       local part = parts[_index_0]
       local stripped_part = part:match("([^%[%]%<%>]+)")
@@ -753,6 +753,10 @@ parseDirective = function(directive)
       end
       if not in_option_values and part:match("^%<") then
         in_option_values = true
+      end
+      if maybe_description and not part:match("^%<") then
+        maybe_description = false
+        in_description = true
       end
       if in_option_names then
         table.insert(option_names, stripped_part)
@@ -774,6 +778,7 @@ parseDirective = function(directive)
       end
       if in_option_names and part:match("%]$") then
         in_option_names = false
+        maybe_description = true
       end
       if in_option_values and part:match("%>$") then
         in_option_values = false
@@ -1595,7 +1600,7 @@ do
 local _ENV = _ENV
 package.preload[ "alfons.version" ] = function( ... ) local arg = _G.arg;
 return {
-  VERSION = "5.2"
+  VERSION = "5.2.1"
 }
 end
 end
