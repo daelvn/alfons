@@ -17,6 +17,7 @@ A task is declared using the docstring above.
 ## Declaring an option for a task
 
 `--- @option task [long s] <value> Description of the option.`
+`--- @option task [long s] Description of the flag (no value).`
 
 The docstring above has several parts. First, the name of the task that you are referencing. Then, between square brackets, you have to put all the forms of the option, the long preferrably first. Between the angle brackets, you can put each of the expected values. Everything that comes afterward is the description of the option.
 
