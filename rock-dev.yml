@@ -28,6 +28,8 @@ build:
     alfons.version: alfons/version.lua
     alfons.look: alfons/look.lua
     alfons.init: alfons/init.lua
+    alfons.help: alfons/help.lua
+    alfons.parser: alfons/parser.lua
   install:
     bin:
       alfons: bin/alfons.lua
