@@ -50,8 +50,8 @@ Alfons is a task runner to help you manage your project. It's inspired by the wo
 - **Help messages.** You can now display a help message with `--help`, or even get help for a specific task with `--help [task]`.
   - This help message can be automatically generated from the detected tasks in the Taskfile.
   - It works best when you document your Taskfile, so you can add descriptions and options.
-- **Shell autocompletion.** Shell autocompletion is now available in Zsh and Bash flavors.
-  - The Zsh flavor is by far the most complete, since Zsh's completion system is slightly more capable.
+- **Shell autocompletion.** Shell autocompletion is now available in Zsh, Bash and Fish flavors.
+  - The Zsh and Fish flavors are by far the most complete, since Zsh's and Fish's completion systems are slightly more capable.
   - Bash is only able to list tasks, and sometimes options or flags for those tasks. Use Zsh.
   - Check [the documentation](docs/autocompletion.md) for more info and install instructions.
 - **Additions to the environment.**
