@@ -43,6 +43,8 @@ Alfons is a task runner to help you manage your project. It's inspired by the wo
 ## Changelog
 
 ### 5.2
+
+- **5.2.2** (09.08.2024) Fixed the `reduce` implementation
 - **5.2** (08.06.2024) Implemented Taskfile documentation, help messages and autocompletion
 
 - **Taskfile documentation.** You can now document your Taskfiles for automatic help messages and shell completion.
@@ -62,6 +64,7 @@ Alfons is a task runner to help you manage your project. It's inspired by the wo
   - `slice`: Creates a slice of an array
   - `map`, `reduce`, `filter` do to arrays what you would expect
   - `contains` has been rewritten
+
 ### 5
 
 - **5.0.2** (23.01.2023) Rolled back test mode
