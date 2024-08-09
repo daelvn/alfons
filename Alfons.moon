@@ -50,3 +50,11 @@ tasks:
       print file
   cmdread: =>
     show cmdread "echo 'hi'"
+  reduce: =>
+    t = {1, 2, 3}
+    reduced = reduce t, ((acc, e) ->
+      print 'accv', acc.v
+      print 'e', e
+      return {v: acc.v + e}
+    ), { v: 0 }
+    show reduced.v

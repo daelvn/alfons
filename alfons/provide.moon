@@ -404,9 +404,11 @@ map = (arr, predicate) -> [predicate v, k for k, v in ipairs arr]
 -- reduce/foldl
 reduce = (arr, predicate, initial) ->
   accumulator = initial or arr[1]
-  start = initial and 0 or 1
-  for i = start, i < #arr
+  start = initial and 1 or 2
+  i = start
+  while i <= #arr
     accumulator = predicate accumulator, arr[i]
+    i += 1
   return accumulator
 
 -- slice (arr:[*], start:number?, end:number?) -> [*]

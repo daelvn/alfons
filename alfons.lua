@@ -1353,9 +1353,11 @@ end
 local reduce
 reduce = function(arr, predicate, initial)
   local accumulator = initial or arr[1]
-  local start = initial and 0 or 1
-  for i = start, i < #arr do
+  local start = initial and 1 or 2
+  local i = start
+  while i <= #arr do
     accumulator = predicate(accumulator, arr[i])
+    i = i + 1
   end
   return accumulator
 end
