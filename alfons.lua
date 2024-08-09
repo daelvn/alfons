@@ -1440,6 +1440,39 @@ keys = function(tbl)
   end
   return _accum_0
 end
+local values
+values = function(tbl)
+  local _accum_0 = { }
+  local _len_0 = 1
+  for k, v in pairs(tbl) do
+    _accum_0[_len_0] = v
+    _len_0 = _len_0 + 1
+  end
+  return _accum_0
+end
+local entries
+entries = function(tbl)
+  local _accum_0 = { }
+  local _len_0 = 1
+  for k, v in pairs(tbl) do
+    _accum_0[_len_0] = {
+      k,
+      v
+    }
+    _len_0 = _len_0 + 1
+  end
+  return _accum_0
+end
+local fromEntries
+fromEntries = function(arr)
+  local _tbl_0 = { }
+  for _des_0 in ipairs(arr) do
+    local k, v
+    k, v = _des_0[1], _des_0[2]
+    _tbl_0[k] = v
+  end
+  return _tbl_0
+end
 local sanitize
 sanitize = function(pattern)
   if pattern == nil then
@@ -1486,7 +1519,10 @@ return {
   reduce = reduce,
   slice = slice,
   keys = keys,
+  values = values,
   contains = contains,
+  entries = entries,
+  fromEntries = fromEntries,
   sanitize = sanitize
 }
 end
@@ -1626,7 +1662,7 @@ do
 local _ENV = _ENV
 package.preload[ "alfons.version" ] = function( ... ) local arg = _G.arg;
 return {
-  VERSION = "5.2.2"
+  VERSION = "5.3"
 }
 end
 end
