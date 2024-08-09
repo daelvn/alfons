@@ -49,6 +49,7 @@ FILE = do
   elseif Path.exists "Alfons.lua"  then "Alfons.lua"
   elseif Path.exists "Alfons.moon" then "Alfons.moon"
   elseif Path.exists "Alfons.tl"   then "Alfons.tl"
+  elseif Path.exists "Alfons.yue"  then "Alfons.yue"
   else errors 1, "No Taskfile found."
 
 -- Also accept a custom language
@@ -56,6 +57,7 @@ LANGUAGE = do
   if     FILE\match "moon$" then "moon"
   elseif FILE\match "lua$"  then "lua"
   elseif FILE\match "tl$"   then "teal"
+  elseif FILE\match "yue$"  then "yue"
   elseif args.type          then args.type
   else errors 1, "Cannot resolve format for Taskfile."
 
@@ -63,11 +65,12 @@ unless COMPLETING
   printerr "Using #{FILE} (#{LANGUAGE})"
 
 -- Load string
-import readMoon, readLua, readTeal from require "alfons.file"
+import readMoon, readLua, readTeal, readYue from require "alfons.file"
 content, contentErr = switch LANGUAGE
   when "moon" then readMoon FILE
   when "lua"  then readLua  FILE
   when "teal" then readTeal FILE
+  when "yue"  then readYue  FILE
   else errors 1, "Cannot resolve format '#{LANGUAGE}' for Taskfile."
 unless content then errors 1, contentErr
 

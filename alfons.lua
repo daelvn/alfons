@@ -132,10 +132,29 @@ readTeal = function(file)
   end
   return content
 end
+local readYue
+readYue = function(file)
+  local content
+  do
+    local _with_0 = safeOpen(file, "r")
+    if _with_0.error then
+      return nil, "Could not open " .. tostring(file) .. ": " .. tostring(_with_0.error)
+    end
+    local to_lua
+    to_lua = require("yue").to_lua
+    content = to_lua(_with_0:read("*a"))
+    if not (content) then
+      return nil, "Could not read " .. tostring(file) .. ": " .. tostring(content)
+    end
+    _with_0:close()
+  end
+  return content
+end
 return {
   readMoon = readMoon,
   readLua = readLua,
   readTeal = readTeal,
+  readYue = readYue,
   readFile = readFile
 }
 end
@@ -464,6 +483,11 @@ runString = function(content, environment, runAlways, child, genv, rqueue, prett
     end
     local callstack = (getmetatable(genv)).store.callstack
     table.insert(callstack, name)
+    if (('function' ~= type(task)) and ('table' ~= type(task))) then
+      provide.printError("Task " .. tostring(name) .. " is not callable. Please check that it is a function.")
+      provide.printError("The task may be running on its own without calling it.")
+      os.exit(1)
+    end
     local ret = task(self)
     table.remove(callstack, #callstack)
     return ret
@@ -1760,6 +1784,8 @@ do
     FILE = "Alfons.moon"
   elseif Path.exists("Alfons.tl") then
     FILE = "Alfons.tl"
+  elseif Path.exists("Alfons.yue") then
+    FILE = "Alfons.yue"
   else
     FILE = errors(1, "No Taskfile found.")
   end
@@ -1772,6 +1798,8 @@ do
     LANGUAGE = "lua"
   elseif FILE:match("tl$") then
     LANGUAGE = "teal"
+  elseif FILE:match("yue$") then
+    LANGUAGE = "yue"
   elseif args.type then
     LANGUAGE = args.type
   else
@@ -1781,10 +1809,10 @@ end
 if not (COMPLETING) then
   printerr("Using " .. tostring(FILE) .. " (" .. tostring(LANGUAGE) .. ")")
 end
-local readMoon, readLua, readTeal
+local readMoon, readLua, readTeal, readYue
 do
   local _obj_0 = require("alfons.file")
-  readMoon, readLua, readTeal = _obj_0.readMoon, _obj_0.readLua, _obj_0.readTeal
+  readMoon, readLua, readTeal, readYue = _obj_0.readMoon, _obj_0.readLua, _obj_0.readTeal, _obj_0.readYue
 end
 local content, contentErr
 local _exp_0 = LANGUAGE
@@ -1794,6 +1822,8 @@ elseif "lua" == _exp_0 then
   content, contentErr = readLua(FILE)
 elseif "teal" == _exp_0 then
   content, contentErr = readTeal(FILE)
+elseif "yue" == _exp_0 then
+  content, contentErr = readYue(FILE)
 else
   content, contentErr = errors(1, "Cannot resolve format '" .. tostring(LANGUAGE) .. "' for Taskfile.")
 end
