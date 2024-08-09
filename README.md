@@ -21,6 +21,7 @@ Alfons is a task runner to help you manage your project. It's inspired by the wo
 - [Alfons 5](#alfons-5)
   - [Table of contents](#table-of-contents)
   - [Changelog](#changelog)
+    - [5.3](#53)
     - [5.2](#52)
     - [5](#5)
     - [4.4](#44)
@@ -41,6 +42,16 @@ Alfons is a task runner to help you manage your project. It's inspired by the wo
   - [Goodbye?](#goodbye)
 
 ## Changelog
+
+### 5.3
+
+- **5.3** (09.08.2024) Added [Yuescript](https://yuescript.org) support. Added a few functions.
+
+- **Yuescript support.** You can now use `Alfons.yue` files (or any taskfile that ends in `.yue`) to load in Yuescript tasks.
+- **Additions to the environment.**
+  - `values`: Get the values of a table as an array
+  - `entries`: Turns a table into an array of key-value tuples
+  - `fromEntries`: Reverses the process of `entries`
 
 ### 5.2
 

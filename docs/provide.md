@@ -12,6 +12,9 @@ To see the documentation for `build` and `watch`, check out their respective mar
     - [npairs](#npairs)
     - [env](#env)
     - [keys](#keys)
+    - [values](#values)
+    - [entries](#entries)
+    - [fromEntries](#fromentries)
   - [Arrays](#arrays)
     - [map](#map)
     - [reduce](#reduce)
@@ -73,6 +76,24 @@ You can access `TEST` by using `env.TEST`.
 `keys (table:{*:*}) -> [*]`
 
 Returns all the keys in a table.
+
+### values
+
+`values (table:{*:*}) -> [*]`
+
+Returns all the values in a table.
+
+### entries
+
+`entries (table:{*:*}) -> [{*,*}]`
+
+Returns an array of `{key, value}` tuples made from the keys and values of a table.
+
+### fromEntries
+
+`fromEntries (entries:[{*,*}]) -> {*:*}`
+
+Reverses the process of `entries`.
 
 ## Arrays
 
