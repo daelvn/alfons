@@ -132,10 +132,29 @@ readTeal = function(file)
   end
   return content
 end
+local readYue
+readYue = function(file)
+  local content
+  do
+    local _with_0 = safeOpen(file, "r")
+    if _with_0.error then
+      return nil, "Could not open " .. tostring(file) .. ": " .. tostring(_with_0.error)
+    end
+    local to_lua
+    to_lua = require("yue").to_lua
+    content = to_lua(_with_0:read("*a"))
+    if not (content) then
+      return nil, "Could not read " .. tostring(file) .. ": " .. tostring(content)
+    end
+    _with_0:close()
+  end
+  return content
+end
 return {
   readMoon = readMoon,
   readLua = readLua,
   readTeal = readTeal,
+  readYue = readYue,
   readFile = readFile
 }
 end
@@ -175,8 +194,13 @@ getopt = function(argl)
         break
       end
       if flags.wait then
-        push(flags.wait, arg)
-        flags.wait = false
+        if arg:match("^%-%-") then
+          push((flags.wait:gsub("%-", "_")), true)
+          flags.wait = arg:match("^%-%-([a-za-z0-9%-_]+)")
+        else
+          push((flags.wait:gsub("%-", "_")), arg)
+          flags.wait = false
+        end
         _continue_0 = true
         break
       end
@@ -205,7 +229,7 @@ getopt = function(argl)
           break
         end
       end
-      if arg:match("^%-%-?([a-zA-Z0-9%-_]+)=(.+)$") then
+      if arg:match("^%-%-?([a-za-z0-9%-_]+)=(.+)$") then
         local opt, value = arg:match("^%-%-?([a-zA-Z0-9%-_]+)=(.+)")
         push((opt:gsub("%-", "_")), value)
         _continue_0 = true
@@ -224,7 +248,7 @@ getopt = function(argl)
     end
   end
   if flags.wait then
-    push(flags.wait, true)
+    push((flags.wait:gsub("%-", "_")), true)
   end
   return args
 end
@@ -464,6 +488,11 @@ runString = function(content, environment, runAlways, child, genv, rqueue, prett
     end
     local callstack = (getmetatable(genv)).store.callstack
     table.insert(callstack, name)
+    if (('function' ~= type(task)) and ('table' ~= type(task))) then
+      provide.printError("Task " .. tostring(name) .. " is not callable. Please check that it is a function.")
+      provide.printError("The task may be running on its own without calling it.")
+      os.exit(1)
+    end
     local ret = task(self)
     table.remove(callstack, #callstack)
     return ret
@@ -744,7 +773,7 @@ parseDirective = function(directive)
     local parts = split(rest, '%s+')
     local task = parts[1]
     local option_names, option_values, description = { }, { }, ""
-    local in_option_names, in_option_values, in_description = false, false, false
+    local in_option_names, in_option_values, maybe_description, in_description = false, false, false, false
     for _index_0 = 2, #parts do
       local part = parts[_index_0]
       local stripped_part = part:match("([^%[%]%<%>]+)")
@@ -753,6 +782,10 @@ parseDirective = function(directive)
       end
       if not in_option_values and part:match("^%<") then
         in_option_values = true
+      end
+      if maybe_description and not part:match("^%<") then
+        maybe_description = false
+        in_description = true
       end
       if in_option_names then
         table.insert(option_names, stripped_part)
@@ -774,6 +807,7 @@ parseDirective = function(directive)
       end
       if in_option_names and part:match("%]$") then
         in_option_names = false
+        maybe_description = true
       end
       if in_option_values and part:match("%>$") then
         in_option_values = false
@@ -1348,9 +1382,11 @@ end
 local reduce
 reduce = function(arr, predicate, initial)
   local accumulator = initial or arr[1]
-  local start = initial and 0 or 1
-  for i = start, i < #arr do
+  local start = initial and 1 or 2
+  local i = start
+  while i <= #arr do
     accumulator = predicate(accumulator, arr[i])
+    i = i + 1
   end
   return accumulator
 end
@@ -1409,6 +1445,39 @@ keys = function(tbl)
   end
   return _accum_0
 end
+local values
+values = function(tbl)
+  local _accum_0 = { }
+  local _len_0 = 1
+  for k, v in pairs(tbl) do
+    _accum_0[_len_0] = v
+    _len_0 = _len_0 + 1
+  end
+  return _accum_0
+end
+local entries
+entries = function(tbl)
+  local _accum_0 = { }
+  local _len_0 = 1
+  for k, v in pairs(tbl) do
+    _accum_0[_len_0] = {
+      k,
+      v
+    }
+    _len_0 = _len_0 + 1
+  end
+  return _accum_0
+end
+local fromEntries
+fromEntries = function(arr)
+  local _tbl_0 = { }
+  for _des_0 in ipairs(arr) do
+    local k, v
+    k, v = _des_0[1], _des_0[2]
+    _tbl_0[k] = v
+  end
+  return _tbl_0
+end
 local sanitize
 sanitize = function(pattern)
   if pattern == nil then
@@ -1455,7 +1524,10 @@ return {
   reduce = reduce,
   slice = slice,
   keys = keys,
+  values = values,
   contains = contains,
+  entries = entries,
+  fromEntries = fromEntries,
   sanitize = sanitize
 }
 end
@@ -1595,7 +1667,7 @@ do
 local _ENV = _ENV
 package.preload[ "alfons.version" ] = function( ... ) local arg = _G.arg;
 return {
-  VERSION = "5.2"
+  VERSION = "5.3.1"
 }
 end
 end
@@ -1753,6 +1825,8 @@ do
     FILE = "Alfons.moon"
   elseif Path.exists("Alfons.tl") then
     FILE = "Alfons.tl"
+  elseif Path.exists("Alfons.yue") then
+    FILE = "Alfons.yue"
   else
     FILE = errors(1, "No Taskfile found.")
   end
@@ -1765,6 +1839,8 @@ do
     LANGUAGE = "lua"
   elseif FILE:match("tl$") then
     LANGUAGE = "teal"
+  elseif FILE:match("yue$") then
+    LANGUAGE = "yue"
   elseif args.type then
     LANGUAGE = args.type
   else
@@ -1774,10 +1850,10 @@ end
 if not (COMPLETING) then
   printerr("Using " .. tostring(FILE) .. " (" .. tostring(LANGUAGE) .. ")")
 end
-local readMoon, readLua, readTeal
+local readMoon, readLua, readTeal, readYue
 do
   local _obj_0 = require("alfons.file")
-  readMoon, readLua, readTeal = _obj_0.readMoon, _obj_0.readLua, _obj_0.readTeal
+  readMoon, readLua, readTeal, readYue = _obj_0.readMoon, _obj_0.readLua, _obj_0.readTeal, _obj_0.readYue
 end
 local content, contentErr
 local _exp_0 = LANGUAGE
@@ -1787,6 +1863,8 @@ elseif "lua" == _exp_0 then
   content, contentErr = readLua(FILE)
 elseif "teal" == _exp_0 then
   content, contentErr = readTeal(FILE)
+elseif "yue" == _exp_0 then
+  content, contentErr = readYue(FILE)
 else
   content, contentErr = errors(1, "Cannot resolve format '" .. tostring(LANGUAGE) .. "' for Taskfile.")
 end

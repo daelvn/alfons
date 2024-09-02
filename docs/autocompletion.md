@@ -28,3 +28,20 @@ $ cp bin/completion.zsh $HOME/.oh-my-zsh/completions/_alfons
 # Hopefully cross platform
 $ sudo cp bin/completion.zsh /usr/share/zsh/functions/Completion/_alfons
 ```
+
+## Fish
+
+Fish will autocomplete arguments, tasks, task options and will suggest values for some task option types (same as zsh).
+
+It will use the currently selected taskfile (according to -f / --file) for the completion.
+
+### Installing
+
+Move the completion file to your `$fish_complete_path` (typically `~/.config/fish/completions`), under the name `alfons.fish`.
+
+```sh
+# Create the completion directory if it doesnt exist
+$ mkdir -p $HOME/.config/fish/completions
+# Add the completion file, with the correct name, so that fish finds it
+$ cp bin/completion.fish $HOME/.config/fish/completions/alfons.fish
+```

@@ -21,7 +21,7 @@ errors = (code, msg) ->
 -- == Describing task option ==
 -- --- @option task_name [argument] <input?> Description
 -- --- @option release [version v] <version:string> Version of the release.
--- --- @option status [info i] <> Shows status information.
+-- --- @option status [info i] Shows status information.
 -- == Enabling flags for a task ==
 -- --- @flag task_name flags
 -- --- @flag * hide
@@ -46,7 +46,7 @@ parseDirective = (directive) ->
       parts = split rest, '%s+'
       task = parts[1]
       option_names, option_values, description = {}, {}, ""
-      in_option_names, in_option_values, in_description = false, false, false
+      in_option_names, in_option_values, maybe_description, in_description = false, false, false, false
       for part in *parts[2,]
         stripped_part = part\match "([^%[%]%<%>]+)"
         -- realize where we are IN
@@ -54,6 +54,9 @@ parseDirective = (directive) ->
           in_option_names = true
         if not in_option_values and part\match "^%<"
           in_option_values = true
+        if maybe_description and not part\match "^%<"
+          maybe_description = false
+          in_description = true
         -- add part depending in area
         if in_option_names
           table.insert option_names, stripped_part
@@ -70,6 +73,7 @@ parseDirective = (directive) ->
         -- realize where we are OUT
         if in_option_names and part\match "%]$"
           in_option_names = false
+          maybe_description = true
         if in_option_values and part\match "%>$"
           in_option_values = false
           in_description = true

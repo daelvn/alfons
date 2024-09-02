@@ -1,0 +1,2 @@
+tasks:
+  test: => "Hello from Yuescript!" |> show

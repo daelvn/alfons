@@ -404,9 +404,11 @@ map = (arr, predicate) -> [predicate v, k for k, v in ipairs arr]
 -- reduce/foldl
 reduce = (arr, predicate, initial) ->
   accumulator = initial or arr[1]
-  start = initial and 0 or 1
-  for i = start, i < #arr
+  start = initial and 1 or 2
+  i = start
+  while i <= #arr
     accumulator = predicate accumulator, arr[i]
+    i += 1
   return accumulator
 
 -- slice (arr:[*], start:number?, end:number?) -> [*]
@@ -426,6 +428,18 @@ contains = (arr, value) -> for v in *arr
 -- Returns all the keys of a table
 keys = (tbl) -> [k for k, v in pairs tbl]
 
+-- values (tbl:{*:*}) -> [*]
+-- Returns all the values of a table
+values = (tbl) -> [v for k, v in pairs tbl]
+
+-- entries (tbl:{*:*}) -> [*,*][]
+-- Returns the keys and values of a table as an array of [key, value]s
+entries = (tbl) -> [{k, v} for k, v in pairs tbl]
+
+-- fromEntries (entries:[*,*]) -> {*:*}
+-- Turns an array of entries like [key, value]s into a table
+fromEntries = (arr) -> {k, v for {k, v} in ipairs arr}
+
 -- sanitize (string) -> string
 -- Pattern-escapes a string
 sanitize = (pattern="") -> pattern\gsub "[%(%)%.%%%+%-%*%?%[%]%^%$]", "%%%0"
@@ -443,6 +457,7 @@ sanitize = (pattern="") -> pattern\gsub "[%(%)%.%%%+%-%*%?%[%]%^%$]", "%%%0"
   :listAll, :safeOpen, :safePopen
   :isEmpty, :delete, :copy
   :lines, :split, :filter, :map, :reduce
-  :slice, :keys, :contains
+  :slice, :keys, :values, :contains
+  :entries, :fromEntries
   :sanitize
 }

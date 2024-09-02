@@ -21,6 +21,7 @@ Alfons is a task runner to help you manage your project. It's inspired by the wo
 - [Alfons 5](#alfons-5)
   - [Table of contents](#table-of-contents)
   - [Changelog](#changelog)
+    - [5.3](#53)
     - [5.2](#52)
     - [5](#5)
     - [4.4](#44)
@@ -42,7 +43,20 @@ Alfons is a task runner to help you manage your project. It's inspired by the wo
 
 ## Changelog
 
+### 5.3
+
+- **5.3.1** (02.09.2024) Fixed argument parser bug. `alfons --a --b` is now `a = true; b = true` instead of `a = "--b"`.
+- **5.3** (09.08.2024) Added [Yuescript](https://yuescript.org) support. Added a few functions.
+
+- **Yuescript support.** You can now use `Alfons.yue` files (or any taskfile that ends in `.yue`) to load in Yuescript tasks.
+- **Additions to the environment.**
+  - `values`: Get the values of a table as an array
+  - `entries`: Turns a table into an array of key-value tuples
+  - `fromEntries`: Reverses the process of `entries`
+
 ### 5.2
+
+- **5.2.2** (09.08.2024) Fixed the `reduce` implementation
 - **5.2** (08.06.2024) Implemented Taskfile documentation, help messages and autocompletion
 
 - **Taskfile documentation.** You can now document your Taskfiles for automatic help messages and shell completion.
@@ -50,8 +64,8 @@ Alfons is a task runner to help you manage your project. It's inspired by the wo
 - **Help messages.** You can now display a help message with `--help`, or even get help for a specific task with `--help [task]`.
   - This help message can be automatically generated from the detected tasks in the Taskfile.
   - It works best when you document your Taskfile, so you can add descriptions and options.
-- **Shell autocompletion.** Shell autocompletion is now available in Zsh and Bash flavors.
-  - The Zsh flavor is by far the most complete, since Zsh's completion system is slightly more capable.
+- **Shell autocompletion.** Shell autocompletion is now available in Zsh, Bash and Fish flavors.
+  - The Zsh and Fish flavors are by far the most complete, since Zsh's and Fish's completion systems are slightly more capable.
   - Bash is only able to list tasks, and sometimes options or flags for those tasks. Use Zsh.
   - Check [the documentation](docs/autocompletion.md) for more info and install instructions.
 - **Additions to the environment.**
@@ -62,6 +76,7 @@ Alfons is a task runner to help you manage your project. It's inspired by the wo
   - `slice`: Creates a slice of an array
   - `map`, `reduce`, `filter` do to arrays what you would expect
   - `contains` has been rewritten
+
 ### 5
 
 - **5.0.2** (23.01.2023) Rolled back test mode

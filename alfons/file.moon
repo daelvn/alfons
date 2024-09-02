@@ -55,4 +55,21 @@ readTeal = (file) ->
   -- return
   return content
 
-{ :readMoon, :readLua, :readTeal, :readFile }
+-- REQUIRES "yue" MODULE
+readYue = (file) ->
+  local content
+  with safeOpen file, "r"
+    -- check that we could open correctly
+    if .error
+      return nil, "Could not open #{file}: #{.error}"
+    -- read and compile
+    import to_lua from require "yue"
+    content = to_lua \read "*a"
+    -- check that we could compile correctly
+    unless content
+      return nil, "Could not read #{file}: #{content}"
+    \close!
+  -- return
+  return content
+
+{ :readMoon, :readLua, :readTeal, :readYue, :readFile }

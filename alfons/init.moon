@@ -74,6 +74,10 @@ runString = (content, environment=ENVIRONMENT, runAlways=true, child=0, genv={},
     self.task = -> run name, task, argl
     callstack = (getmetatable genv).store.callstack
     table.insert callstack, name
+    if (('function' != type task) and ('table' != type task))
+      provide.printError "Task #{name} is not callable. Please check that it is a function."
+      provide.printError "The task may be running on its own without calling it."
+      os.exit 1
     ret = task self
     table.remove callstack, #callstack
     return ret
