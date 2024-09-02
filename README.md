@@ -45,6 +45,7 @@ Alfons is a task runner to help you manage your project. It's inspired by the wo
 
 ### 5.3
 
+- **5.3.1** (02.09.2024) Fixed argument parser bug. `alfons --a --b` is now `a = true; b = true` instead of `a = "--b"`.
 - **5.3** (09.08.2024) Added [Yuescript](https://yuescript.org) support. Added a few functions.
 
 - **Yuescript support.** You can now use `Alfons.yue` files (or any taskfile that ends in `.yue`) to load in Yuescript tasks.

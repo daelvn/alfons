@@ -1667,7 +1667,7 @@ do
 local _ENV = _ENV
 package.preload[ "alfons.version" ] = function( ... ) local arg = _G.arg;
 return {
-  VERSION = "5.3"
+  VERSION = "5.3.1"
 }
 end
 end
