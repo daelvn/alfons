@@ -194,8 +194,13 @@ getopt = function(argl)
         break
       end
       if flags.wait then
-        push(flags.wait, arg)
-        flags.wait = false
+        if arg:match("^%-%-") then
+          push((flags.wait:gsub("%-", "_")), true)
+          flags.wait = arg:match("^%-%-([a-za-z0-9%-_]+)")
+        else
+          push((flags.wait:gsub("%-", "_")), arg)
+          flags.wait = false
+        end
         _continue_0 = true
         break
       end
@@ -224,7 +229,7 @@ getopt = function(argl)
           break
         end
       end
-      if arg:match("^%-%-?([a-zA-Z0-9%-_]+)=(.+)$") then
+      if arg:match("^%-%-?([a-za-z0-9%-_]+)=(.+)$") then
         local opt, value = arg:match("^%-%-?([a-zA-Z0-9%-_]+)=(.+)")
         push((opt:gsub("%-", "_")), value)
         _continue_0 = true
@@ -243,7 +248,7 @@ getopt = function(argl)
     end
   end
   if flags.wait then
-    push(flags.wait, true)
+    push((flags.wait:gsub("%-", "_")), true)
   end
   return args
 end
