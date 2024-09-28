@@ -38,6 +38,9 @@ COMPLETING = LIST_TASKS or LIST_OPTIONS or GET_OPTION_TYPE
 -- Show help message
 HELP = args.help
 
+-- With debug in environment
+INCLUDE_DEBUG = args.include_debug
+
 -- introduction
 unless COMPLETING
   prints "%{bold blue}Alfons #{VERSION}"
@@ -76,7 +79,7 @@ unless content then errors 1, contentErr
 
 -- Run the taskfile
 import runString from require "alfons.init"
-alfons, alfonsErr = runString content, nil, true, 0, {}, {}, true
+alfons, alfonsErr = runString content, nil, true, 0, {}, {}, true, INCLUDE_DEBUG
 unless alfons then errors 1, alfonsErr
 env = alfons ...
 

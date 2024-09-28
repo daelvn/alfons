@@ -18,12 +18,14 @@ sanitize = (pattern) -> pattern\gsub "[%(%)%.%%%+%-%*%?%[%]%^%$]", "%%%0" if pat
 PREFIX = "alfons.tasks."
 
 -- initialize a new environment
-initEnv = (run, base=ENVIRONMENT, genv, modname="main", pretty=false) ->
+initEnv = (run, base=ENVIRONMENT, genv, modname="main", pretty=false, debug_mode=false) ->
   -- create table to be the actual environment
   env, envmt         = {}, {}
   env.tasks, tasksmt = {}, {}
   setmetatable env, envmt
   setmetatable env.tasks, tasksmt
+  if debug_mode
+    base.debug = debug
   -- set envmt.__index to access environment and provided functions
   envmt.__index = (k) =>
     if genv and k == "__ran"
@@ -52,7 +54,7 @@ initEnv = (run, base=ENVIRONMENT, genv, modname="main", pretty=false) ->
   return env
 
 -- runs a taskfile
-runString = (content, environment=ENVIRONMENT, runAlways=true, child=0, genv={}, rqueue={}, pretty=false) ->
+runString = (content, environment=ENVIRONMENT, runAlways=true, child=0, genv={}, rqueue={}, pretty=false, debug_mode=false) ->
   return nil, "Taskfile content must be a string" unless "string" == type content
   -- if content has no newlines and starts with 'alfons.tasks', use look.
   local modname
@@ -91,7 +93,7 @@ runString = (content, environment=ENVIRONMENT, runAlways=true, child=0, genv={},
   -- reset genv metatable
   setmetatable genv, {store: {callstack: {}}} unless getmetatable genv
   -- initialize environment
-  env           = initEnv run, environment, genv, modname, pretty
+  env           = initEnv run, environment, genv, modname, pretty, debug_mode
   genv[modname] = env
   -- load file
   alf, alfErr = loadEnv content, env
