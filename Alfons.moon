@@ -9,6 +9,7 @@ tasks:
   compile: =>
     sh "moonc #{file}" for file in wildcard "alfons/**.moon"
     sh "moonc bin/alfons.moon"
+    sh "yue alfons"
   --- @task clean Clean all built files
   clean: =>
     show "Cleaning files"
@@ -24,9 +25,10 @@ tasks:
     @o    or= @output or "alfons.lua"
     @s    or= @entry or "bin/alfons.lua"
     modules = for file in wildcard "./alfons/*.moon" do "alfons.#{filename file}"
+    lua_modules = for file in wildcard "./alfons/*.lua" do "alfons.#{filename file}"
     tasks   = for file in wildcard "./alfons/tasks/*.moon" do "alfons.tasks.#{filename file}"
-    show "amalg.lua -o #{@o} -s #{@s} #{table.concat modules, ' '} #{table.concat tasks, ' '}"
-    sh "amalg.lua -o #{@o} -s #{@s} #{table.concat modules, ' '} #{table.concat tasks, ' '}"
+    show "amalg.lua -o #{@o} -s #{@s} #{table.concat modules, ' '} #{table.concat lua_modules, ' '} #{table.concat tasks, ' '}"
+    sh "amalg.lua -o #{@o} -s #{@s} #{table.concat modules, ' '} #{table.concat lua_modules, ' '} #{table.concat tasks, ' '}"
   --- @task produce Generate %{green}`alfons.lua`%{reset}
   produce: =>
     tasks.compile!
@@ -53,7 +55,18 @@ tasks:
       print file
   where: =>
     inspect = require 'inspect'
-    print inspect debug.getinfo 1
+    main = false
+    main_depth = -1
+    stack_depth = 0
+    while not main
+      frame = debug.getinfo stack_depth
+      if frame.what == 'main'
+        main = frame
+        main_depth = stack_depth
+      else
+        stack_depth += 1
+    print (debug.getinfo main_depth + 1).source, main.source
+
   cmdread: =>
     show cmdread "echo 'hi'"
   reduce: =>
