@@ -41,6 +41,18 @@ HELP = args.help
 -- With debug in environment
 INCLUDE_DEBUG = args.include_debug
 
+import getExecutablePath from require "alfons.spawn"
+-- Find self executable
+smallest_index = 0
+for i = -1, -math.huge, -1
+  if not arg[i]
+    smallest_index = i + 1
+    break
+INTERPRETER = getExecutablePath arg[smallest_index]
+INTERPRETER_COMMAND = INTERPRETER .. " " .. table.concat [arg[i] for i = smallest_index + 1, -1, 1], ' '
+EXECUTABLE = arg[0]
+print INTERPRETER_COMMAND
+
 -- introduction
 unless COMPLETING
   prints "%{bold blue}Alfons #{VERSION}"
