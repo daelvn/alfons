@@ -51,6 +51,9 @@ tasks:
   wild: =>
     for file in wildcard "./**.moon"
       print file
+  where: =>
+    inspect = require 'inspect'
+    print inspect debug.getinfo 1
   cmdread: =>
     show cmdread "echo 'hi'"
   reduce: =>
