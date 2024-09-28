@@ -78,7 +78,14 @@ runString = (content, environment=ENVIRONMENT, runAlways=true, child=0, genv={},
       provide.printError "Task #{name} is not callable. Please check that it is a function."
       provide.printError "The task may be running on its own without calling it."
       os.exit 1
-    ret = task self
+    -- Create error reporter
+    errorHandler = (err) ->
+      rewrite = err\gsub "%[string \"Alfons\"%]", "Taskfile (#{modname}:#{child})"
+      provide.printError "Error in task `#{name}`:\n  #{rewrite}"
+      provide.printError "  Callstack:\n    (root)"
+      provide.printError "    " .. table.concat callstack, '\n    '
+      os.exit 1
+    ret = xpcall (() -> task self), errorHandler
     table.remove callstack, #callstack
     return ret
   -- reset genv metatable
