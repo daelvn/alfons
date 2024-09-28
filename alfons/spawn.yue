@@ -1,0 +1,13 @@
+-- alfons.spawn
+-- Spawns a task as an independent process
+
+getPlatform = ->
+  switch package.config::sub 1, 1
+    when "\\" then return "Windows"
+    when "/" then return "Unix"
+    else return "Unknown"
+
+getAlfonsLocation = ->
+  return debug.getinfo(1)
+
+print getAlfonsLocation!.source
