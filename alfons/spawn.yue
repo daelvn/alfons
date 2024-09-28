@@ -1,13 +1,19 @@
 -- alfons.spawn
 -- Spawns a task as an independent process
+import lines, cmdread from "alfons.provide"
 
-getPlatform = ->
+export getPlatform = ->
   switch package.config::sub 1, 1
     when "\\" then return "Windows"
     when "/" then return "Unix"
     else return "Unknown"
 
-getAlfonsLocation = ->
-  return debug.getinfo(1)
+export getExecutablePath = (executable) ->
+  switch getPlatform!
+    when "Windows"
+      return cmdread "where.exe #{executable}"
+    when "Unix"
+      res = lines cmdread "whereis #{executable}"
+      return res[1]\match ".+: ([^ ]+)"
 
-print getAlfonsLocation!.source
+spawnSelf = (interpreter, executable) ->
