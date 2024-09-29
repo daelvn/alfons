@@ -41,8 +41,11 @@ tasks:
   hello:  => print "hello!"
   shello: => sh "echo 'hello!'"
   spawn2: =>
-    spawn tasks.hello
-    spawn tasks.shello
+    inspect = require "inspect"
+    spawn = require "alfons.spawn"
+    spawn.process!
+    -- spawn tasks.hello
+    -- spawn tasks.shello
   args:   =>
     inspect = require "inspect"
     print inspect args

@@ -385,7 +385,7 @@ sanitize = function(pattern)
   end
 end
 PREFIX = "alfons.tasks."
-initEnv = function(run, base, genv, modname, pretty)
+initEnv = function(run, base, genv, modname, pretty, debug_mode)
   if base == nil then
     base = ENVIRONMENT
   end
@@ -395,11 +395,17 @@ initEnv = function(run, base, genv, modname, pretty)
   if pretty == nil then
     pretty = false
   end
+  if debug_mode == nil then
+    debug_mode = false
+  end
   local env, envmt = { }, { }
   local tasksmt
   env.tasks, tasksmt = { }, { }
   setmetatable(env, envmt)
   setmetatable(env.tasks, tasksmt)
+  if debug_mode then
+    base.debug = debug
+  end
   envmt.__index = function(self, k)
     if genv and k == "__ran" then
       return (getmetatable(genv[modname])).__ran
@@ -440,7 +446,7 @@ initEnv = function(run, base, genv, modname, pretty)
   envmt.__ran = 0
   return env
 end
-runString = function(content, environment, runAlways, child, genv, rqueue, pretty)
+runString = function(content, environment, runAlways, child, genv, rqueue, pretty, debug_mode)
   if environment == nil then
     environment = ENVIRONMENT
   end
@@ -458,6 +464,9 @@ runString = function(content, environment, runAlways, child, genv, rqueue, prett
   end
   if pretty == nil then
     pretty = false
+  end
+  if debug_mode == nil then
+    debug_mode = false
   end
   if not ("string" == type(content)) then
     return nil, "Taskfile content must be a string"
@@ -493,7 +502,17 @@ runString = function(content, environment, runAlways, child, genv, rqueue, prett
       provide.printError("The task may be running on its own without calling it.")
       os.exit(1)
     end
-    local ret = task(self)
+    local errorHandler
+    errorHandler = function(err)
+      local rewrite = err:gsub("%[string \"Alfons\"%]", "Taskfile (" .. tostring(modname) .. ":" .. tostring(child) .. ")")
+      provide.printError("Error in task `" .. tostring(name) .. "`:\n  " .. tostring(rewrite))
+      provide.printError("  Callstack:\n    (root)")
+      provide.printError("    " .. table.concat(callstack, '\n    '))
+      return os.exit(1)
+    end
+    local ret = xpcall((function()
+      return task(self)
+    end), errorHandler)
     table.remove(callstack, #callstack)
     return ret
   end
@@ -504,7 +523,7 @@ runString = function(content, environment, runAlways, child, genv, rqueue, prett
       }
     })
   end
-  local env = initEnv(run, environment, genv, modname, pretty)
+  local env = initEnv(run, environment, genv, modname, pretty, debug_mode)
   genv[modname] = env
   local alf, alfErr = loadEnv(content, env)
   if alfErr then
@@ -1556,6 +1575,51 @@ end
 
 do
 local _ENV = _ENV
+package.preload[ "alfons.spawn" ] = function( ... ) local arg = _G.arg;
+local _module_0 = { }
+local lines, cmdread
+do
+	local _obj_0 = require("alfons.provide")
+	lines, cmdread = _obj_0.lines, _obj_0.cmdread
+end
+local getPlatform
+getPlatform = function()
+	local _exp_0 = package.config:sub(1, 1)
+	if "\\" == _exp_0 then
+		return "Windows"
+	elseif "/" == _exp_0 then
+		return "Unix"
+	else
+		return "Unknown"
+	end
+end
+_module_0["getPlatform"] = getPlatform
+local getExecutablePath
+getExecutablePath = function(executable)
+	local _exp_0 = getPlatform()
+	if "Windows" == _exp_0 then
+		return cmdread("where.exe " .. tostring(executable))
+	elseif "Unix" == _exp_0 then
+		local res = lines(cmdread("whereis " .. tostring(executable)))
+		return res[1]:match(".+: ([^ ]+)")
+	end
+end
+_module_0["getExecutablePath"] = getExecutablePath
+local detach
+detach = function(command)
+	return "nohup " .. tostring(command) .. " & disown"
+end
+local spawnSelf
+spawnSelf = function(props)
+	local interpreter, executable, child, callstack = props.interpreter, props.executable, props.child, props.callstack
+	return os.execute(detach(tostring(interpreter) .. " " .. tostring(executable) .. " --child="))
+end
+return _module_0
+end
+end
+
+do
+local _ENV = _ENV
 package.preload[ "alfons.tasks.fetch" ] = function( ... ) local arg = _G.arg;
 return {
   tasks = {
@@ -1810,6 +1874,27 @@ local ZSH_GET_OPTION_TYPE = args.zsh_get_option_type
 local GET_OPTION_TYPE = ZSH_GET_OPTION_TYPE or args.get_option_type
 local COMPLETING = LIST_TASKS or LIST_OPTIONS or GET_OPTION_TYPE
 local HELP = args.help
+local INCLUDE_DEBUG = args.include_debug
+local getExecutablePath
+getExecutablePath = require("alfons.spawn").getExecutablePath
+local smallest_index = 0
+for i = -1, -math.huge, -1 do
+  if not arg[i] then
+    smallest_index = i + 1
+    break
+  end
+end
+local INTERPRETER = getExecutablePath(arg[smallest_index])
+local INTERPRETER_COMMAND = INTERPRETER .. " " .. table.concat((function()
+  local _accum_0 = { }
+  local _len_0 = 1
+  for i = smallest_index + 1, -1, 1 do
+    _accum_0[_len_0] = arg[i]
+    _len_0 = _len_0 + 1
+  end
+  return _accum_0
+end)(), ' ')
+local EXECUTABLE = arg[0]
 if not (COMPLETING) then
   prints("%{bold blue}Alfons " .. tostring(VERSION))
 end
@@ -1873,7 +1958,7 @@ if not (content) then
 end
 local runString
 runString = require("alfons.init").runString
-local alfons, alfonsErr = runString(content, nil, true, 0, { }, { }, true)
+local alfons, alfonsErr = runString(content, nil, true, 0, { }, { }, true, INCLUDE_DEBUG)
 if not (alfons) then
   errors(1, alfonsErr)
 end
@@ -2113,6 +2198,7 @@ if HELP then
       padding = 2
     }, {
       (Option('--help [task]', 'Displays this help message, or for a specific task')),
+      (Option('--include-debug=[boolean]', 'Include the `debug` table in the environment of the taskfiles')),
       (Option('--file -f <file>', 'Loads a custom Taskfile')),
       (Option('--list', 'Lists all the tasks available for the loaded Taskfile')),
       (Option('--list-options <task>', 'Lists all the options available to a task'))

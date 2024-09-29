@@ -16,4 +16,15 @@ export getExecutablePath = (executable) ->
       res = lines cmdread "whereis #{executable}"
       return res[1]\match ".+: ([^ ]+)"
 
-spawnSelf = (interpreter, executable) ->
+-- wraps a command so that it detaches from this process
+detach = (command) -> "nohup #{command} & disown"
+
+-- spawns a copy of alfons running as a child
+spawnSelf = (props) ->
+  {
+    :interpreter -- lua/moon
+    :executable  -- alfons
+    :child       -- child #
+    :callstack   -- csv callstack
+  } = props
+  os.execute detach "#{interpreter} #{executable} --child="

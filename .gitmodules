@@ -1,0 +1,3 @@
+[submodule "subprocess"]
+	path = subprocess
+	url = git@github.com:sheredom/subprocess.h.git

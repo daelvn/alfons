@@ -41,7 +41,7 @@ HELP = args.help
 -- With debug in environment
 INCLUDE_DEBUG = args.include_debug
 
-import getExecutablePath from require "alfons.spawn"
+import getExecutablePath from require "alfons.spawn_lua"
 -- Find self executable
 smallest_index = 0
 for i = -1, -math.huge, -1
@@ -51,7 +51,6 @@ for i = -1, -math.huge, -1
 INTERPRETER = getExecutablePath arg[smallest_index]
 INTERPRETER_COMMAND = INTERPRETER .. " " .. table.concat [arg[i] for i = smallest_index + 1, -1, 1], ' '
 EXECUTABLE = arg[0]
-print INTERPRETER_COMMAND
 
 -- introduction
 unless COMPLETING
@@ -220,6 +219,7 @@ if HELP
     (Paragraph 'Built-in options:')
     (Columns {padding: 2}, {
       (Option '--help [task]', 'Displays this help message, or for a specific task')
+      (Option '--include-debug=[boolean]', 'Include the `debug` table in the environment of the taskfiles')
       (Option '--file -f <file>', 'Loads a custom Taskfile')
       (Option '--list', 'Lists all the tasks available for the loaded Taskfile')
       (Option '--list-options <task>', 'Lists all the options available to a task')
