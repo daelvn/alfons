@@ -197,4 +197,15 @@ runString = (content, environment=ENVIRONMENT, runAlways=true, child=0, genv={},
     -- return
     return env
 
-{ :runString, :initEnv }
+-- runString with table arguments
+runStringT = =>
+  runString @content,
+    @environment,
+    @runAlways,
+    @child,
+    @genv or @global_environment,
+    @rqueue or @finalize_queue,
+    @pretty,
+    @debug_mode
+
+{ :runString, :runStringT, :initEnv }
