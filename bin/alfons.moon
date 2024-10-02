@@ -7,6 +7,10 @@ Path                = require "path"
 unpack            or= table.unpack
 printerr            = (t) -> io.stderr\write t .. "\n"
 
+-- if running in debug mode, precompile yuescript
+if os.getenv 'ALFONS_DEBUG'
+  os.execute 'yue alfons'
+
 -- utils
 prints     = (...)       -> printerr unpack [style arg for arg in *{...}]
 printError = (text)      -> printerr style "%{red}#{text}"
@@ -77,9 +81,35 @@ content, contentErr = switch LANGUAGE
   else errors 1, "Cannot resolve format '#{LANGUAGE}' for Taskfile."
 unless content then errors 1, contentErr
 
+-- Retrieve information about interpreter and executable path
+import where from require "alfons.process"
+smallest_index = 0
+for i = -1, -math.huge, -1
+  if not arg[i]
+    smallest_index = i + 1
+    break
+INTERPRETER = where arg[smallest_index]
+INTERPRETER_COMMAND = INTERPRETER .. " " .. table.concat [arg[i] for i = smallest_index + 1, -1, 1], ' '
+EXECUTABLE = arg[0]
+
 -- Run the taskfile
-import runString from require "alfons.init"
-alfons, alfonsErr = runString content, nil, true, 0, {}, {}, true, INCLUDE_DEBUG
+import runStringT from require "alfons.init"
+import ENVIRONMENT, mergeEnvironments from require "alfons.env"
+-- alfons, alfonsErr = runString content, nil, true, 0, {}, {}, true, INCLUDE_DEBUG
+alfons, alfonsErr = runStringT {
+  :content,
+  environment: mergeEnvironments ENVIRONMENT, {
+    ALFONS_INTERPRETER: INTERPRETER_COMMAND,
+    ALFONS_EXECUTABLE: EXECUTABLE,
+    ALFONS_FILE: FILE,
+  },
+  runAlways: true,
+  child: 0,
+  global_environment: {},
+  finalize_queue: {},
+  pretty: true,
+  debug_mode: INCLUDE_DEBUG
+}
 unless alfons then errors 1, alfonsErr
 env = alfons ...
 

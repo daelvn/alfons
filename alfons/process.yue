@@ -1,0 +1,19 @@
+-- alfons.process
+-- Process managing for alfons
+import 'luv' as uv
+import lines, cmdread from 'alfons.provide'
+
+export getPlatform = -> switch uv.os_uname!.sysname
+  when 'Linux' then 'Linux'
+  when 'Windows' then 'Windows'
+  else 'Unknown'
+
+export where = (executable) ->
+  switch getPlatform!
+    when 'Windows'
+      return cmdread "where.exe #{executable}"
+    when 'Linux'
+      res = lines cmdread "whereis #{executable}"
+      return res[1]::match ".+: ([^ ]+)"
+    else
+      return executable
