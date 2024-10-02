@@ -34,4 +34,11 @@ tasks:
     tasks.clean!
   --- @task test Run an Alfons test
   --- @option test [n] <name> Name of the test to run
-  test: => sh "moon test/#{@n or ''}.moon"
+  test: =>
+    path = "test/#{@n or ''}"
+    if fs.exists "#{path}.yue"
+      sh "yue alfons"
+      sh "yue -e #{path}.yue"
+      tasks.clean!
+    else
+      sh "moon test/#{@n or ''}.moon"
