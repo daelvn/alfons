@@ -1,7 +1,9 @@
 -- alfons.process
 -- Process managing for alfons
 import 'luv' as uv
-import lines, cmdread from 'alfons.provide'
+import lines, cmdread, prints from 'alfons.provide'
+
+const Pipe = uv.new_pipe
 
 export getPlatform = -> switch uv.os_uname!.sysname
   when 'Linux' then 'Linux'
@@ -17,3 +19,58 @@ export where = (executable) ->
       return res[1]::match ".+: ([^ ]+)"
     else
       return executable
+
+export spawn = (args) ->
+  -- unwrap args
+  {
+    :interpreter,
+    :executable,
+    :file,
+  } = args
+
+  -- create in/out/err pipes
+  pipes =
+    stdin: Pipe!
+    stdout: Pipe!
+    stderr: Pipe!
+
+  -- create process
+  local handle
+  handle, pid = uv.spawn 'cat', {
+    -- args: [ executable, '-f', file ],
+    args: { '-' },
+    stdio: [ pipes.stdin, pipes.stdout, pipes.stderr ],
+    -- hide: true
+  }, (code, signal) ->
+    prints "%{yellow}Process exited (#{signal}:#{code})"
+    uv.close
+
+  -- make sure the process actually opened
+  unless handle
+    prints "%{red}Could not spawn process: #{interpreter}"
+    prints "%{red}  #{pid}"
+    return uv.close handle
+
+  -- read pipes
+  uv.read_start pipes.stdout, (err, data) ->
+    if err
+      prints "%{red}Error! #{err}"
+    elseif data
+      prints "%{green}#{data}"
+    else
+      prints "%{yellow}stdout end"
+  uv.read_start pipes.stderr, (err, data) ->
+    if err
+      prints "%{red}Error! #{err}"
+    elseif data
+      prints "%{cyan}#{data}"
+    else
+      prints "%{yellow}stderr end"
+
+  -- write
+  uv.write pipes.stdin, "Hello!"
+
+  -- shutdown
+  uv.shutdown pipes.stdin, ->
+    prints "%{yellow}stdin shutdown"
+    -- uv.close pipes.stdin

@@ -4,3 +4,9 @@ tasks:
     show ALFONS_INTERPRETER
     show ALFONS_EXECUTABLE
     sh "#{ALFONS_INTERPRETER} #{ALFONS_EXECUTABLE} -f #{ALFONS_FILE} hello"
+  spawn: =>
+    process.spawn {
+      interpreter: ALFONS_INTERPRETER,
+      executable: ALFONS_EXECUTABLE,
+      file: ALFONS_FILE,
+    }
