@@ -1,15 +1,16 @@
--- alfons.wildcard
+---# alfons.wildcard #---
 -- Reimplements the old filekit wildcard behavior
 Path = require "path"
 fs   = require "path.fs"
 
--- listAll (dir:string) -> [string]
--- Filekit's listAll
+--# API #--
+
+--- @function listAll :: dir:string -> [string]
+--- Filekit's listAll
 listAll = (dir) -> [node for node in fs.scandir dir]
 
--- Turns a glob into a Lua pattern
--- @tparam string glob Path with globs
--- @treturn string Lua pattern
+--- @function fromGlob :: glob:string -> pattern:string
+--- Turns a glob into a Lua pattern
 fromGlob = (glob) ->
   sanitize = (pattern) -> pattern\gsub "[%(%)%.%%%+%-%*%?%[%]%^%$]", "%%%0" if pattern
   saglob   = sanitize glob
@@ -20,17 +21,20 @@ fromGlob = (glob) ->
     --print "==> #{mid}"
     return "#{mid}$"
 
--- TODO alias this to testGlob
--- TODO compile the glob here, dont make the user do it
+--///--
+-- TODO: alias this to testGlob
+-- TODO: compile the glob here, dont make the user do it
+-- FIXME: can't get admonitions to work
+--///--
+--- @function matchGlob :: pattern:string, path:string -> boolean
 --- Matches a compiled glob with a string
--- @tparam string glob Compiled glob
--- @tparam string path Path to compare to
--- @treturn boolean Whether it matches or not
+-- !!! note
+--     This function is defined as `nil != path\match pattern`. In the future, this will be
+--     aliased to `testGlob` and the glob will be compiled in-place with @@@fromGlob@@@.
 matchGlob = (glob, path) -> nil != path\match glob
 
+--- @function glob :: glob:string -> paths:[string]
 --- Returns a list of paths matched by the globs
--- @tparam string path Path with globs
--- @treturn table Table of globbed files
 glob = (path, all={}) ->
   -- Return if there is nothing to glob
   return path unless path\match "%*"
@@ -53,9 +57,8 @@ glob = (path, all={}) ->
   -- Return
   return all
 
---- Glob as an iterator
--- @tparam string path Path with globs
--- @treturn function Iterator
+--- @function iglob :: glob:string -> -> path:string
+--- @@@glob@@@ as an iterator
 iglob = (path) ->
   globbed = glob path
   i       = 0

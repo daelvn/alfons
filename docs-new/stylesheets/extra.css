@@ -1,0 +1,57 @@
+:root {
+  --md-primary-fg-color:        #faac18;
+  --md-primary-fg-color--light: #fad58e;
+  --md-primary-fg-color--dark:  #c78200;
+}
+
+.fancy-scrollbar {
+  --sb-track-color: var(--md-primary-fg-color--light);
+  --sb-thumb-color: var(--md-primary-fg-color--dark);
+  --sb-size: 3px;
+}
+
+.fancy-scrollbar::-webkit-scrollbar {
+  width: 3px;
+  scrollbar-width: thin;
+}
+
+.fancy-scrollbar::-webkit-scrollbar-track {
+  background: var(--sb-track-color);
+  border-radius: 8px;
+}
+
+.fancy-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--sb-thumb-color);
+  border-radius: 8px;
+  
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  .fancy-scrollbar {
+    scrollbar-color: var(--sb-thumb-color)
+                     var(--sb-track-color);
+  }
+}
+
+.md-typeset .fir-symbol {
+  display: flex;
+  align-items: center;
+  font-size: 0.8em;
+  font-family: monospace, monospace;
+  overflow-x: auto;
+  white-space: nowrap;
+  & h3 {
+    display: flex;
+    align-items: center;
+    margin: 0;
+  }
+  & span {
+    margin: 0;
+    margin-top: 0.4em;
+    line-height: 1.4;
+  }
+}
+
+.md-grid {
+  max-width: 71rem;
+}

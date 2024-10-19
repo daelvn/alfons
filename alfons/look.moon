@@ -1,4 +1,4 @@
--- alfons.look
+---# alfons.look #--
 -- Gets the path for a module, specifically tailored for Alfons
 import readMoon, readLua from require "alfons.file"
 Path                        = require "path"
@@ -9,6 +9,13 @@ dirsep, pathsep, wildcard = package.config\match "^(.)\n(.)\n(.)"
 modsep                    = "%."
 swildcard                 = sanitize wildcard
 
+--# API #--
+
+--///--
+-- FIXME: why is it generating double lines
+--///--
+--- @function makeLook :: gpath:string -> module:string -> content:string|nil, err:string|nil
+--- Generate a function that looks for a module in a package path
 makeLook = (gpath=package.path) ->
   -- generate lists of paths
   paths     = [path                        for path in gpath\gmatch "[^#{pathsep}]+"]
@@ -34,4 +41,6 @@ makeLook = (gpath=package.path) ->
     else
       return nil, "#{name} not found."
 
+--- @function look :: module:string -> content:string|nil, err:string|nil
+--- @@@makeLook@@@ with `package.path` applied by default.
 { :makeLook, look: makeLook! }
